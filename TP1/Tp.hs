@@ -22,7 +22,7 @@ mean xs = realToFrac (sum xs) / genericLength xs
 split :: Eq a => a -> [a] -> [[a]]
 -- split = undefined
 split d [] = []
-split d xs = takeWhile (\= d) xs : (split tail(dropWhile (\= d) xs))
+split d xs = takeWhile (\= d) xs : (split d tail(dropWhile (\= d) xs))
 
 longitudPromedioPalabras :: Extractor
 longitudPromedioPalabras = undefined
