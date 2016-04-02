@@ -20,9 +20,16 @@ mean :: [Float] -> Float
 mean xs = realToFrac (sum xs) / genericLength xs
 
 split :: Eq a => a -> [a] -> [[a]]
--- split = undefined
-split d [] = []
-split d xs = takeWhile (\= d) xs : (split d tail(dropWhile (\= d) xs))
+--split d [] = []
+--split d xs = takeWhile (\= d) xs : (split d tail(dropWhile (\= d) xs))
+
+--split d [] = [[]]
+--split d (x:xs) = if d == x then []:split(xs)
+--       				   	else (x:head(split(xs))):tail(split(xs))
+
+split d = foldr (\x (xs:xss) -> if x == d then []:xs:xss else (x:xs):xss) [[]]
+-- si me encuentro con un delimitador, es una palabra aparte.  Si no, la letra es parte de la misma palabra.
+
 
 longitudPromedioPalabras :: Extractor
 longitudPromedioPalabras = undefined
