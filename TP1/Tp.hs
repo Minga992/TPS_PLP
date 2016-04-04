@@ -111,10 +111,14 @@ distEuclideana xs ys = sqrt sum zipWith (*) (zipWith (-) xs ys) zipWith (-) xs y
 -- los zipWith (-) hacen p-q, el zipwith * hace la multiplicacion de ellos, obteniendo el cuadrado, sum adivinen, y sqrt les
 -- hace la raiz cuadrado 
 
-prodVect :: Eq a => [a] -> [a] -> a
+prodEsc :: Eq a => [a] -> [a] -> a
+prodEsc xs ys = sum zipWith (*) xs ys
 
 distCoseno :: Medida
-distCoseno xs ys = zipWith (*) xs ys
+distCoseno xs ys = prodEsc xs ys / ((sqrt prodEsc xs xs) * sqrt prodEsc ys ys)
+-- el ProdEsc hace el producto escalar de dos vectores, el puntito a medialtura para los amigos, luego de eso, la respuesta es
+-- basicamente return lo que pide el enunciado en idioma imperativo... hay unos parentesis que podrian estar de mas, los puse 
+-- solo por las dudas.
 
 knn :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
 knn = undefined
