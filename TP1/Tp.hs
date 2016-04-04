@@ -40,6 +40,18 @@ longitudPromedioPalabras xs = mean map genericLength split " " xs
 -- le aplico map con genericLength, que dada una lista te devuelve su longitud en algun formato(supongo que es adaptable o algo asi,
 -- o sino no entendi) y a eso le aplico mean que es una suerte de promedio.
 
+--Auxiliar
+cantAp :: Eq a => a -> [a] -> Int
+
+cantAp d = foldr (\x acum -> (if x==d then 1 else 0) + acum ) 0
+-- Ve la cantidad de apariciones de un elemento en una lista
+
+--Auxiliar
+noRep :: Eq a => [a] -> [a]
+
+noRep = foldr (\x xs -> if elem x xs then xs else x:xs) []
+--Devuelve una lista sin elementos repetidos.
+
 
 cuentas :: Eq a => [a] -> [(Int, a)]
 
@@ -48,16 +60,25 @@ cuentas :: Eq a => [a] -> [(Int, a)]
 --cuentas (x:xs) = (genericLength filter (= x) x:xs) : cuentas filter (\= x) x:xs
 
 --se podria haber hecho con head, pero me parecio mas claro asi
-cuentas = undefined
+
+--Version final:
+
+cuentas xs = noRep [(cantAp a xs ) | a <- xs]
 
 repeticionesPromedio :: Extractor
-repeticionesPromedio xs = mean map (\xt -> fromIntegral snd xt) cuentas xs
+
+repeticionesPromedio xs = mean map (\xt -> fromIntegral snd xt) cuentas split " " xs
+-- sencillo, hago split para separar en palabras,  hago cuentas para saber cuanto se repite cada palabra, aplico map y convierto
+-- lo que me dio cuentas en solo numeros con formato Num hasta donde entendi, y de ahi pinto mean.
 
 tokens :: [Char]
 tokens = "_,)(*;-=>/.{}\"&:+#[]<|%!\'@?~^$` abcdefghijklmnopqrstuvwxyz0123456789"
 
 frecuenciaTokens :: [Extractor]
-frecuenciaTokens = undefined
+frecuenciaTokens = [ \xs -> realToFrac cantAp a xs / genericLength xs | a <-tokens]
+-- ACLARACION, use real to frac porque lo usaron ellos, se que tengo que aplicar algo, porque cantAp es int, pero no estoy seguro que
+-- me armo una lista por comprension que tenga funciones que dado un xs toman su correspondiente token, y ven la frecuencia relativa.
+-- si, no hay mucho que explicar aca(ALE)
 
 normalizarExtractor :: [Texto] -> Extractor -> Extractor
 normalizarExtractor = undefined
