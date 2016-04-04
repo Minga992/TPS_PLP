@@ -85,14 +85,15 @@ normalizar :: Eq a =>  a -> Extractor -> Extractor
 normalizar maxabs f = \xs -> f xs /abs maxabs
 --dada una funcion, y un numero que va a ser el representante del 1.0 o del -1,0, normaliza al extractor
 
---Auxiliar
-esElmaxAbs :: Eq a => a -> a -> a
-esElmaxAbs maxx minn = if abs maxx - abs minn >= 0 then maxx else minn
---dados dos numeros devuelve aquel que sea mayor en valor absoluto
-
 normalizarExtractor :: [Texto] -> Extractor -> Extractor
 normalizarExtractor [] f = f 																--devuelvo algo, no se que hacer aca
-normalizarExtractor xs f = normalizar (esElmaxAbs (maximum map f xs) minimum map f xs) f
+normalizarExtractor xs f = normalizar (max (abs maximum map f xs) abs minimum map f xs) f
+
+--Otra version, mas compacta
+
+--normalizarExtractor [] f = f
+--normalizarExtractor xs f = (\y -> y/n).f
+--							where n = max (abs maximum map f xs) abs minimum map f xs
 
 -- la idea aca fue, conseguir al mayor en valor absoluto, ese chabon va a representar el 1.0 o el -1.0, depende el signo, y su opueto
 -- va a representar al otro.Una vez que tengo eso, para normalizar simplemente hago que el extractor divida su resultado por este numero
@@ -106,7 +107,7 @@ extraerFeatures es ts = [map (normalizarExtractor ts e) ts | e <- es]
 
 
 distEuclideana :: Medida
-distEuclideana = undefined
+distEuclideana xs ys = sqrt sum zipWith (^) (zipWith (-) xs ys) zipWith (-) xs ys 
 
 distCoseno :: Medida
 distCoseno = undefined
