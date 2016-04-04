@@ -63,7 +63,7 @@ cuentas :: Eq a => [a] -> [(Int, a)]
 
 --Version final:
 
-cuentas xs = noRep [(cantAp a xs ) | a <- xs]
+cuentas xs = [((cantAp a xs ), a) | a <- noRep xs]
 
 repeticionesPromedio :: Extractor
 
@@ -107,10 +107,14 @@ extraerFeatures es ts = [map (normalizarExtractor ts e) ts | e <- es]
 
 
 distEuclideana :: Medida
-distEuclideana xs ys = sqrt sum zipWith (^) (zipWith (-) xs ys) zipWith (-) xs ys 
+distEuclideana xs ys = sqrt sum zipWith (*) (zipWith (-) xs ys) zipWith (-) xs ys 
+-- los zipWith (-) hacen p-q, el zipwith * hace la multiplicacion de ellos, obteniendo el cuadrado, sum adivinen, y sqrt les
+-- hace la raiz cuadrado 
+
+prodVect :: Eq a => [a] -> [a] -> a
 
 distCoseno :: Medida
-distCoseno = undefined
+distCoseno xs ys = zipWith (*) xs ys
 
 knn :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
 knn = undefined
