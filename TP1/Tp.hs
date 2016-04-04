@@ -80,11 +80,30 @@ frecuenciaTokens = [ \xs -> realToFrac cantAp a xs / genericLength xs | a <-toke
 -- me armo una lista por comprension que tenga funciones que dado un xs toman su correspondiente token, y ven la frecuencia relativa.
 -- si, no hay mucho que explicar aca(ALE)
 
+--Auxiliar
+normalizar :: Eq a =>  a -> Extractor -> Extractor
+normalizar maxabs f = \xs -> f xs /abs maxabs
+--dada una funcion, y un numero que va a ser el representante del 1.0 o del -1,0, normaliza al extractor
+
+--Auxiliar
+esElmaxAbs :: Eq a => a -> a -> a
+esElmaxAbs maxx minn = if abs maxx - abs minn >= 0 then maxx else minn
+--dados dos numeros devuelve aquel que sea mayor en valor absoluto
+
 normalizarExtractor :: [Texto] -> Extractor -> Extractor
-normalizarExtractor = undefined
+normalizarExtractor [] f = f 																--devuelvo algo, no se que hacer aca
+normalizarExtractor xs f = normalizar (esElmaxAbs (maximum map f xs) minimum map f xs) f
+
+-- la idea aca fue, conseguir al mayor en valor absoluto, ese chabon va a representar el 1.0 o el -1.0, depende el signo, y su opueto
+-- va a representar al otro.Una vez que tengo eso, para normalizar simplemente hago que el extractor divida su resultado por este numero
+-- obteniendo asi la proporcion deseada (explicacion tipo Utilisima (atentos a la mayuscula,no es por ser nombre propio)), el signo
+-- va a estar dado por el signo original de lo que devolvia el extractor. 
+
 
 extraerFeatures :: [Extractor] -> [Texto] -> Datos
-extraerFeatures = undefined
+extraerFeatures es ts = [map (normalizarExtractor ts e) ts | e <- es]
+--todavia no se que hace, insertar comentario (ALE)
+
 
 distEuclideana :: Medida
 distEuclideana = undefined
