@@ -82,7 +82,7 @@ frecuenciaTokens = [ \xs -> realToFrac cantAp a xs / genericLength xs | a <-toke
 
 --Auxiliar
 normalizar :: Eq a =>  a -> Extractor -> Extractor
-normalizar maxabs f = \xs -> f xs /abs maxabs
+normalizar maxabs f = \xs -> f xs / maxabs
 --dada una funcion, y un numero que va a ser el representante del 1.0 o del -1,0, normaliza al extractor
 
 normalizarExtractor :: [Texto] -> Extractor -> Extractor
