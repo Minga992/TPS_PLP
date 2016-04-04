@@ -51,7 +51,7 @@ cuentas :: Eq a => [a] -> [(Int, a)]
 cuentas = undefined
 
 repeticionesPromedio :: Extractor
-repeticionesPromedio = undefined
+repeticionesPromedio xs = mean map (\xt -> fromIntegral snd xt) cuentas xs
 
 tokens :: [Char]
 tokens = "_,)(*;-=>/.{}\"&:+#[]<|%!\'@?~^$` abcdefghijklmnopqrstuvwxyz0123456789"
