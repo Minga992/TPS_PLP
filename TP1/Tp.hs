@@ -100,11 +100,24 @@ normalizarExtractor xs f = normalizar (max (abs maximum map f xs) abs minimum ma
 -- obteniendo asi la proporcion deseada (explicacion tipo Utilisima (atentos a la mayuscula,no es por ser nombre propio)), el signo
 -- va a estar dado por el signo original de lo que devolvia el extractor. 
 
+--Auxiliar
+extractoresNormalizados :: [Texto] -> [Extractor] -> [Extractor]
+extractoresNormalizados ts exs = [normalizarExtractor ts ex | ex <- exs]
+
+-- Dada una lista de extractores, y un texto de comparacion, normaliza los extractores de acuerdo a los textos.
+
+--Auxiliar
+featuresDelText :: Texto -> [Extractor] -> Instancia
+featuresDelText t = foldr (\f fs -> f t : fs) []
+
+-- Dado un texto y una lista de extractores, saca los features de aplicarle al texto todos los extractores.
 
 extraerFeatures :: [Extractor] -> [Texto] -> Datos
-extraerFeatures es ts = [map (normalizarExtractor ts e) ts | e <- es]
---todavia no se que hace, insertar comentario (ALE)
+extraerFeatures exs ts = [featuresDelText t ns | t <- ts]
+						 where ns = extractoresNormalizados ts exs
 
+-- La idea es que dado un grupo de extractores y un grupo de textos primero normalizo todos los extractores, y luego le aplico a cada 
+-- texto todos los extractores normalizados por medio de la funncion featuresDelText
 
 distEuclideana :: Medida
 distEuclideana xs ys = sqrt sum zipWith (*) (zipWith (-) xs ys) zipWith (-) xs ys 
