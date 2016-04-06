@@ -21,7 +21,7 @@ mean xs = realToFrac (sum xs) / genericLength xs
 
 --Auxiliar
 quitarListVacias :: Eq a => [[a]] -> [[a]]
-quitarListVacias xs = foldr (\x xs -> if x==[] then xs else x:xs) []
+quitarListVacias xs = foldr (\x xs -> if null x then xs else x:xs) []
 --dada una lista de listas, remueve todas aquellas listas que sean vacias.
 
 
