@@ -19,6 +19,12 @@ tryClassifier x y = let xs = extraerFeatures ([longitudPromedioPalabras, repetic
 mean :: [Float] -> Float
 mean xs = realToFrac (sum xs) / genericLength xs
 
+--Auxiliar
+quitarListVacias :: Eq a => [[a]] -> [[a]]
+quitarListVacias xs = foldr (\x xs -> if x==[] then xs else x:xs) []
+--dada una lista de listas, remueve todas aquellas listas que sean vacias.
+
+
 split :: Eq a => a -> [a] -> [[a]]
 
 --Verision explicita:
@@ -30,7 +36,8 @@ split :: Eq a => a -> [a] -> [[a]]
 --       				   	else (x:head(split(xs))):tail(split(xs))
 
 --Version final
-split d = foldr (\x (xs:xss) -> if x == d then []:xs:xss else (x:xs):xss) [[]]
+
+split d = quitarListVacias (foldr (\x (xs:xss) -> if x == d then []:xs:xss else (x:xs):xss) [[]])
 -- si me encuentro con un delimitador, es una palabra aparte.  Si no, la letra es parte de la misma palabra.
 
 
