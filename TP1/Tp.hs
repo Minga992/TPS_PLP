@@ -164,7 +164,7 @@ knn k ds ls m = \xs -> devolverEtiqueta [snd p | p <- (kMin (take k ns) (drop k 
 
 
 accuracy :: [Etiqueta] -> [Etiqueta] -> Float
-accuracy xs ys= (sum(zipWith (\x y -> if x == y then 1 else 0) xs ys))/(genericLenght xs)
+accuracy xs ys = (fromIntegral (sum (zipWith (\x y -> if x == y then 1 else 0) xs ys))) / (genericLength xs)
 
 -- hay que ponerle algo a sum para que tipe con la division rara
 
