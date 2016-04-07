@@ -168,14 +168,25 @@ accuracy = undefined
 
 -- Auxiliar
 tomoParticionPe :: Int -> Int -> [a] -> [a]
+tomoParticionPe n p xs = take (lxs * p) (drop (lxs * p) xs)
+						where lxs = (genericLength xs)/n
+-- Dada una lista de elementos, y dos enteros, uno que indica la cantidad de particiones de la lista en partes iguales,
+-- y otro una particion en particular, devuelve los elementos que pertenecen a la particion particular
 
 -- Auxiliar
 noTomoParticionPe :: Int -> Int -> [a] -> [a]
+noTomoParticionPe n p xs = (take (lxs * p) xs) ++ (drop (lxs * p) xs)
+						  where lxs = (genericLength xs)/n
 
+-- Dada una lista de elementos, y dos enteros, uno que indica la cantidad de particiones de la lista en partes iguales,
+-- y otro una particion en particular, devuelve los elementos que no pertenecen a la particion particular
 
 separarDatos :: Datos -> [Etiqueta] -> Int -> Int -> (Datos, Datos, [Etiqueta], [Etiqueta])
-separarDatos xs ys n p= If ((genericLength xs) % n) == 0 then (tomoParticionPe n p xs) else (noTomoParticionPe n p (take (((genericLength xs)/n)*n) xs ))
-
+separarDatos xs ys n p = If ((genericLength xs) % n) == 0 
+						then ((tomoParticionPe n p xs),(noTomoParticionPe n p xs),(tomoParticionPe n p ys),(noTomoParticionPe n p ys)) 
+						else ((tomoParticionPe n p (take lxsn xs)), (noTomoParticionPe n p (take lxsn xs)),
+						 	  (tomoParticionPe n p (take lxsn ys)), (noTomoParticionPe n p (take lxsn ys)))
+						where lxsn = ((genericLength xs)/n)*n
 
 
 
