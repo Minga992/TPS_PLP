@@ -148,12 +148,20 @@ maxFstPar (x:xs) = foldr (\y mfp-> if null xs then y else cond) x xs
 
 -- Auxiliar
 kMin :: Num a => [(a,b)] -> [(a,b)] -> [(a,b)]
-kMin xs ys = foldr (\z zs -> if z < (maxFstPar zs) then ns else zs) xs ys
-				where ns = (takewhile (\= (maxFstPar zs)) zs) ++ [z] ++ (tail (dropwhile (\= (maxFstPar zs)) zs))
+kMin xs ys = foldr (\z zs -> if (fst z) < fst (maxFstPar zs) then ns else zs) xs ys
+				where ns = (takewhile ((\=) (maxFstPar zs)) zs) ++ [z] ++ (tail (dropwhile (\= (maxFstPar zs)) zs))
+-- Dada dos listas de pares, que pretenden ser un prefijo y su correspondiente sufijo que completan una lista original, devuelve los k
+-- elementos de la lista entera cuya primer componente es menor al resto. k esta determinado por el tamaño de la primer lista.
 
+devolverEtiqueta :: [Etiqueta] -> Etiqueta
+devolverEtiqueta xs = snd (maxFstPar (cuentas xs))
+-- Dada unalista ded etiquetas, devuelve aquella etiqueta que aparezca una mayor cantidad de veces.
 
 knn :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
-knn k ds ls m = \xs -> blabla (zip (map (m xs) ds) ls)
+knn k ds ls m = \xs -> devolverEtiqueta [ snd p |p <- (kMin (take k ns) (drop k ns))]
+						where ns = zip (map (m xs) ds) ls
+-- Que alguien explique estoXD
+
 
 accuracy :: [Etiqueta] -> [Etiqueta] -> Float
 accuracy = undefined
