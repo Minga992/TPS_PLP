@@ -149,7 +149,7 @@ maxFstPar (x:xs) = foldr (\y mfp-> if null xs then y else cond) x xs
 -- Auxiliar
 kMin :: Num a => [(a,b)] -> [(a,b)] -> [(a,b)]
 kMin xs ys = foldr (\z zs -> if (fst z) < fst (maxFstPar zs) then ns else zs) xs ys
-				where ns = (takewhile ((\=) (maxFstPar zs)) zs) ++ [z] ++ (tail (dropwhile (\= (maxFstPar zs)) zs))
+				where ns = (takeWhile ((\=) (maxFstPar zs)) zs) ++ [z] ++ (tail (dropWhile (\=) (maxFstPar zs)) zs)
 -- Dada dos listas de pares, que pretenden ser un prefijo y su correspondiente sufijo que completan una lista original, devuelve los k
 -- elementos de la lista entera cuya primer componente es menor al resto. k esta determinado por el tamaño de la primer lista.
 
@@ -158,7 +158,7 @@ devolverEtiqueta xs = snd (maxFstPar (cuentas xs))
 -- Dada unalista ded etiquetas, devuelve aquella etiqueta que aparezca una mayor cantidad de veces.
 
 knn :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
-knn k ds ls m = \xs -> devolverEtiqueta [ snd p |p <- (kMin (take k ns) (drop k ns))]
+knn k ds ls m = \xs -> devolverEtiqueta [snd p | p <- (kMin (take k ns) (drop k ns))]
 						where ns = zip (map (m xs) ds) ls
 -- Que alguien explique estoXD
 
@@ -167,28 +167,46 @@ accuracy :: [Etiqueta] -> [Etiqueta] -> Float
 accuracy = undefined
 
 -- Auxiliar
-tomoParticionPe :: Int -> Int -> [a] -> [a]
-tomoParticionPe n p xs = take (lxs * p) (drop (lxs * p) xs)
-						where lxs = (genericLength xs)/n
+-- tomoParticionPe :: Int -> Int -> [a] -> [a]
+-- tomoParticionPe n p xs = take (lxs * p) (drop (lxs * p) xs)
+						-- where lxs = (genericLength xs)/n
 -- Dada una lista de elementos, y dos enteros, uno que indica la cantidad de particiones de la lista en partes iguales,
 -- y otro una particion en particular, devuelve los elementos que pertenecen a la particion particular
 
 -- Auxiliar
-noTomoParticionPe :: Int -> Int -> [a] -> [a]
-noTomoParticionPe n p xs = (take (lxs * p) xs) ++ (drop (lxs * p) xs)
-						  where lxs = (genericLength xs)/n
+-- noTomoParticionPe :: Int -> Int -> [a] -> [a]
+-- noTomoParticionPe n p xs = (take (lxs * p) xs) ++ (drop (lxs * p) xs)
+						  -- where lxs = (genericLength xs)/n
 
 -- Dada una lista de elementos, y dos enteros, uno que indica la cantidad de particiones de la lista en partes iguales,
 -- y otro una particion en particular, devuelve los elementos que no pertenecen a la particion particular
+						  
+-- Auxiliar -- sublista i f xs devuelve la sublista de xs entre los indices i y f inclusive
+sublista :: Int -> Int -> [a] -> [a]
+sublista i f = if i <= f then (take (f-i+1)).(drop i) else []
+
+-- Auxiliar -- renombre de sublista para que se entienda mejor desp -- ver si poner como where
+pTest :: Int -> Int -> [a] -> [a]
+pTest = sublista
+
+-- Auxiliar -- i y f son los indices del cacho para test, esto devuelve todo lo demas
+pTrain :: Int -> Int -> [a] -> [a]
+pTrain i f xs = (sublista 0 (i-1) xs) ++ (sublista (f+1) ((length xs)-1))
+
+-- Auxiliar -- se encarga de dejarme la lista linda segun la cantidad de particiones que me piden
+sacarSobr :: [a] -> Int -> [a]
+sacarSobr xs n = take (((length xs)/n)*n) xs
 
 separarDatos :: Datos -> [Etiqueta] -> Int -> Int -> (Datos, Datos, [Etiqueta], [Etiqueta])
-separarDatos xs ys n p = If ((genericLength xs) % n) == 0 
-						then ((tomoParticionPe n p xs),(noTomoParticionPe n p xs),(tomoParticionPe n p ys),(noTomoParticionPe n p ys)) 
-						else ((tomoParticionPe n p (take lxsn xs)), (noTomoParticionPe n p (take lxsn xs)),
-						 	  (tomoParticionPe n p (take lxsn ys)), (noTomoParticionPe n p (take lxsn ys)))
-						where lxsn = ((genericLength xs)/n)*n
-
-
+separarDatos xs ys n p = (pTrain i f (sacarSobr xs n), pTest i f (sacarSobr xs n), pTrain i f (sacarSobr ys n), pTest i f (sacarSobr ys n))
+						where i = ((length xs)/n)*(p-1)
+							  f = (((length xs)/n)*p)-1
+						
+						-- if ((length xs) % n) == 0 
+						-- then ((noTomoParticionPe n p xs),(tomoParticionPe n p xs),(noTomoParticionPe n p ys),(tomoParticionPe n p ys)) 
+						-- else ((noTomoParticionPe n p (take lxsn xs)), (tomoParticionPe n p (take lxsn xs)),
+						 	--  (noTomoParticionPe n p (take lxsn ys)), (tomoParticionPe n p (take lxsn ys)))
+						-- where lxsn = ((genericLength xs)/n)*n
 
 nFoldCrossValidation :: Int -> Datos -> [Etiqueta] -> Float
 nFoldCrossValidation = undefined
