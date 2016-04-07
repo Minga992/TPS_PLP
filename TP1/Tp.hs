@@ -20,8 +20,8 @@ mean :: [Float] -> Float
 mean xs = realToFrac (sum xs) / genericLength xs
 
 --Auxiliar
-quitarListVacias :: Eq a => [[a]] -> [[a]]
-quitarListVacias xs = foldr (\x xs -> if null x then xs else x:xs) []
+quitarListVacias :: [[a]] -> [[a]]
+quitarListVacias = foldr (\x xs -> if null x then xs else (x:xs)) []
 --dada una lista de listas, remueve todas aquellas listas que sean vacias.
 
 
@@ -37,8 +37,10 @@ split :: Eq a => a -> [a] -> [[a]]
 
 --Version final
 
-split d = quitarListVacias (foldr (\x (xs:xss) -> if x == d then []:xs:xss else (x:xs):xss) [[]])
+split d ys = quitarListVacias (foldr (\x (xs:xss) -> if x == d then []:xs:xss else (x:xs):xss) [[]] ys)
 -- si me encuentro con un delimitador, es una palabra aparte.  Si no, la letra es parte de la misma palabra.
+-- quitarListVacias es un parche autorizado por pablo =P
+-- explicitamos ys porque si no no tipa
 
 
 longitudPromedioPalabras :: Extractor
