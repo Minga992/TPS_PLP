@@ -140,8 +140,20 @@ distCoseno xs ys = prodEsc xs ys / ((sqrt (prodEsc xs xs)) * (sqrt (prodEsc ys y
 -- basicamente return lo que pide el enunciado en idioma imperativo... hay unos parentesis que podrian estar de mas, los puse 
 -- solo por las dudas.
 
+-- Auxiliar
+maxFstPar :: Num a => [(a,b)] -> (a,b)
+maxFstPar (x:xs) = foldr (\y mfp-> if null xs then y else cond) x xs
+						where cond = if (fst y) > (fst mfp) then y else mfp
+-- Dada una lista de pares, devuelve el par con mayor valor en la primer componente
+
+-- Auxiliar
+kMin :: Num a => [(a,b)] -> [(a,b)] -> [(a,b)]
+kMin xs ys = foldr (\z zs -> if z < (maxFstPar zs) then ns else zs) xs ys
+				where ns = (takewhile (\= (maxFstPar zs)) zs) ++ [z] ++ (tail (dropwhile (\= (maxFstPar zs)) zs))
+
+
 knn :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
-knn = undefined
+knn k ds ls m = \xs -> blabla (zip (map (m xs) ds) ls)
 
 accuracy :: [Etiqueta] -> [Etiqueta] -> Float
 accuracy = undefined
