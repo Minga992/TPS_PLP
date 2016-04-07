@@ -166,8 +166,18 @@ knn k ds ls m = \xs -> devolverEtiqueta [ snd p |p <- (kMin (take k ns) (drop k 
 accuracy :: [Etiqueta] -> [Etiqueta] -> Float
 accuracy = undefined
 
+-- Auxiliar
+tomoParticionPe :: Int -> Int -> [a] -> [a]
+
+-- Auxiliar
+noTomoParticionPe :: Int -> Int -> [a] -> [a]
+
+
 separarDatos :: Datos -> [Etiqueta] -> Int -> Int -> (Datos, Datos, [Etiqueta], [Etiqueta])
-separarDatos = undefined
+separarDatos xs ys n p= If ((genericLength xs) % n) == 0 then (tomoParticionPe n p xs) else (noTomoParticionPe n p (take (((genericLength xs)/n)*n) xs ))
+
+
+
 
 nFoldCrossValidation :: Int -> Datos -> [Etiqueta] -> Float
 nFoldCrossValidation = undefined
