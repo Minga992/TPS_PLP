@@ -181,5 +181,22 @@ separarDatos xs ys n p = let
 						 	--  (noTomoParticionPe n p (take lxsn ys)), (tomoParticionPe n p (take lxsn ys)))
 						-- where lxsn = ((genericLength xs)/n)*n
 
+-- Auxiliar
+obtenerEtiquetas :: [(Datos, Datos, [Etiqueta], [Etiqueta])] -> [Etiqueta]
+obtenerEtiquetas ds = foldr (\x xs -> (map (knn 15 (xTrain x) (yTrain x) distEuclideana) (xVal x)) ++ xs ) [] ds
+
+ -- Dada una lista con ese tipo raro que lo llamare experimento, devuelvo las etiquetas que devuelve nuestro modelo aplicado a cada
+ -- experimento. Ver que uso ++ y map, porque a mi modelo entrenado le paso muchas instancias, no una sola.
+
+
 nFoldCrossValidation :: Int -> Datos -> [Etiqueta] -> Float
-nFoldCrossValidation = undefined
+nFoldCrossValidation n ds es = mean (zipWith (accuracy) (obtenerEtiquetas ns) (etireales)
+								where ns = [separarDatos ds es n i |i <- [1.. n]]
+								etireales = concat (map yVal ns)
+
+-- la idea aca es primero obtener una lista con los datos ordenados segun los de entrenamiento y los de prueba para cada particion,
+-- eso sucede en ns. Luego, con obtener etiquetas entrene mis modelos y veo que etiqueta me tiran a cada prueba, luego mido el
+-- porcentaje de aciertos respecto a las verdaderas etiquetas, y al final calculo el promedio.
+
+-- FUNCIONES A COMPLETAR:
+-- xTrain, yTrain, xVal, yVal, deben devolver dada UNA cuartupla el primer, el tercer, el segundo y el cuarto elemento respectivamente
