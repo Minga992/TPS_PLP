@@ -118,9 +118,9 @@ maxFstPar (x:xs) = foldr (\y mfp-> if null xs then y else cond y mfp) x xs
 -- Auxiliar -- Dada dos listas de pares, que pretenden ser prefijo-sufijo (si las concateno tengo la lista completa),
 			-- devuelve los k elementos de la lista entera cuya primer componente es menor al resto. 
 			-- k esta determinado por el tamaño de la primer lista.
-kMin :: Ord a => [(a,b)] -> [(a,b)] -> [(a,b)]
+kMin :: (Ord a, Eq b) => [(a,b)] -> [(a,b)] -> [(a,b)]
 kMin xs ys = foldr (\z zs -> if (fst z) < fst (maxFstPar zs) then ns z zs else zs) xs ys
-				where ns = (\z zs -> (takeWhile ((/=) (maxFstPar zs)) zs) ++ [z] ++ (tail (dropWhile ((/=) (maxFstPar zs)) zs))
+				where ns = (\z zs -> (takeWhile ((/=) (maxFstPar zs)) zs) ++ [z] ++ (tail (dropWhile ((/=) (maxFstPar zs)) zs)))
 
 devolverEtiqueta :: [Etiqueta] -> Etiqueta
 devolverEtiqueta xs = snd (maxFstPar (cuentas xs))
@@ -154,7 +154,7 @@ accuracy xs ys = (fromIntegral (sum (zipWith (\x y -> if x == y then 1 else 0) x
 						  
 -- Auxiliar -- sublista i f xs devuelve la sublista de xs entre los indices i y f inclusive
 sublista :: Int -> Int -> [a] -> [a]
-sublista i f = if i <= f then (take (f-i+1)).(drop i) else []
+sublista i f = if i <= f then (take (f-i+1)).(drop i) else (const [])
 
 -- Auxiliar -- renombre de sublista para que se entienda mejor desp -- ver si poner como where
 -- pTest :: Int -> Int -> [a] -> [a]
@@ -162,16 +162,16 @@ sublista i f = if i <= f then (take (f-i+1)).(drop i) else []
 
 -- Auxiliar -- i y f son los indices del cacho para test, esto devuelve todo lo demas
 pTrain :: Int -> Int -> [a] -> [a]
-pTrain i f xs = (sublista 0 (i-1) xs) ++ (sublista (f+1) ((length xs)-1))
+pTrain i f xs = (sublista 0 (i-1) xs) ++ (sublista (f+1) ((length xs)-1) xs)
 
 -- Auxiliar -- se encarga de dejarme la lista linda segun la cantidad de particiones que me piden
 sacarSobr :: [a] -> Int -> [a]
-sacarSobr xs n = take (((length xs)/n)*n) xs
+sacarSobr xs n = take (((length xs) `div` n)*n) xs
 
 separarDatos :: Datos -> [Etiqueta] -> Int -> Int -> (Datos, Datos, [Etiqueta], [Etiqueta])
 separarDatos xs ys n p = let 
-							i = ((length xs)/n)*(p-1)
-							f = (((length xs)/n)*p)-1
+							i = ((length xs) `div` n)*(p-1)
+							f = (((length xs) `div` n)*p)-1
 							pTest = sublista
 						in (pTrain i f (sacarSobr xs n), pTest i f (sacarSobr xs n), pTrain i f (sacarSobr ys n), pTest i f (sacarSobr ys n))
 						
