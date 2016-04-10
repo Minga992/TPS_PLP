@@ -181,22 +181,33 @@ separarDatos xs ys n p = let
 						 	--  (noTomoParticionPe n p (take lxsn ys)), (tomoParticionPe n p (take lxsn ys)))
 						-- where lxsn = ((genericLength xs)/n)*n
 
--- Auxiliar
-obtenerEtiquetas :: [(Datos, Datos, [Etiqueta], [Etiqueta])] -> [Etiqueta]
-obtenerEtiquetas ds = foldr (\x xs -> (map (knn 15 (xTrain x) (yTrain x) distEuclideana) (xVal x)) ++ xs ) [] ds
+-- Auxiliar -- Dada una cuatrupla devuelve su primer componente => datos de entrenamiento
+dTrain :: (a,b,c,d) -> a
+dTrain (w,x,y,z) = w
 
- -- Dada una lista con ese tipo raro que lo llamare experimento, devuelvo las etiquetas que devuelve nuestro modelo aplicado a cada
- -- experimento. Ver que uso ++ y map, porque a mi modelo entrenado le paso muchas instancias, no una sola.
+-- Auxiliar -- Dada una cuatrupla devuelve su segunda componente => datos de validacion
+dVal :: (a,b,c,d) -> b
+dVal (w,x,y,z) = x
 
+-- Auxiliar -- Dada una cuatrupla devuelve su tercer componente => etiquetas de entrenamiento
+lTrain :: (a,b,c,d) -> c
+lTrain (w,x,y,z) = y
+
+-- Auxiliar -- Dada una cuatrupla devuelve su cuarta componente => etiquetas de validacion
+lVal :: (a,b,c,d) -> d
+lVal (w,x,y,z) = z
+
+-- Auxiliar -- Dada una lista de cuatruplas con datos y etiquetas separados por training y validacion, 
+			-- devuelvo las etiquetas que devuelve nuestro modelo aplicado a cada instancia de prueba. 
+			-- Ver que uso map, porque a mi modelo entrenado le paso muchas instancias, no una sola.
+obtenerEtiquetas :: [(Datos, Datos, [Etiqueta], [Etiqueta])] -> [[Etiqueta]]
+obtenerEtiquetas = foldr (\x xs -> (map (knn 15 (dTrain x) (lTrain x) distEuclideana) (dVal x)) : xs ) []
 
 nFoldCrossValidation :: Int -> Datos -> [Etiqueta] -> Float
-nFoldCrossValidation n ds es = mean (zipWith (accuracy) (obtenerEtiquetas ns) (etireales)
-								where ns = [separarDatos ds es n i |i <- [1.. n]]
-								etireales = concat (map yVal ns)
-
+nFoldCrossValidation n ds es = mean (zipWith accuracy (obtenerEtiquetas ns) etireales)
+								where 
+									ns = [separarDatos ds es n i |i <- [1..n]]
+									etireales = map lVal ns
 -- la idea aca es primero obtener una lista con los datos ordenados segun los de entrenamiento y los de prueba para cada particion,
 -- eso sucede en ns. Luego, con obtener etiquetas entrene mis modelos y veo que etiqueta me tiran a cada prueba, luego mido el
 -- porcentaje de aciertos respecto a las verdaderas etiquetas, y al final calculo el promedio.
-
--- FUNCIONES A COMPLETAR:
--- xTrain, yTrain, xVal, yVal, deben devolver dada UNA cuartupla el primer, el tercer, el segundo y el cuarto elemento respectivamente
