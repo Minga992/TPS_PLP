@@ -10,8 +10,8 @@ main = runTestTT allTests
 
 allTests = test [
  	"split" ~: testsSplit,
- 	"cuentas" ~: testsCuentas,
  	"longitudPromedioPalabras" ~: testsLongitudPromedioPalabras,
+ 	"cuentas" ~: testsCuentas,
  	"repeticionesPromedio" ~: testRepeticionesPromedio,
  	"frecuenciaTokens" ~: testsFrecuenciaTokens,
  	"normalizarExtractor" ~: testsNormalizarExtractor,
@@ -25,17 +25,20 @@ allTests = test [
 
 testsSplit = test [
  	split ',' ",PLP," ~?= ["PLP"],
- 	split ',' " ,PLP, " ~?= [" ","PLP"," "]
+ 	split ',' " ,PLP, " ~?= [" ","PLP"," "],
+ 	split ',' ",,,,,,," ~?= [],
+ 	split ',' ",,,PLP,,,,,PLP,,," ~?= ["PLP","PLP"]
   	]
+
+testsLongitudPromedioPalabras = test [
+	longitudPromedioPalabras "Este es el test donde testeo cuál es la longitud promedio de las palabras" ~?= 4.285714
+	]
 
 testsCuentas = test [
 --	cuentas ["x","x","y","x","z"] ~?= [(3,"x"), (1,"y"), (1,"z")]
-	cuentas ["x","x","y","x","z"] ~?= [(1,"y"), (3,"x"), (1,"z")]
-	
-	]
-
-testsLongitudPromedioPalabras = test [
-	longitudPromedioPalabras "Este es el test donde testeo cuàl es la longitud promedio de las palabras" ~?= 4.285714
+--  nuestra funcion no deja las cosas en el mismo orden que el ejemplo, pero lo que devuelve sigue siendo correcto
+	cuentas ["x","x","y","x","z"] ~?= [(1,"y"), (3,"x"), (1,"z")],
+	cuentas ["a","b","r","a","c","a","d","a","b","r","a"] ~?= [(1,"c"),(1,"d"),(2,"b"),(2,"r"),(5,"a")]
 	]
 
 testRepeticionesPromedio = test [
@@ -43,15 +46,25 @@ testRepeticionesPromedio = test [
 	]
 	
 testsFrecuenciaTokens = test [
-	(head frecuenciaTokens) "use_snake_case !" ~?= 0.125
+	(head frecuenciaTokens) "use_snake_case !" ~?= 0.125, -- esto es con el _
+	(frecuenciaTokens !!23) "use_snake_case !" ~?= 0.0625, -- esto es con el !
+	(frecuenciaTokens !!4) "use_snake_case !" ~?= 0 -- esto es con el *
 	]
 
-testsNormalizarExtractor = test [
-	normalizarExtractor ["soy una papa","ale es una papa","todos somos papas"] longitudPromedioPalabras "soy una papa" ~?= 0.6666666
+testsNormalizarExtractor = 
+	let
+		xs = ["soy una papa","ale es una papa","todos somos papas"]
+		ys = ["soy una papa!","ale es una papa!!","todos somos papas!!!"]
+	in
+	test [
+		normalizarExtractor xs longitudPromedioPalabras "soy una papa" ~?= 0.6666666,
+		normalizarExtractor xs repeticionesPromedio "ale es una papa" ~?= 1,
+		map (normalizarExtractor ys (frecuenciaTokens !!23)) ys ~?= [0.5128205,0.7843137,1]
 	]
 
 testsExtraerFeatures = test [
-	-- extraerFeatures [longitudPromedioPalabras,repeticionesPromedio] ["anita lava la tina","dabale arroz a la zorra el abad","saben que sabemos que saben esto"] ~?=
+	let ps = ["anita lava la tina","dabale arroz a la zorra el abad","saben que sabemos que saben esto"] in
+	extraerFeatures [longitudPromedioPalabras,repeticionesPromedio] ps ~?= [[0.8333333,0.6666667],[0.7936508,0.6666667],[1,1]],
 	let ts = ["b=a", "a = 2; a = 4", "C:/DOS C:/DOS/RUN RUN/DOS/RUN"] in
 	extraerFeatures [longitudPromedioPalabras, repeticionesPromedio] ts ~?= [[0.33333334,0.6666667],[0.12962963,1.0],[1.0,0.6666667]]
 	]
@@ -62,15 +75,23 @@ testsDistancias = test [
 	]
 
 testsKnn = test [
+--	En el primer caso, a diferencia del ejemplo en el enunciado, nuestra funcion responde "i".
+-- 	Esto se debe a la forma en que elegimos los k mas cercanos. En este ejemplo, los puntos [0,1] y [2,1]
+--	estan a la misma distancia de [1,1], y califican dentro de los mas cercanos, pero uno es "i" y el otro "f".
+--	La forma en que elegimos los mas cercanos, se queda con [0,1], y dado el empate, elige el primero.
+--	No hacemos caso especial al hecho de que [1,1] esta dentro de los datos iniciales.
+	(knn 2 [[0,1],[0,2],[2,1],[1,1],[2,3]] ["i","i","f","f","i"] distEuclideana) [1,1] ~?= "i",
 	(knn 3 [[0,1],[0,2],[2,1],[1,1],[2,3]] ["i","i","f","f","i"] distEuclideana) [1,1] ~?= "f"
 	]
 
-testsSepararDatos = test [
+testsSepararDatos = 
 	let 
 		xs = [[1,1],[2,2],[3,3],[4,4],[5,5],[6,6],[7,7]] :: Datos
 		y = ["1","2","3","4","5","6","7"]
 	in
-	separarDatos xs y 3 2 ~?= ([[1.0,1.0],[2.0,2.0],[5.0,5.0],[6.0,6.0]],[[3.0,3.0],[4.0,4.0]],["1","2","5","6"],["3","4"])
+	test [
+		separarDatos xs y 3 2 ~?= ([[1.0,1.0],[2.0,2.0],[5.0,5.0],[6.0,6.0]],[[3.0,3.0],[4.0,4.0]],["1","2","5","6"],["3","4"]),
+		separarDatos xs y 7 2 ~?= ([[1.0,1.0],[3.0,3.0],[4.0,4.0],[5.0,5.0],[6.0,6.0],[7.0,7.0]],[[2.0,2.0]],["1","3","4","5","6","7"],["2"])
 	]
 
 testsAccuracy = test [
@@ -78,5 +99,12 @@ testsAccuracy = test [
 	]
 
 testsNFoldCrossValidation = test [
-	nFoldCrossValidation 2 [[2,1],[2,2],[4,3],[3,2]] ["f","i","f","i"] ~?= 0.5
+--	Esta prueba funciona pero en realidad los datos van a estar normalizados
+	nFoldCrossValidation 2 [[2,1],[2,2],[4,3],[3,2]] ["f","i","f","i"] ~?= 0.5,
+--	Aca probamos con datos normalizados
+	let
+		ds = [[0.05,0.05],[0.1,0.1],[0.15,0.15],[0.2,0.2],[0.25,0.25],[0.3,0.3],[0.35,0.35],[0.4,0.4],[0.45,0.45],[0.5,0.5],[0.55,0.55],[0.6,0.6],[0.65,0.65],[0.7,0.7],[0.75,0.75],[0.8,0.8],[0.85,0.85],[0.9,0.9],[0.95,0.95],[1.0,1.0]]
+		ls = ["f", "f", "i", "i", "f", "i", "f", "i", "f", "f", "f", "f", "i", "i", "f", "i", "f", "i", "f", "f"]
+	in
+		nFoldCrossValidation 20 ds ls ~?= 0.55
 	]

@@ -29,14 +29,6 @@ split d ys = quitarListVacias (foldr (\x (xs:xss) -> if x == d then []:xs:xss el
 -- quitarListVacias es un parche autorizado por Pablo =P
 -- explicitamos ys porque si no no tipa
 
---Verisiones explicitas:
---split d [] = []
---split d xs = takeWhile (\= d) xs : (split d tail(dropWhile (\= d) xs))
-
---split d [] = [[]]
---split d (x:xs) = if d == x then []:split(xs)
---       				   	else (x:head(split(xs))):tail(split(xs))
-
 longitudPromedioPalabras :: Extractor
 longitudPromedioPalabras xs = mean (map genericLength (split ' ' xs))
 -- hago el split sacando los espacios del medio, eso me da una lista de listas,
@@ -52,9 +44,7 @@ noRep = foldr (\x xs -> if elem x xs then xs else x:xs) []
 
 cuentas :: Eq a => [a] -> [(Int, a)]
 cuentas xs = [(cantAp a xs, a) | a <- (noRep xs)]
---Version explicita:
---cuentas [] 	 = []
---cuentas (x:xs) = (genericLength filter (= x) x:xs) : cuentas filter (\= x) x:xs
+-- Devuelve los pares en un orden diferente al del ejemplo del enunciado
 
 repeticionesPromedio :: Extractor
 repeticionesPromedio xs = mean (map (\xt -> fromIntegral (fst xt)) (cuentas (split ' ' xs)))
@@ -66,14 +56,6 @@ tokens = "_,)(*;-=>/.{}\"&:+#[]<|%!\'@?~^$` abcdefghijklmnopqrstuvwxyz0123456789
 
 frecuenciaTokens :: [Extractor]
 frecuenciaTokens = [ \xs -> realToFrac (cantAp a xs) / genericLength xs | a <-tokens]
--- ACLARACION, use real to frac porque lo usaron ellos, se que tengo que aplicar algo, porque cantAp es int, pero no estoy seguro que
--- me armo una lista por comprension que tenga funciones que dado un xs toman su correspondiente token, y ven la frecuencia relativa.
--- si, no hay mucho que explicar aca(ALE)
-
---Auxiliar
--- normalizar :: Eq a =>  a -> Extractor -> Extractor
--- normalizar maxabs f = \xs -> f xs / maxabs
---dada una funcion, y un numero que va a ser el representante del 1.0 o del -1,0, normaliza al extractor
 
 normalizarExtractor :: [Texto] -> Extractor -> Extractor
 normalizarExtractor [] f = f
@@ -82,9 +64,6 @@ normalizarExtractor xs f = (\y -> y/n).f
 -- la idea aca fue, conseguir al mayor en valor absoluto, que va a representar el 1.0 o el -1.0, depende el signo, y su opueto
 -- va a representar al otro. Una vez que tengo eso, para normalizar simplemente hago que el extractor divida su resultado por este numero
 -- obteniendo asi la proporcion deseada, el signo va a estar dado por el signo original de lo que devolvia el extractor. 
-
--- normalizarExtractor [] f = f  --devuelvo algo, no se que hacer aca
--- normalizarExtractor xs f = normalizar (max (abs maximum map f xs) abs minimum map f xs) f
 
 --Auxiliar -- Dada una lista de extractores, y un texto de comparacion, normaliza los extractores de acuerdo a los textos.
 extractoresNormalizados :: [Texto] -> [Extractor] -> [Extractor]
@@ -139,28 +118,9 @@ knn k ds ls m = (\xs -> devolverEtiqueta [snd p | p <- (kMin (take k (ns xs)) (d
 accuracy :: [Etiqueta] -> [Etiqueta] -> Float
 accuracy xs ys = (fromIntegral (sum (zipWith (\x y -> if x == y then 1 else 0) xs ys))) / (genericLength xs)
 
--- Auxiliar
--- tomoParticionPe :: Int -> Int -> [a] -> [a]
--- tomoParticionPe n p xs = take (lxs * p) (drop (lxs * p) xs)
-						-- where lxs = (genericLength xs)/n
--- Dada una lista de elementos, y dos enteros, uno que indica la cantidad de particiones de la lista en partes iguales,
--- y otro una particion en particular, devuelve los elementos que pertenecen a la particion particular
-
--- Auxiliar
--- noTomoParticionPe :: Int -> Int -> [a] -> [a]
--- noTomoParticionPe n p xs = (take (lxs * p) xs) ++ (drop (lxs * p) xs)
-						  -- where lxs = (genericLength xs)/n
-
--- Dada una lista de elementos, y dos enteros, uno que indica la cantidad de particiones de la lista en partes iguales,
--- y otro una particion en particular, devuelve los elementos que no pertenecen a la particion particular
-						  
 -- Auxiliar -- sublista i f xs devuelve la sublista de xs entre los indices i y f inclusive
 sublista :: Int -> Int -> [a] -> [a]
 sublista i f = if i <= f then (take (f-i+1)).(drop i) else (const [])
-
--- Auxiliar -- renombre de sublista para que se entienda mejor desp -- ver si poner como where
--- pTest :: Int -> Int -> [a] -> [a]
--- pTest = sublista
 
 -- Auxiliar -- i y f son los indices del cacho para test, esto devuelve todo lo demas
 pTrain :: Int -> Int -> [a] -> [a]
@@ -177,12 +137,6 @@ separarDatos xs ys n p = let
 							pTest = sublista
 						in (pTrain i f (sacarSobr xs n), pTest i f (sacarSobr xs n), pTrain i f (sacarSobr ys n), pTest i f (sacarSobr ys n))
 						
-						-- if ((length xs) % n) == 0 
-						-- then ((noTomoParticionPe n p xs),(tomoParticionPe n p xs),(noTomoParticionPe n p ys),(tomoParticionPe n p ys)) 
-						-- else ((noTomoParticionPe n p (take lxsn xs)), (tomoParticionPe n p (take lxsn xs)),
-						 	--  (noTomoParticionPe n p (take lxsn ys)), (tomoParticionPe n p (take lxsn ys)))
-						-- where lxsn = ((genericLength xs)/n)*n
-
 -- Auxiliar -- Dada una cuatrupla devuelve su primer componente => datos de entrenamiento
 dTrain :: (a,b,c,d) -> a
 dTrain (w,x,y,z) = w
@@ -202,6 +156,7 @@ lVal (w,x,y,z) = z
 -- Auxiliar -- Dada una lista de cuatruplas con datos y etiquetas separados por training y validacion, 
 			-- devuelvo las etiquetas que devuelve nuestro modelo aplicado a cada instancia de prueba. 
 			-- Ver que uso map, porque a mi modelo entrenado le paso muchas instancias, no una sola.
+			-- Hardcodeamos 15 y distEuclideana porque lo dice el enunciado.
 obtenerEtiquetas :: [(Datos, Datos, [Etiqueta], [Etiqueta])] -> [[Etiqueta]]
 obtenerEtiquetas = foldr (\x xs -> (map (knn 15 (dTrain x) (lTrain x) distEuclideana) (dVal x)) : xs ) []
 
