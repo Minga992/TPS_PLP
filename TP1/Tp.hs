@@ -118,8 +118,10 @@ maxFstPar (x:xs) = foldr (\y mfp-> if null xs then y else cond y mfp) x xs
 -- Auxiliar -- Dada dos listas de pares, que pretenden ser prefijo-sufijo (si las concateno tengo la lista completa),
 			-- devuelve los k elementos de la lista entera cuya primer componente es menor al resto. 
 			-- k esta determinado por el tamaño de la primer lista.
+			-- La idea es, a cada paso, comparar el max de la primer lista con el siguiente elemento de la segunda.
+			-- En caso de que el max sea mayor al otro, lo intercambio.  A la larga me quedan los k minimos en la primer lista.
 kMin :: (Ord a, Eq b) => [(a,b)] -> [(a,b)] -> [(a,b)]
-kMin xs ys = foldr (\z zs -> if (fst z) < fst (maxFstPar zs) then ns z zs else zs) xs ys
+kMin xs = foldr (\z zs -> if (fst z) < fst (maxFstPar zs) then ns z zs else zs) xs
 				where ns = (\z zs -> (takeWhile ((/=) (maxFstPar zs)) zs) ++ [z] ++ (tail (dropWhile ((/=) (maxFstPar zs)) zs)))
 
 devolverEtiqueta :: [Etiqueta] -> Etiqueta
