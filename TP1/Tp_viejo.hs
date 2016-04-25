@@ -59,7 +59,7 @@ frecuenciaTokens = [ \xs -> realToFrac (cantAp a xs) / genericLength xs | a <-to
 
 normalizarExtractor :: [Texto] -> Extractor -> Extractor
 normalizarExtractor [] f = f
-normalizarExtractor xs f = (\y -> y/n).f
+normalizarExtractor xs f = (\y -> realToFrac y/n).f
 			where n = max (abs (maximum (map f xs))) (abs (minimum (map f xs)))
 -- la idea aca fue, conseguir al mayor en valor absoluto, que va a representar el 1.0 o el -1.0, depende el signo, y su opueto
 -- va a representar al otro. Una vez que tengo eso, para normalizar simplemente hago que el extractor divida su resultado por este numero
