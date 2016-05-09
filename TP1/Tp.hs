@@ -19,14 +19,10 @@ tryClassifier x y = let xs = extraerFeatures ([longitudPromedioPalabras, repetic
 mean :: [Float] -> Float
 mean xs = realToFrac (sum xs) / genericLength xs
 
---Auxiliar -- dada una lista de listas, remueve todas aquellas listas que sean vacias.
-quitarListVacias :: [[a]] -> [[a]]
-quitarListVacias = foldr (\x xs -> if null x then xs else (x:xs)) []
-
 split :: Eq a => a -> [a] -> [[a]]
-split d ys = quitarListVacias (foldr (\x (xs:xss) -> if x == d then []:xs:xss else (x:xs):xss) [[]] ys)
+split d ys = filter (null) (foldr (\x (xs:xss) -> if x == d then []:xs:xss else (x:xs):xss) [[]] ys)
 -- si me encuentro con un delimitador, es una palabra aparte.  Si no, la letra es parte de la misma palabra.
--- quitarListVacias es un parche autorizado por Pablo =P
+-- filter null es un parche autorizado por Pablo =P, quita todas las listas vacias
 -- explicitamos ys porque si no no tipa
 
 longitudPromedioPalabras :: Extractor
@@ -39,11 +35,12 @@ cantAp :: Eq a => a -> [a] -> Int
 cantAp d = foldr (\x acum -> (if x==d then 1 else 0) + acum ) 0
 
 --Auxiliar -- Dada una lista, la devuelve sin elementos repetidos.
-noRep :: Eq a => [a] -> [a]
-noRep = foldr (\x xs -> if elem x xs then xs else x:xs) []
+--noRep :: Eq a => [a] -> [a]
+--noRep = foldr (\x xs -> if elem x xs then xs else x:xs) []
+-- lo dejo porque nub deja la primer ocurrencia, y hay que ver como afecta
 
 cuentas :: Eq a => [a] -> [(Int, a)]
-cuentas xs = [(cantAp a xs, a) | a <- (noRep xs)]
+cuentas xs = [(cantAp a xs, a) | a <- (nub xs)] -- aca puse nub en vez de noRep
 -- Devuelve los pares en un orden diferente al del ejemplo del enunciado
 
 repeticionesPromedio :: Extractor
@@ -70,17 +67,18 @@ extractoresNormalizados :: [Texto] -> [Extractor] -> [Extractor]
 extractoresNormalizados ts exs = [normalizarExtractor ts ex | ex <- exs]
 
 --Auxiliar -- Dado un texto y una lista de extractores, saca los features de aplicarle al texto todos los extractores.
-featuresDelText :: Texto -> [Extractor] -> Instancia
-featuresDelText t = foldr (\f fs -> f t : fs) []
+--featuresDelText :: Texto -> [Extractor] -> Instancia
+--featuresDelText t = foldr (\f fs -> f t : fs) []
+--lo dejo solo por las dudas, hasta que testeemos
 
 extraerFeatures :: [Extractor] -> [Texto] -> Datos
-extraerFeatures exs ts = [featuresDelText t ns | t <- ts]
+extraerFeatures exs ts = [map (\f -> f t) ns | t <- ts] --aca decia featuresDelText t ns
 						 where ns = extractoresNormalizados ts exs
 -- La idea es que dado un grupo de extractores y un grupo de textos primero normalizo todos los extractores, y luego le aplico a cada 
 -- texto todos los extractores normalizados por medio de la funncion featuresDelText
 
 distEuclideana :: Medida
-distEuclideana xs ys = sqrt (sum (zipWith (*) (zipWith (-) xs ys) (zipWith (-) xs ys)))
+distEuclideana xs ys = sqrt (sum (map (**2) (zipWith (-) xs ys))) --esto fue modificado, le meti ese map
 
 -- Auxiliar -- Producto escalar
 prodEsc :: Num a => [a] -> [a] -> a
@@ -116,7 +114,7 @@ knn k ds ls m = (\xs -> devolverEtiqueta [snd p | p <- (kMin (take k (ns xs)) (d
 -- que etiqueta se repite mas veces
 
 accuracy :: [Etiqueta] -> [Etiqueta] -> Float
-accuracy xs ys = (fromIntegral (sum (zipWith (\x y -> if x == y then 1 else 0) xs ys))) / (genericLength xs)
+accuracy xs ys = (sum (zipWith (\x y -> if x == y then 1.0 else 0.0) xs ys)) / (genericLength xs)
 
 -- Auxiliar -- sublista i f xs devuelve la sublista de xs entre los indices i y f inclusive
 sublista :: Int -> Int -> [a] -> [a]
