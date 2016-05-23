@@ -113,6 +113,13 @@ knn k ds ls m = (\xs -> devolverEtiqueta [snd p | p <- (kMin (take k (ns xs)) (d
 -- los k primeros y el resto, con eso busco los k minimos respecto de la distancia (fst del par) y me fijo
 -- que etiqueta se repite mas veces
 
+
+knnReload :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
+knnReload k ds ls m = (\ins -> modaEstadistica etiquetasDeKVecinosMasCercanos (zip distanciasATodasLasInstancias ls))
+						where distanciasATodasLasInstancias = map (m ins) ds
+						etiquetasDeKVecinosMasCercanos = (\dists -> [snd p | kVecinosMasCercanos k dists ls m])
+						modaEstadistica = (\xs ->  snd (maxFstPar (cuentas xs)))
+
 accuracy :: [Etiqueta] -> [Etiqueta] -> Float
 accuracy xs ys = (sum (zipWith (\x y -> if x == y then 1.0 else 0.0) xs ys)) / (genericLength xs)
 
