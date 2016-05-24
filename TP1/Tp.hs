@@ -101,24 +101,27 @@ kMin :: (Ord a, Eq b) => [(a,b)] -> [(a,b)] -> [(a,b)]
 kMin xs = foldr (\z zs -> if (fst z) < fst (maxFstPar zs) then ns z zs else zs) xs
 				where ns = (\z zs -> (takeWhile ((/=) (maxFstPar zs)) zs) ++ [z] ++ (tail (dropWhile ((/=) (maxFstPar zs)) zs)))
 
-devolverEtiqueta :: [Etiqueta] -> Etiqueta
-devolverEtiqueta xs = snd (maxFstPar (cuentas xs))
+--devolverEtiqueta :: [Etiqueta] -> Etiqueta
+--devolverEtiqueta xs = snd (maxFstPar (cuentas xs))
 -- Dada una lista de etiquetas, devuelve aquella etiqueta que aparezca una mayor cantidad de veces.
 
-knn :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
-knn k ds ls m = (\xs -> devolverEtiqueta [snd p | p <- (kMin (take k (ns xs)) (drop k (ns xs)))])
-						where ns = (\xs -> zip (map (m xs) ds) ls)
+--knnviejo :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
+--knnviejo k ds ls m = (\xs -> devolverEtiqueta [snd p | p <- (kMin (take k (ns xs)) (drop k (ns xs)))])
+--						where ns = (\xs -> zip (map (m xs) ds) ls)
 -- mapeo la medida entre la lista que me dan y la que tengo (datos) obteniendo una lista de numeritos,
 -- zipeo esa lista de numeritos con su correspondiente etiqueta, separo la lista resultante en dos listas:
 -- los k primeros y el resto, con eso busco los k minimos respecto de la distancia (fst del par) y me fijo
 -- que etiqueta se repite mas veces
 
+kVecinosMasCercanos :: (Ord a, Eq b) => Int -> [(a,b)] -> [(a,b)]
+kVecinosMasCercanos k dists = kMin (take k dists) (drop k dists)
 
-knnReload :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
-knnReload k ds ls m = (\ins -> modaEstadistica etiquetasDeKVecinosMasCercanos (zip distanciasATodasLasInstancias ls))
-						where distanciasATodasLasInstancias = map (m ins) ds
-						etiquetasDeKVecinosMasCercanos = (\dists -> [snd p | kVecinosMasCercanos k dists ls m])
-						modaEstadistica = (\xs ->  snd (maxFstPar (cuentas xs)))
+knn :: Int -> Datos -> [Etiqueta] -> Medida -> Modelo
+knn k ds ls m = (\ins -> modaEstadistica (etiquetasDeKVecinosMasCercanos (zip distanciasATodasLasInstancias ls)))
+						where 
+							distanciasATodasLasInstancias = map (m ins) ds
+							etiquetasDeKVecinosMasCercanos = (\dists -> [snd p | p <- (kVecinosMasCercanos k dists)])
+							modaEstadistica = (\xs ->  snd (maxFstPar (cuentas xs)))
 
 accuracy :: [Etiqueta] -> [Etiqueta] -> Float
 accuracy xs ys = (sum (zipWith (\x y -> if x == y then 1.0 else 0.0) xs ys)) / (genericLength xs)
@@ -141,35 +144,36 @@ separarDatos xs ys n p = let
 							f = (((length xs) `div` n)*p)-1
 							pTest = sublista
 						in (pTrain i f (sacarSobr xs n), pTest i f (sacarSobr xs n), pTrain i f (sacarSobr ys n), pTest i f (sacarSobr ys n))
+
 						
 -- Auxiliar -- Dada una cuatrupla devuelve su primer componente => datos de entrenamiento
-dTrain :: (a,b,c,d) -> a
-dTrain (w,x,y,z) = w
+--dTrain :: (a,b,c,d) -> a
+--dTrain (w,x,y,z) = w
 
--- Auxiliar -- Dada una cuatrupla devuelve su segunda componente => datos de validacion
-dVal :: (a,b,c,d) -> b
-dVal (w,x,y,z) = x
+---- Auxiliar -- Dada una cuatrupla devuelve su segunda componente => datos de validacion
+--dVal :: (a,b,c,d) -> b
+--dVal (w,x,y,z) = x
 
--- Auxiliar -- Dada una cuatrupla devuelve su tercer componente => etiquetas de entrenamiento
-lTrain :: (a,b,c,d) -> c
-lTrain (w,x,y,z) = y
+---- Auxiliar -- Dada una cuatrupla devuelve su tercer componente => etiquetas de entrenamiento
+--lTrain :: (a,b,c,d) -> c
+--lTrain (w,x,y,z) = y
 
--- Auxiliar -- Dada una cuatrupla devuelve su cuarta componente => etiquetas de validacion
-lVal :: (a,b,c,d) -> d
-lVal (w,x,y,z) = z
+---- Auxiliar -- Dada una cuatrupla devuelve su cuarta componente => etiquetas de validacion
+cuartaCoordenada :: (a,b,c,d) -> d
+cuartaCoordenada (w,x,y,z) = z
 
 -- Auxiliar -- Dada una lista de cuatruplas con datos y etiquetas separados por training y validacion, 
 			-- devuelvo las etiquetas que devuelve nuestro modelo aplicado a cada instancia de prueba. 
 			-- Ver que uso map, porque a mi modelo entrenado le paso muchas instancias, no una sola.
 			-- Hardcodeamos 15 y distEuclideana porque lo dice el enunciado.
 obtenerEtiquetas :: [(Datos, Datos, [Etiqueta], [Etiqueta])] -> [[Etiqueta]]
-obtenerEtiquetas = foldr (\x xs -> (map (knn 15 (dTrain x) (lTrain x) distEuclideana) (dVal x)) : xs ) []
+obtenerEtiquetas = foldr (\(dTrain,dVal,lTrain,lVal) xs -> (map (knn 15 dTrain lTrain distEuclideana) dVal) : xs ) []
 
 nFoldCrossValidation :: Int -> Datos -> [Etiqueta] -> Float
 nFoldCrossValidation n ds es = mean (zipWith accuracy (obtenerEtiquetas ns) etireales)
 								where 
 									ns = [separarDatos ds es n i |i <- [1..n]]
-									etireales = map lVal ns
+									etireales = map cuartaCoordenada ns
 -- la idea aca es primero obtener una lista con los datos ordenados segun los de entrenamiento y los de prueba para cada particion,
 -- eso sucede en ns. Luego, con obtener etiquetas entrene mis modelos y veo que etiqueta me tiran a cada prueba, luego mido el
 -- porcentaje de aciertos respecto a las verdaderas etiquetas, y al final calculo el promedio.
