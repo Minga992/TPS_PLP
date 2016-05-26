@@ -35,10 +35,8 @@ testsLongitudPromedioPalabras = test [
 	]
 
 testsCuentas = test [
---	cuentas ["x","x","y","x","z"] ~?= [(3,"x"), (1,"y"), (1,"z")]
---  nuestra funcion no deja las cosas en el mismo orden que el ejemplo, pero lo que devuelve sigue siendo correcto
-	cuentas ["x","x","y","x","z"] ~?= [(1,"y"), (3,"x"), (1,"z")],
-	cuentas ["a","b","r","a","c","a","d","a","b","r","a"] ~?= [(1,"c"),(1,"d"),(2,"b"),(2,"r"),(5,"a")]
+	cuentas ["x","x","y","x","z"] ~?= [(3,"x"), (1,"y"), (1,"z")],
+	cuentas ["a","b","r","a","c","a","d","a","b","r","a"] ~?= [(5,"a"),(2,"b"),(2,"r"),(1,"c"),(1,"d")]
 	]
 
 testRepeticionesPromedio = test [
@@ -75,12 +73,8 @@ testsDistancias = test [
 	]
 
 testsKnn = test [
---	En el primer caso, a diferencia del ejemplo en el enunciado, nuestra funcion responde "i".
--- 	Esto se debe a la forma en que elegimos los k mas cercanos. En este ejemplo, los puntos [0,1] y [2,1]
---	estan a la misma distancia de [1,1], y califican dentro de los mas cercanos, pero uno es "i" y el otro "f".
---	La forma en que elegimos los mas cercanos, se queda con [0,1], y dado el empate, elige el primero.
 --	No hacemos caso especial al hecho de que [1,1] esta dentro de los datos iniciales.
-	(knn 2 [[0,1],[0,2],[2,1],[1,1],[2,3]] ["i","i","f","f","i"] distEuclideana) [1,1] ~?= "i",
+	(knn 2 [[0,1],[0,2],[2,1],[1,1],[2,3]] ["i","i","f","f","i"] distEuclideana) [1,1] ~?= "f",
 	(knn 3 [[0,1],[0,2],[2,1],[1,1],[2,3]] ["i","i","f","f","i"] distEuclideana) [1,1] ~?= "f"
 	]
 
