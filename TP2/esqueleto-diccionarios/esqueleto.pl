@@ -29,8 +29,8 @@ ej(3, [rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, 
 
 diccionario_lista(S):-diccionario(X), string_codes(X,S).
 
-juntar_con([R1],J,R1):-not(append(X,[J | Y],R1)).
-juntar_con([X|L],J,R1):-append(X,[J | Y],R1), juntar_con(L,J,Y).
+juntar_con([R],Elem,R):-not(append(Head,[Elem | RTail],R)).
+juntar_con([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), juntar_con(Tail,Elem,RTail).
 
 palabras(S,P):-juntar_con(P,espacio,S).
 
