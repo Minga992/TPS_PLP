@@ -32,5 +32,5 @@ diccionario_lista(S):-diccionario(X), string_codes(X,S).
 juntar_con([X],_,X).
 juntar_con([X|L],J,R1):-juntar_con(L,J,R2),append(X,[J],Y),append(Y,R2,R1).
 
-% palabras así todavìa no anda
+palabras(S,[S]):-not(append(X,[espacio | Y],S)).
 palabras(S,[X|P]):-append(X,[espacio | Y],S), palabras(Y,P).
