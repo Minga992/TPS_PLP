@@ -50,4 +50,8 @@ palabras_con_variables(P, V):-atomos_a_variables(P,V,_).
 %quitar(Elem, [Elem|TaiL], HSE|TaiLSE) :- quitar(Elem, TaiL, [HSE| TaiLSE]).
 %quitar(Elem, [Head|TaiL], HSE|TaiLSE) :- quitar(Elem, TaiL, TaiLSE), Elem \= Head, Elem \= HSE.
 
+quitar(_,[],[]).
+quitar(Elem,[Head|Tail],R) :- Elem == Head, quitar(Elem,Tail,R).
+quitar(Elem,[Head|Tail],R) :- Elem \== Head, quitar(Elem,Tail,T), append([Head],T,R).
+
 
