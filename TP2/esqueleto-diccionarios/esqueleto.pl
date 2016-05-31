@@ -36,7 +36,13 @@ palabras(S,P):-juntar_con(P,espacio,S).
 
 
 asignar_var(A, MI, MI) :- member((A,_), MI).
-asignar_var(A,MI,[(A,_) | MF]):-not(member((A,_),MI)).%, append((A,X),MI,MF).
+asignar_var(A,MI,[(A,_) | MI]):-not(member((A,_),MI)).
 
-% palabras(S,[S]):-not(append(X,[espacio | Y],S)).
-% palabras(S,[X|P]):-append(X,[espacio | Y],S), palabras(Y,P).
+
+atomos_a_variables([X], [Y], [(X,Y)]).
+atomos_a_variables([X|Xs], [Y|Ys], MF) :- atomos_a_variables(Xs,Ys,MI),asignar_var(X,MI,MF),member((X,Y),MF).
+
+
+
+% palabras_con_variables(P, V):-palabras(S,P),atomos_a_variables(S,Vaux,MF),palabras(Vaux,V).
+
