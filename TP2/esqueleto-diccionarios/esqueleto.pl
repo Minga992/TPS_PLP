@@ -39,9 +39,9 @@ asignar_var(A, MI, MI) :- member((A,_), MI).
 asignar_var(A,MI,[(A,_) | MI]):-not(member((A,_),MI)).
 
 
-atomos_a_variables([[X] | []], [[Y] | []], [(X,Y)]).
-atomos_a_variables([[X] | Xss], [[Y] | Yss], MI):-atomos_a_variables(Xss,Yss,MI), asignar_var(X,MI,MF), member((X,Y),MF).
-atomos_a_variables([[X | Xs] | Xss], [[Y | Ys] | Yss], MI):-atomos_a_variables([Xs | Xss],[Ys | Yss],MI), asignar_var(X,MI,MF), member((X,Y),MF).
+atomos_a_variables([[Atom]], [[Var]], [(Atom,Var)]).
+atomos_a_variables([[Atom] | AtomSS], [[Var] | VarSS], MI):-atomos_a_variables(AtomSS,VarSS,MI), asignar_var(Atom,MI,MF), member((Atom,Var),MF).
+atomos_a_variables([[Atom | AtomS] | AtomSS], [[Var | VarS] | VarSS], MI):-atomos_a_variables([AtomS | AtomSS],[VarS | VarSS],MI), asignar_var(Atom,MI,MF), member((Atom,Var),MF).
 
 palabras_con_variables(P, V):-atomos_a_variables(P,V,_).
 
