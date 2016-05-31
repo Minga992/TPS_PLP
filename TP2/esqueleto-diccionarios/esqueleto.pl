@@ -45,3 +45,9 @@ atomos_a_variables([[Atom | AtomS] | AtomSS], [[Var | VarS] | VarSS], MI):-atomo
 
 palabras_con_variables(P, V):-atomos_a_variables(P,V,_).
 
+%esto es una idea muy basica y pete, resaltado pete en este compilador, de quitar, esta mal, hay que pelearse con el hecho de no tener cosas instanseadas.
+%quitar(Elem, [], []).
+%quitar(Elem, [Elem|TaiL], HSE|TaiLSE) :- quitar(Elem, TaiL, [HSE| TaiLSE]).
+%quitar(Elem, [Head|TaiL], HSE|TaiLSE) :- quitar(Elem, TaiL, TaiLSE), Elem \= Head, Elem \= HSE.
+
+
