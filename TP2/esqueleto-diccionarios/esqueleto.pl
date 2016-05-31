@@ -55,3 +55,4 @@ quitar(Elem,[Head|Tail],R) :- Elem == Head, quitar(Elem,Tail,R).
 quitar(Elem,[Head|Tail],R) :- Elem \== Head, quitar(Elem,Tail,T), append([Head],T,R).
 
 
+cant_distintos(L,Cant) :- list_to_set(L,S), length(S,Cant).
