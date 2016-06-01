@@ -56,3 +56,8 @@ quitar(Elem,[Head|Tail],R) :- Elem \== Head, quitar(Elem,Tail,T), append([Head],
 
 
 cant_distintos(L,Cant) :- list_to_set(L,S), length(S,Cant).
+
+peleate_vos([],[]).
+peleate_vos([HK|TK],[HM|TM]):- diccionario_lista(S), HK = S, HK = HM, peleate_vos(TK,TM).
+
+descifrar(S,B):- palabras(S,H), palabras_con_variables(H,K), peleate_vos(K,M),juntar_con(M, 32, J), string_codes(B, J).
