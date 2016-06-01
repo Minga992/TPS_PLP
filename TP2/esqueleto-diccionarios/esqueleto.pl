@@ -61,3 +61,8 @@ peleate_vos([],[]).
 peleate_vos([HK|TK],[HM|TM]):- diccionario_lista(S), HK = S, HK = HM, peleate_vos(TK,TM).
 
 descifrar(S,B):- palabras(S,H), palabras_con_variables(H,K), peleate_vos(K,M),juntar_con(M, 32, J), string_codes(B, J).
+
+espacios_everywhere(S,P).
+espacios_everywhere([H,M|S], [H,espacio,M|P]):- espacios_everywhere([M|S],[M|P]). 
+
+descifrar_sin_espacios(S,M):- espacios_everywhere(S,P), descifrar(P,M).
