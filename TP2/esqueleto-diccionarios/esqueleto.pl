@@ -64,7 +64,7 @@ descifrar(S,B):- cant_distintos(S,Cant), palabras(S,H), palabras_con_variables(H
 
 espacios_everywhere([],[]).
 espacios_everywhere([S],[S]).
-espacios_everywhere([H,M|S], [H,M|P]):- espacios_everywhere([M|S],[M|P]). 
 espacios_everywhere([H,M|S], [H,espacio,M|P]):- espacios_everywhere([M|S],[M|P]). 
+espacios_everywhere([H,M|S], [H,M|P]):- espacios_everywhere([M|S],[M|P]). 
 
 descifrar_sin_espacios(S,M):- espacios_everywhere(S,P), descifrar(P,M).
