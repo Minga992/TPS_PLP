@@ -60,7 +60,7 @@ cant_distintos(L,Cant) :- list_to_set(L,S), length(S,Cant).
 peleate_vos([],[]).
 peleate_vos([S|TK],[S|TM]):- diccionario_lista(S), peleate_vos(TK,TM).
 
-descifrar(S,B):- palabras(S,H), palabras_con_variables(H,K), peleate_vos(K,M),juntar_con(M, 32, J), string_codes(B, J).
+descifrar(S,B):- cant_distintos(S,Cant), palabras(S,H), palabras_con_variables(H,K), peleate_vos(K,M),juntar_con(M, 32, J), cant_distintos(J, Cant), string_codes(B, J).
 
 espacios_everywhere([],[]).
 espacios_everywhere([S],[S]).
