@@ -70,11 +70,16 @@ espacios_everywhere([H,M|S], [H,M|P]):- espacios_everywhere([M|S],[M|P]).
 descifrar_sin_espacios(S,M):- espacios_everywhere(S,P), descifrar(P,M).
 
 
-% desp la hago
-%desvio_standard:-
+
+%les presento codigo en pseudoprolog, con sexo oculto;)
+desvio_standard(Msje, Desvio):- string_codes(Msje, CodesMsje), juntar_con(CodesPalab, 32, CodesMsje), map(CodesPalab, length, LenghtsPalab),
+				sum_list(LenghtsPalab, TodasLasLetras), length(LenghtsPalab, CantPalab), 
+				MediaLongPalab is (TodasLasLetras / CantPalab), map(LenghtsPalab, - MediaLongPalab, FaltaElCuadrado),
+				map(FaltaElCuadrado, ^2, AhoraLaSumatoria), sum_list(AhoraLaSumatoria, DividimePorN),
+				Desvio is sqrt(DividimePorN / CantPalab).
 
 el_mas_parejo?(MSE, S):- desvio_standard(MSE, DesvStanMSE), 
-setof(X,(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard(MsjeDeComparacion, DesvStanMDC), mayor(DesvStanMSE, DesvStanMDC), X=MsjeDeComparacion), L), empty?(L). 
+setof(X,(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard(MsjeDeComparacion, DesvStanMDC), mayor(DesvStanMSE, DesvStanMDC), X=MsjeDeComparacion), L), L = []. 
 
 mensajes_mas_parejos(S,M):- descifrar_sin_espacios(S, MsjeSinEspacios), el_mas_parejo?(MsjeSinEspacios, S).
 
