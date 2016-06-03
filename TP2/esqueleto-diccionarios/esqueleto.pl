@@ -68,3 +68,14 @@ espacios_everywhere([H,M|S], [H,espacio,M|P]):- espacios_everywhere([M|S],[M|P])
 espacios_everywhere([H,M|S], [H,M|P]):- espacios_everywhere([M|S],[M|P]). 
 
 descifrar_sin_espacios(S,M):- espacios_everywhere(S,P), descifrar(P,M).
+
+
+% desp la hago
+%desvio_standard:-
+
+el_mas_parejo?(MSE, S):- desvio_standard(MSE, DesvStanMSE), 
+setof(X,(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard(MsjeDeComparacion, DesvStanMDC), mayor(DesvStanMSE, DesvStanMDC), X=MsjeDeComparacion), L), empty?(L). 
+
+mensajes_mas_parejos(S,M):- descifrar_sin_espacios(S, MsjeSinEspacios), el_mas_parejo?(MsjeSinEspacios, S).
+
+
