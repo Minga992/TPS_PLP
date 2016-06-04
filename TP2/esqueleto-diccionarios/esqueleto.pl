@@ -27,28 +27,35 @@ ej(2, [rombo, cuadrado, espacio, perro, triangulo, sol, cuadrado]).
 
 ej(3, [rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, gato]).
 
+% diccionario_lista(?S)
+% si no se instancia S, la va instanciando en las listas de ascii correspondientes a las palabras del diccionario actual.
+% si se instancia S, da true si hay una palabra en el diccionario actual con esos ascii.
 diccionario_lista(S):-diccionario(X), string_codes(X,S).
 
+% juntar_con(?Lista1, ?Elem, ?Lista2)
+% da true si Lista2 concatena las sublistas de Lista1 separando por Elem.
+% si sólo se instancia Lista1 da false, fallando en 'not(member(Elem,Head))', ya que basta tomar Elem = Head.
+% si sólo se instancia Elem, falla al no poder instanciar los parámetros de append.
+% si sólo se instancia Lista2, arroja los resultados posibles para Lista1 y Elem.
 juntar_con([R],Elem,R):-not(append(_,[Elem | _],R)).
 juntar_con([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
 
+% palabras(?S,?P)
+% al menos uno de los dos parámetros debe instanciarse (ver juntar_con)
 palabras(S,P):-juntar_con(P,espacio,S).
 
-
+% asignar_var(?A,?MI,?MF)
+% funciona con cualquier cantidad de variables instanciadas (incluso 0) debido al funcionamiento de member.
 asignar_var(A, MI, MI) :- member((A,_), MI).
 asignar_var(A,MI,[(A,_) | MI]):-not(member((A,_),MI)).
 
-
+% atomos_a_variables(Lista1,Lista2,Lista3)
+% da true si Lista3 contiene los pares formados por los elementos de Lista1 y Lista2, en el orden en el que vienen, y para cada primer coordenada existe sólo 1 segunda coordenada (ejemplo: no pueden estar (3,4) y (3,5) a la vez).  No hay repetidos en Lista3.
 atomos_a_variables([[Atom]], [[Var]], [(Atom,Var)]).
 atomos_a_variables([[Atom] | AtomSS], [[Var] | VarSS], MF):-atomos_a_variables(AtomSS,VarSS,MI), asignar_var(Atom,MI,MF), member((Atom,Var),MF).
 atomos_a_variables([[Atom | AtomS] | AtomSS], [[Var | VarS] | VarSS], MF):-atomos_a_variables([AtomS | AtomSS],[VarS | VarSS],MI), asignar_var(Atom,MI,MF), member((Atom,Var),MF).
 
 palabras_con_variables(P, V):-atomos_a_variables(P,V,_).
-
-%esto es una idea muy basica y pete, resaltado pete en este compilador, de quitar, esta mal, hay que pelearse con el hecho de no tener cosas instanseadas.
-%quitar(Elem, [], []).
-%quitar(Elem, [Elem|TaiL], HSE|TaiLSE) :- quitar(Elem, TaiL, [HSE| TaiLSE]).
-%quitar(Elem, [Head|TaiL], HSE|TaiLSE) :- quitar(Elem, TaiL, TaiLSE), Elem \= Head, Elem \= HSE.
 
 quitar(_,[],[]).
 quitar(Elem,[Head|Tail],R) :- Elem == Head, quitar(Elem,Tail,R).
