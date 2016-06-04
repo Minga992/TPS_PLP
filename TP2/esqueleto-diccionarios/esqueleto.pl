@@ -90,13 +90,13 @@ al_cuadrado([],[]).
 al_cuadrado([X|XS],[C|CS]) :- C is X^2, al_cuadrado(XS,CS).
 
 desvio_standard(Msje, Desvio):- longitudes_palabras(Msje,Longs), sum_list(Longs, SumaLongs), length(Longs, CantPalab), 
-				Media is SumaLongs/CantPalab, restar_a_todos(Media,SumaLongs,FaltaElCuadrado),
+				Media is SumaLongs/CantPalab, restar_a_todos(Media,Longs,FaltaElCuadrado),
 				al_cuadrado(FaltaElCuadrado,AhoraLaSum),
 				sum_list(AhoraLaSum,DividimePorN), Desvio is sqrt(DividimePorN/CantPalab).
 
 
-el_mas_parejo(MSE, S):- desvio_standard(MSE, DesvStanMSE), not(descifrar_sin_espacios(S, MsjeDeComparacion), 
-			desvio_standard(MsjeDeComparacion, DesvStanMDC), DesvStanMSE > DesvStanMDC). 
+el_mas_parejo(MSE, S):- desvio_standard(MSE, DesvStanMSE), not((descifrar_sin_espacios(S, MsjeDeComparacion), 
+			desvio_standard(MsjeDeComparacion, DesvStanMDC), DesvStanMSE > DesvStanMDC)). 
 
 %setof(X,(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard(MsjeDeComparacion, DesvStanMDC), mayor(DesvStanMSE, DesvStanMDC), X=MsjeDeComparacion), L), L = []. 
 
