@@ -84,7 +84,7 @@ longitudes([],[]).
 longitudes([X|XS],[L|LS]) :- length(X,L), longitudes(XS,LS).
 
 restar_a_todos(_,[],[]).
-restar_a_todos(M,[X|XS],[R|RS]) :- R is X-M, restar_media(M,XS,RS).
+restar_a_todos(M,[X|XS],[R|RS]) :- R is X-M, restar_a_todos(M,XS,RS).
 
 al_cuadrado([],[]).
 al_cuadrado([X|XS],[C|CS]) :- C is X^2, al_cuadrado(XS,CS).
