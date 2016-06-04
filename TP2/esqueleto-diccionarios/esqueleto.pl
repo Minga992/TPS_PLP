@@ -78,8 +78,10 @@ desvio_standard(Msje, Desvio):- string_codes(Msje, CodesMsje), juntar_con(CodesP
 				map(FaltaElCuadrado, ^2, AhoraLaSumatoria), sum_list(AhoraLaSumatoria, DividimePorN),
 				Desvio is sqrt(DividimePorN / CantPalab).
 
-el_mas_parejo?(MSE, S):- desvio_standard(MSE, DesvStanMSE), 
-setof(X,(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard(MsjeDeComparacion, DesvStanMDC), mayor(DesvStanMSE, DesvStanMDC), X=MsjeDeComparacion), L), L = []. 
+el_mas_parejo?(MSE, S):- desvio_standard(MSE, DesvStanMSE), not(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard
+			 (MsjeDeComparacion, DesvStanMDC), DesvStanMSE > DesvStanMDC). 
+
+%setof(X,(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard(MsjeDeComparacion, DesvStanMDC), mayor(DesvStanMSE, DesvStanMDC), X=MsjeDeComparacion), L), L = []. 
 
 mensajes_mas_parejos(S,M):- descifrar_sin_espacios(S, MsjeSinEspacios), el_mas_parejo?(MsjeSinEspacios, S).
 
