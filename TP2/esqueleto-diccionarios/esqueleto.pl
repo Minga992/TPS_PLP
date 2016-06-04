@@ -72,17 +72,34 @@ descifrar_sin_espacios(S,M):- espacios_everywhere(S,P), descifrar(P,M).
 
 
 %les presento codigo en pseudoprolog, con sexo oculto;)
-desvio_standard(Msje, Desvio):- string_codes(Msje, CodesMsje), juntar_con(CodesPalab, 32, CodesMsje), map(CodesPalab, length, LenghtsPalab),
-				sum_list(LenghtsPalab, TodasLasLetras), length(LenghtsPalab, CantPalab), 
-				MediaLongPalab is (TodasLasLetras / CantPalab), map(LenghtsPalab, - MediaLongPalab, FaltaElCuadrado),
-				map(FaltaElCuadrado, ^2, AhoraLaSumatoria), sum_list(AhoraLaSumatoria, DividimePorN),
-				Desvio is sqrt(DividimePorN / CantPalab).
+%desvio_standard(Msje, Desvio):- string_codes(Msje, CodesMsje), juntar_con(CodesPalab, 32, CodesMsje), map(CodesPalab, length, LenghtsPalab),
+%				sum_list(LenghtsPalab, TodasLasLetras), length(LenghtsPalab, CantPalab), 
+%				MediaLongPalab is (TodasLasLetras / CantPalab), map(LenghtsPalab, - MediaLongPalab, FaltaElCuadrado),
+%				map(FaltaElCuadrado, ^2, AhoraLaSumatoria), sum_list(AhoraLaSumatoria, DividimePorN),
+%				Desvio is sqrt(DividimePorN / CantPalab).
 
-el_mas_parejo?(MSE, S):- desvio_standard(MSE, DesvStanMSE), not(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard
-			 (MsjeDeComparacion, DesvStanMDC), DesvStanMSE > DesvStanMDC). 
+longitudes_palabras(Msje,Longs) :- string_codes(Msje, CodesMsje), juntar_con(CodesPalab, 32, CodesMsje), longitudes(CodesPalab, Longs).
+
+longitudes([],[]).
+longitudes([X|XS],[L|LS]) :- length(X,L), longitudes(XS,LS).
+
+restar_a_todos(_,[],[]).
+restar_a_todos(M,[X|XS],[R|RS]) :- R is X-M, restar_media(M,XS,RS).
+
+al_cuadrado([],[]).
+al_cuadrado([X|XS],[C|CS]) :- C is X^2, al_cuadrado(XS,CS).
+
+desvio_standard(Msje, Desvio):- longitudes_palabras(Msje,Longs), sum_list(Longs, SumaLongs), length(Longs, CantPalab), 
+				Media is SumaLongs/CantPalab, restar_a_todos(Media,SumaLongs,FaltaElCuadrado),
+				al_cuadrado(FaltaElCuadrado,AhoraLaSum),
+				sum_list(AhoraLaSum,DividimePorN), Desvio is sqrt(DividimePorN/CantPalab).
+
+
+el_mas_parejo(MSE, S):- desvio_standard(MSE, DesvStanMSE), not(descifrar_sin_espacios(S, MsjeDeComparacion), 
+			desvio_standard(MsjeDeComparacion, DesvStanMDC), DesvStanMSE > DesvStanMDC). 
 
 %setof(X,(descifrar_sin_espacios(S, MsjeDeComparacion), desvio_standard(MsjeDeComparacion, DesvStanMDC), mayor(DesvStanMSE, DesvStanMDC), X=MsjeDeComparacion), L), L = []. 
 
-mensajes_mas_parejos(S,M):- descifrar_sin_espacios(S, MsjeSinEspacios), el_mas_parejo?(MsjeSinEspacios, S).
+mensajes_mas_parejos(S,MsjeSinEspacios):- descifrar_sin_espacios(S, MsjeSinEspacios), el_mas_parejo(MsjeSinEspacios, S).
 
 
