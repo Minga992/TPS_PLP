@@ -49,13 +49,16 @@ palabras(S,P):-juntar_con(P,espacio,S).
 asignar_var(A, MI, MI) :- member((A,_), MI).
 asignar_var(A,MI,[(A,_) | MI]):-not(member((A,_),MI)).
 
-% atomos_a_variables(Lista1,Lista2,Lista3) TERMINAR ESTE
+% atomos_a_variables(?Lista1,?Lista2,?Lista3) 
 % da true si Lista3 contiene los pares formados por los elementos de Lista1 y Lista2, en el orden en el que vienen, y para cada primer coordenada existe sólo 1 segunda coordenada (ejemplo: no pueden estar (3,4) y (3,5) a la vez).  No hay repetidos en Lista3.
+% La razón por la cual las tres listas llevan un ?, es que atomos_a_variables/3 utilza member/2 y asignar_var/3, y ambas no necesitan recibir instanciadas ninguna de sus variables.
 atomos_a_variables([[Atom]], [[Var]], [(Atom,Var)]).
 atomos_a_variables([[Atom] | AtomSS], [[Var] | VarSS], MF):-atomos_a_variables(AtomSS,VarSS,MI), asignar_var(Atom,MI,MF), member((Atom,Var),MF).
 atomos_a_variables([[Atom | AtomS] | AtomSS], [[Var | VarS] | VarSS], MF):-atomos_a_variables([AtomS | AtomSS],[VarS | VarSS],MI), asignar_var(Atom,MI,MF), member((Atom,Var),MF).
 
-% palabras_con_variables(P,V) TERMINAR ESTE
+% palabras_con_variables(?P,?V)
+% Ver atomos_a_variables/3.
+palabras_con_variables([[]],[[]]).
 palabras_con_variables(P, V):-atomos_a_variables(P,V,_).
 
 % quitar(?Elem,?Lista1,?Lista2)
@@ -74,12 +77,15 @@ quitar(Elem,[Head|Tail],R) :- Elem \== Head, quitar(Elem,Tail,T), append([Head],
 % L debe instanciarse para que funcione list_to_set/2.
 cant_distintos(L,Cant) :- list_to_set(L,S), length(S,Cant).
 
-% CAMBIAME EL NOMBREEE
-peleate_vos([],[]).
-peleate_vos([S|TK],[S|TM]):- diccionario_lista(S), peleate_vos(TK,TM).
+% armar_mensaje(?Lista)
+% unifica las variables de Lista con palabras del diccionario (pasadas a ascii).
+armar_mensaje([]).
+armar_mensaje([S|TK]):- diccionario_lista(S), armar_mensaje(TK).
 
-% descifrar(S,B)  TERMINAR ESTE
-descifrar(S,B):- cant_distintos(S,Cant), palabras(S,H), palabras_con_variables(H,K), peleate_vos(K,M),juntar_con(M, 32, J), cant_distintos(J, Cant), string_codes(B, J).
+% descifrar(+S,?B)
+% B es la decodificación de la frase codificada en S.
+% S debe estar instanciada por el funcionamiento de cant_distintos/2.
+descifrar(S,B):- cant_distintos(S,Cant), palabras(S,H), palabras_con_variables(H,M), armar_mensaje(M),juntar_con(M, 32, J), cant_distintos(J, Cant), string_codes(B, J).
 
 % espacios_everywhere(?Lista1,?Lista2)
 % da true si Lista2 contiene los mismos elementos que Lista1 en el mismo orden, eventualmente con espacios entre ellos.
@@ -91,7 +97,8 @@ espacios_everywhere([S],[S]).
 espacios_everywhere([H,M|S], [H,espacio,M|P]):- espacios_everywhere([M|S],[M|P]). 
 espacios_everywhere([H,M|S], [H,M|P]):- espacios_everywhere([M|S],[M|P]). 
 
-% descifrar_sin_espacios(S,M)  TERMINAR ESTE
+% descifrar_sin_espacios(+S,?M)
+% S debe estar instanciada, ya que en caso contrario espacios_everywhere/2 genera listas de variables sin instanciar que hacen fallar a descifrar/2, y se cuelga en la generación infinita de dichas listas.
 descifrar_sin_espacios(S,M):- espacios_everywhere(S,P), descifrar(P,M).
 
 % longitudes_palabras(+Msje,?Lista)
@@ -104,31 +111,34 @@ longitudes_palabras(Msje,Longs) :- string_codes(Msje, CodesMsje), juntar_con(Cod
 longitudes([],[]).
 longitudes([X|XS],[L|LS]) :- length(X,L), longitudes(XS,LS).
 
-% restar_a_todos(+M,+Lista1,?Lista2)
-% da true si Lista2 contiene los elementos de Lista1 restándoles el valor M.
+% restar_a_todos(+M,+Lista1,-Lista2)
+% instancia Lista2 en una lista con los elementos de Lista1 restándole a cada uno el valor M.
 % M y Lista1 deben instanciarse por el funcionamiento de 'is' en la segunda declaración (lo de la derecha del 'is' no puede no estar instanciado).
 restar_a_todos(_,[],[]).
 restar_a_todos(M,[X|XS],[R|RS]) :- R is X-M, restar_a_todos(M,XS,RS).
 
-% al_cuadrado(+Lista1,?Lista2)
-% da true si Lista2 contiene los elementos de Lista1 al cuadrado.
+% al_cuadrado(+Lista1,-Lista2)
+% instancia Lista2 en una lista con los elementos de Lista1 al cuadrado.
 % Lista1 debe instanciarse por el funcionamiento de 'is' en la segunda declaración (lo de la derecha del 'is' no puede no estar instanciado).
 al_cuadrado([],[]).
 al_cuadrado([X|XS],[C|CS]) :- C is X^2, al_cuadrado(XS,CS).
 
-% desvio_standard(+Msje,?Desvio)
-% da true si Desvio es el desvio standard de las longitudes de las palabras del string Msje.
+% desvio_standard(+Msje,-Desvio)
+% instancia Desvio en el desvio standard de las longitudes de las palabras del string Msje.
 % Msje debe estar instanciado por el funcionamiento de longitudes_palabras/2.
 desvio_standard(Msje, Desvio):- longitudes_palabras(Msje,Longs), sum_list(Longs, SumaLongs), length(Longs, CantPalab), 
 				Media is SumaLongs/CantPalab, restar_a_todos(Media,Longs,FaltaElCuadrado),
 				al_cuadrado(FaltaElCuadrado,AhoraLaSum),
 				sum_list(AhoraLaSum,DividimePorN), Desvio is sqrt(DividimePorN/CantPalab).
 
-% el_mas_parejo(+MSE,S) TERMINAR ESTE
+% el_mas_parejo(+MSE,+S)
+% da true si el string MSE tiene el menor desvío standard de las longitudes de las palabras que cualquier otro mensaje descifrado a partir de S.
+% las variables deben instanciarse por el funcionamiento de desvio_standard/2 y descifrar_sin_espacios/2.
 el_mas_parejo(MSE, S):- desvio_standard(MSE, DesvStanMSE), not((descifrar_sin_espacios(S, MsjeDeComparacion), 
 			desvio_standard(MsjeDeComparacion, DesvStanMDC), DesvStanMSE > DesvStanMDC)). 
 
-% mensajes_mas_parejos(S,M) TERMINAR ESTE
+% mensajes_mas_parejos(+S,?M)
+% S debe instanciarse por el funcionamiento de descifrar_sin_espacios/2.
 mensajes_mas_parejos(S,MsjeSinEspacios):- descifrar_sin_espacios(S, MsjeSinEspacios), el_mas_parejo(MsjeSinEspacios, S).
 
 
