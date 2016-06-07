@@ -44,15 +44,15 @@ juntar_con([HeadL,NexToHeadL | TaiLL],Elem, LseparConElem):- append(HeadL,[Elem]
 % palabras(+S,?P)
 % da true si S concatena las sublistas de P separando por 'espacio'.
 % S debe instanciarse ya que si sólo se instancia P da resultados inesperados.
-palabras(R,[R]):-not(append(_,[espacio | _],R)).
-palabras(R,[Head | Tail]):-append(Head,[espacio | RTail],R), not(member(espacio,Head)), palabras(RTail,Tail).
+%palabras(R,[R]):-not(append(_,[espacio | _],R)).
+%palabras(R,[Head | Tail]):-append(Head,[espacio | RTail],R), not(member(espacio,Head)), palabras(RTail,Tail).
 
-%separar_por_palabras([R],Elem,R):-not(append(_,[Elem | _],R)).
-%separar_por_palabras([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
+separar_por_palabras([R],Elem,R):-not(append(_,[Elem | _],R)).
+separar_por_palabras([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
 
 % palabras(?S,?P)
 % al menos uno de los dos parámetros debe instanciarse (ver juntar_con/3)
-%palabras(S,P):-separar_por_palabras(P,espacio,S).
+palabras(S,P):-separar_por_palabras(P,espacio,S).
 
 
 
@@ -117,7 +117,8 @@ descifrar_sin_espacios(S,M):- espacios_everywhere(S,P), descifrar(P,M).
 % longitudes_palabras(+Msje,?Lista)
 % da true si Lista contiene las longitudes de las palabras del string Msje.
 % Msje debe estar instanciada porque string_codes/2 no funciona con dos variables no instanciadas.
-longitudes_palabras(Msje,Longs) :- string_codes(Msje, CodesMsje), juntar_con(CodesPalab, 32, CodesMsje), longitudes(CodesPalab, Longs).
+%longitudes_palabras(Msje,Longs) :- string_codes(Msje, CodesMsje), juntar_con(CodesPalab, 32, CodesMsje), longitudes(CodesPalab, Longs).
+longitudes_palabras(Msje,Longs) :- string_codes(Msje, CodesMsje),  separar_por_palabras(CodesPalab, 32, CodesMsje), longitudes(CodesPalab, Longs).
 
 % longitudes(?Lista1,?Lista2)
 % da true si Lista2 mapea las longitudes de las listas de Lista1.
