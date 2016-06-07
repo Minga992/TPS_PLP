@@ -32,7 +32,9 @@ ej(3, [rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, 
 % si se instancia S, da true si hay una palabra en el diccionario actual con esos ascii.
 diccionario_lista(S):-diccionario(X), string_codes(X,S).
 
-% juntar_con(Lista1,Lista2,Lista3) HACER!!!!!!!!!!!!!!!
+% juntar_con(+Lista1,?Elem,?Lista2)
+% Da True si, siendo Lista1 una lista de listas, Lista2 es la concatenación de las listas de Lista1, con el elemento Elem entre los elementos de dos listas distintas
+% Lista1 debe estar instanciada, de lo contrario juntar_con se cuelga.
 juntar_con([],_,[]).
 juntar_con([R],_,R).
 juntar_con([HeadL,NexToHeadL | TaiLL],Elem, LseparConElem):- append(HeadL,[Elem],PrimeraParte), 
