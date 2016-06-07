@@ -37,8 +37,14 @@ diccionario_lista(S):-diccionario(X), string_codes(X,S).
 % si sólo se instancia Lista1 da false, fallando en 'not(member(Elem,Head))', ya que basta tomar Elem = Head.
 % si sólo se instancia Elem, falla al no poder instanciar los parámetros de append/3.
 % si sólo se instancia Lista2, arroja los resultados posibles para Lista1 y Elem.
-juntar_con([R],Elem,R):-not(append(_,[Elem | _],R)).
-juntar_con([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
+%juntar_con([R],Elem,R):-not(append(_,[Elem | _],R)).
+%juntar_con([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
+
+juntar_con([],_,[]).
+juntar_con([R],_,R).
+juntar_con([HeadL,NexToHeadL | TaiLL],Elem, LseparConElem):- append(HeadL,[Elem],PrimeraParte), 
+							     juntar_con([NextToHeadL|TaiLL],Elem,SeguiSeparando),
+							     append(PrimeraParte,SeguiSeparando,LseparConElem).
 
 % palabras(?S,?P)
 % al menos uno de los dos parámetros debe instanciarse (ver juntar_con/3)
