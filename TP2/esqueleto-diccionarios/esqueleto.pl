@@ -37,8 +37,6 @@ diccionario_lista(S):-diccionario(X), string_codes(X,S).
 % si sólo se instancia Lista1 da false, fallando en 'not(member(Elem,Head))', ya que basta tomar Elem = Head.
 % si sólo se instancia Elem, falla al no poder instanciar los parámetros de append/3.
 % si sólo se instancia Lista2, arroja los resultados posibles para Lista1 y Elem.
-%juntar_con([R],Elem,R):-not(append(_,[Elem | _],R)).
-%juntar_con([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
 
 juntar_con([],_,[]).
 juntar_con([R],_,R).
@@ -46,9 +44,17 @@ juntar_con([HeadL,NexToHeadL | TaiLL],Elem, LseparConElem):- append(HeadL,[Elem]
 							     juntar_con([NexToHeadL|TaiLL],Elem,SeguiSeparando),
 							     append(PrimeraParte,SeguiSeparando,LseparConElem).
 
+
+separar_por_palabras([R],Elem,R):-not(append(_,[Elem | _],R)).
+separar_por_palabras([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
+
+
+
 % palabras(?S,?P)
 % al menos uno de los dos parámetros debe instanciarse (ver juntar_con/3)
-palabras(S,P):-juntar_con(P,espacio,S).
+palabras(S,P):-separar_por_palabras(P,espacio,S).
+
+
 
 % asignar_var(?A,?MI,?MF)
 % si se instancian las 3 variables, da true cuando MF es el resultado de agregar (A,_variable) a MI en caso de que no estuviera, o MF = MI si ya estaba.
