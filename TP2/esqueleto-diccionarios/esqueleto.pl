@@ -171,15 +171,30 @@ mensajes_mas_parejos(S,MsjeSinEspacios):- descifrar_sin_espacios(S, MsjeSinEspac
 % diccionario_lista([99, 97, 115, 111]). %% "caso"
 % false.
 
+
 %ej2
 % juntar_con([[d],[c,b],[a,c,a]],espacio,R).
 % R = [d, espacio, c, b, espacio, a, c, a] ;
 % false.
 
-%acá venía el test con el elemento separador incluido en alguna/s de las listas que falló
+% juntar_con([[d,espacio],[c,b],[espacio,a,c,a]],espacio,R).
+% R = [d, espacio, espacio, c, b, espacio, espacio, a, c, a] ;
+% false.
+
+% juntar_con([[d,espacio],[espacio,c,b,espacio],[espacio,a,c,a]],espacio,R).
+% R = [d, espacio, espacio, espacio, c, b, espacio, espacio, espacio, a, c, a] ;
+% false.
+
 
 %ej3
-%depende del anterior
+% palabras( [d, espacio, c, b, espacio, a, c, a], P).
+% P = [[d], [c, b], [a, c, a]] ;
+% false.
+
+% palabras( [d, c, b, a, c, a], P).
+% P = [[d, c, b, a, c, a]] ;
+% false.
+
 
 %ej4
 % asignar_var(cuadrado, [], M).
@@ -191,4 +206,77 @@ mensajes_mas_parejos(S,MsjeSinEspacios):- descifrar_sin_espacios(S, MsjeSinEspac
 % asignar_var(triangulo,  [(cuadrado, _G23161), (triangulo, _G23021)], M).
 % M = [ (cuadrado, _G23161), (triangulo, _G23021)] ;
 % false.
+
+%ej5
+% palabras_con_variables([[rombo,triangulo],[rombo,cuadrado],[circulo,triangulo,cuadrado]],V).
+% V = [[_G88880, _G88889], [_G88880, _G88904], [_G88910, _G88889, _G88904]] ;
+% false.
+
+% palabras_con_variables([[rombo,rombo],[rombo,rombo],[rombo,rombo,rombo]],V).
+% V = [[_G88784, _G88784], [_G88784, _G88784], [_G88784, _G88784, _G88784]] ;
+% false.
+
+% palabras_con_variables([[rombo,triangulo],[estrella,cuadrado],[circulo,perro,gato]],V).
+% V = [[_G88850, _G88859], [_G88865, _G88874], [_G88880, _G88889, _G88898]] ;
+% false.
+
+
+%ej6
+
+% quitar(z,[A,B,A,z],L).
+% L = [A, B, A] ;
+% false.
+
+% quitar(A,[A,B,A,z],L).
+% L = [B, z] ;
+% false.
+
+% quitar(C,[A,B,A,z],L).
+% L = [A, B, A, z].
+
+% quitar(z,[z,A,z,B,A,z,zz,Z],L).
+% L = [A, B, A, zz, Z] ;
+% false.
+
+% quitar(a,[A,B,A,z],L).
+% L = [A, B, A, z].
+
+
+%ej7
+
+% cant_distintos([A,B,A], N).
+% N = 2.
+
+% cant_distintos([A,B,skd,A,z,sjf], N).
+% N = 5.
+
+% cant_distintos([A,B,skd,A,z,sjf,z], N).
+% N = 5.
+
+% cant_distintos([a,b,c,b], N).
+% N = 3.
+
+
+%ej8
+%Con 10000_formas:
+
+% descifrar([rombo, cuadrado, espacio, perro, cuadrado, gato, cuadrado, espacio, estrella, arbol, triangulo, espacio, triangulo, circulo, gato, circulo], M).
+% M = "de jefe por rafa" ;
+% M = "de jefe sur rafa" ;
+% M = "de jefe sor rafa" ;
+% M = "de jefe mir rafa" ;
+% M = "de pese ugt tasa" ;
+% M = "de pese com masa" ;
+% M = "de pese tom masa" ;
+% M = "de tele nos sala" .
+
+% descifrar([rombo, cuadrado, perro, cuadrado, gato, cuadrado, estrella, arbol], M).
+% M = "dirigió" ;
+% M = "dolorosa" ;
+% false.
+
+
+%ej9
+
+
 
