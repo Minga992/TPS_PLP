@@ -43,7 +43,7 @@ diccionario_lista(S):-diccionario(X), string_codes(X,S).
 juntar_con([],_,[]).
 juntar_con([R],_,R).
 juntar_con([HeadL,NexToHeadL | TaiLL],Elem, LseparConElem):- append(HeadL,[Elem],PrimeraParte), 
-							     juntar_con([NextToHeadL|TaiLL],Elem,SeguiSeparando),
+							     juntar_con([NexToHeadL|TaiLL],Elem,SeguiSeparando),
 							     append(PrimeraParte,SeguiSeparando,LseparConElem).
 
 % palabras(?S,?P)
