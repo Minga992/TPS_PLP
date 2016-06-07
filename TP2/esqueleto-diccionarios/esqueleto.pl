@@ -45,29 +45,29 @@ juntar_con([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem
 palabras(S,P):-juntar_con(P,espacio,S).
 
 % asignar_var(?A,?MI,?MF)
-% funciona con cualquier cantidad de variables instanciadas (incluso 0) debido al funcionamiento de member/2.
+% si se instancian las 3 variables, da true cuando MF es el resultado de agregar (A,_variable) a MI en caso de que no estuviera, o MF = MI si ya estaba.
+% si se instancian las variables de a 2, asignar_var/3 es reversible.
+% si se instancia sólo una, tiene que ser MF, en otro caso da infinitos resultados con las posibilidades completadas con variables.
+% si no se instancia ninguna variable, el comportamiento no es el esperado.
 asignar_var(A, MI, MI) :- member((A,_), MI).
 asignar_var(A,MI,[(A,_) | MI]):-not(member((A,_),MI)).
 
-% atomos_a_variables(?Lista1,?Lista2,?Lista3) 
+% atomos_a_variables(+Lista1,?Lista2,?Lista3) 
 % da true si Lista3 contiene los pares formados por los elementos de Lista1 y Lista2, en el orden en el que vienen, y para cada primer coordenada existe sólo 1 segunda coordenada (ejemplo: no pueden estar (3,4) y (3,5) a la vez).  No hay repetidos en Lista3.
-% La razón por la cual las tres listas llevan un ?, es que atomos_a_variables/3 utilza member/2 y asignar_var/3, y ambas no necesitan recibir instanciadas ninguna de sus variables.
+% Lista1 debe estar instanciada porque de lo contrario puede colgarse, fallar o tener un comportamiento no esperado.
 atomos_a_variables([[Atom]], [[Var]], [(Atom,Var)]).
 atomos_a_variables([[Atom] | AtomSS], [[Var] | VarSS], MF):-atomos_a_variables(AtomSS,VarSS,MI), asignar_var(Atom,MI,MF), member((Atom,Var),MF).
 atomos_a_variables([[Atom | AtomS] | AtomSS], [[Var | VarS] | VarSS], MF):-atomos_a_variables([AtomS | AtomSS],[VarS | VarSS],MI), asignar_var(Atom,MI,MF), member((Atom,Var),MF).
 
-% palabras_con_variables(?P,?V)
+% palabras_con_variables(+P,?V)
 % Ver atomos_a_variables/3.
 palabras_con_variables([[]],[[]]).
 palabras_con_variables(P, V):-atomos_a_variables(P,V,_).
 
-% quitar(?Elem,?Lista1,?Lista2)
+% quitar(?Elem,+Lista1,?Lista2)
 % da true si Lista2 es Lista1 quitando las apariciones de Elem.
-% si Elem no se instancia y las listas sí, da true si las listas son iguales y false en caso contrario, por la tercera declaración.
-% si Lista1 no se instancia y Lista2 sí, unifica Lista2 con Lista1, y si se pide una nueva solución se cuelga en la tercera declaración.
-% si Lista2 no se instancia y Lista1 sí, instancia Lista2 como Lista1 sin Elem.
-% si no se instancian ni Elem ni Lista2, instancia Lista2 en Lista1.
-% si sólo se instancia Elem, genera infinitas Lista1 = Lista2.
+% Lista1 debe estar instanciada, ya que de lo contrario se busca unificar Lista1 y Lista2, lo cual no es la idea del predicado.
+% el predicado (==)/2 chequea por equivalencia, no por unificación, lo cual permite comparar variables no instanciadas y distinguirlas, tanto de otras variables como de elementos instanciados.
 quitar(_,[],[]).
 quitar(Elem,[Head|Tail],R) :- Elem == Head, quitar(Elem,Tail,R).
 quitar(Elem,[Head|Tail],R) :- Elem \== Head, quitar(Elem,Tail,T), append([Head],T,R).
@@ -77,8 +77,9 @@ quitar(Elem,[Head|Tail],R) :- Elem \== Head, quitar(Elem,Tail,T), append([Head],
 % L debe instanciarse para que funcione list_to_set/2.
 cant_distintos(L,Cant) :- list_to_set(L,S), length(S,Cant).
 
-% armar_mensaje(?Lista)
+% armar_mensaje(+Lista)
 % unifica las variables de Lista con palabras del diccionario (pasadas a ascii).
+% la variable debe instanciarse, ya que de lo contrario posee un comportamiento no esperado.
 armar_mensaje([]).
 armar_mensaje([S|TK]):- diccionario_lista(S), armar_mensaje(TK).
 
@@ -88,17 +89,17 @@ armar_mensaje([S|TK]):- diccionario_lista(S), armar_mensaje(TK).
 descifrar(S,B):- cant_distintos(S,Cant), palabras(S,H), palabras_con_variables(H,M), armar_mensaje(M),juntar_con(M, 32, J), cant_distintos(J, Cant), string_codes(B, J).
 
 % espacios_everywhere(?Lista1,?Lista2)
-% da true si Lista2 contiene los mismos elementos que Lista1 en el mismo orden, eventualmente con espacios entre ellos.
+% da true si Lista2 contiene los mismos elementos que Lista1 en el mismo orden, eventualmente con espacios intercalados.
 % si sólo se instancia Lista1, Lista2 es instanciada con todas las posibles combinaciones de espacios entre los elementos de Lista1.
 % si sólo se instancia Lista2, Lista1 es instanciada con todas las posibles formas de quitar algún espacio de los elementos de Lista2.
-% puede no instanciarse ninguna de las dos, esto generará sucesivas Lista1 incrementando en uno la longitud cada vez, y una Lista2 para cada Lista1 con todos los posibles espacios incluidos.
+% no debe no instanciarse ninguna, de lo contrario el comportamiento no es el esperado.
 espacios_everywhere([],[]).
 espacios_everywhere([S],[S]).
 espacios_everywhere([H,M|S], [H,espacio,M|P]):- espacios_everywhere([M|S],[M|P]). 
 espacios_everywhere([H,M|S], [H,M|P]):- espacios_everywhere([M|S],[M|P]). 
 
 % descifrar_sin_espacios(+S,?M)
-% S debe estar instanciada, ya que en caso contrario espacios_everywhere/2 genera listas de variables sin instanciar que hacen fallar a descifrar/2, y se cuelga en la generación infinita de dichas listas.
+% S debe estar instanciada por el comportamiento de espacios_everywhere/2.
 descifrar_sin_espacios(S,M):- espacios_everywhere(S,P), descifrar(P,M).
 
 % longitudes_palabras(+Msje,?Lista)
@@ -108,6 +109,7 @@ longitudes_palabras(Msje,Longs) :- string_codes(Msje, CodesMsje), juntar_con(Cod
 
 % longitudes(?Lista1,?Lista2)
 % da true si Lista2 mapea las longitudes de las listas de Lista1.
+% no debe no instanciarse ninguna, de lo contrario el comportamiento no es el esperado.
 longitudes([],[]).
 longitudes([X|XS],[L|LS]) :- length(X,L), longitudes(XS,LS).
 
