@@ -32,27 +32,25 @@ ej(3, [rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, 
 % si se instancia S, da true si hay una palabra en el diccionario actual con esos ascii.
 diccionario_lista(S):-diccionario(X), string_codes(X,S).
 
-% juntar_con(?Lista1, ?Elem, ?Lista2)
-% da true si Lista2 concatena las sublistas de Lista1 separando por Elem.
-% si sólo se instancia Lista1 da false, fallando en 'not(member(Elem,Head))', ya que basta tomar Elem = Head.
-% si sólo se instancia Elem, falla al no poder instanciar los parámetros de append/3.
-% si sólo se instancia Lista2, arroja los resultados posibles para Lista1 y Elem.
-
+% juntar_con(Lista1,Lista2,Lista3) HACER!!!!!!!!!!!!!!!
 juntar_con([],_,[]).
 juntar_con([R],_,R).
 juntar_con([HeadL,NexToHeadL | TaiLL],Elem, LseparConElem):- append(HeadL,[Elem],PrimeraParte), 
 							     juntar_con([NexToHeadL|TaiLL],Elem,SeguiSeparando),
 							     append(PrimeraParte,SeguiSeparando,LseparConElem).
 
+% palabras(+S,?P)
+% da true si S concatena las sublistas de P separando por 'espacio'.
+% S debe instanciarse ya que si sólo se instancia P da resultados inesperados.
+palabras(R,[R]):-not(append(_,[espacio | _],R)).
+palabras(R,[Head | Tail]):-append(Head,[espacio | RTail],R), not(member(espacio,Head)), palabras(RTail,Tail).
 
-separar_por_palabras([R],Elem,R):-not(append(_,[Elem | _],R)).
-separar_por_palabras([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
-
-
+%separar_por_palabras([R],Elem,R):-not(append(_,[Elem | _],R)).
+%separar_por_palabras([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
 
 % palabras(?S,?P)
 % al menos uno de los dos parámetros debe instanciarse (ver juntar_con/3)
-palabras(S,P):-separar_por_palabras(P,espacio,S).
+%palabras(S,P):-separar_por_palabras(P,espacio,S).
 
 
 
