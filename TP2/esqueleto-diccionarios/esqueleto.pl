@@ -277,6 +277,16 @@ mensajes_mas_parejos(S,MsjeSinEspacios):- descifrar_sin_espacios(S, MsjeSinEspac
 
 
 %ej9
+%Con dicc1:
+
+% descifrar_sin_espacios([rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, gato], M).
+% M = "casa de flor" ;
+% M = "casa flor de" ;
+% M = "casa miento" ;
+% false.
+
+%ej10
+
 
 
 
