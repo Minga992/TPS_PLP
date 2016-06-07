@@ -141,4 +141,40 @@ el_mas_parejo(MSE, S):- desvio_standard(MSE, DesvStanMSE), not((descifrar_sin_es
 % S debe instanciarse por el funcionamiento de descifrar_sin_espacios/2.
 mensajes_mas_parejos(S,MsjeSinEspacios):- descifrar_sin_espacios(S, MsjeSinEspacios), el_mas_parejo(MsjeSinEspacios, S).
 
+%ej1
+%Con dicc0:
+
+% diccionario_lista(S).
+% S = [101, 108] ; %% "el"
+% S = [108, 97] ; %% "la"
+% S = [99, 97, 115, 97] ; %% "casa"
+% S = [99, 111, 115, 97]. %% "cosa"
+
+% diccionario_lista([101, 108]). %% "el"
+% true ;
+% false.
+
+% diccionario_lista([99, 97, 115, 111]). %% "caso"
+% false.
+
+%ej2
+% juntar_con([[d],[c,b],[a,c,a]],espacio,R).
+% R = [d, espacio, c, b, espacio, a, c, a] ;
+% false.
+
+%acá venía el test con el elemento separador incluido en alguna/s de las listas que falló
+
+%ej3
+%depende del anterior
+
+%ej4
+% asignar_var(cuadrado, [], M).
+% M = [ (cuadrado, _G23020)].
+
+% asignar_var(cuadrado, [(triangulo,_G23021)], M).
+% M = [ (cuadrado, _G23161), (triangulo, _G23021)].
+
+% asignar_var(triangulo,  [(cuadrado, _G23161), (triangulo, _G23021)], M).
+% M = [ (cuadrado, _G23161), (triangulo, _G23021)] ;
+% false.
 
