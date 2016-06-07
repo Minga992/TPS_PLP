@@ -41,20 +41,14 @@ juntar_con([HeadL,NexToHeadL | TaiLL],Elem, LseparConElem):- append(HeadL,[Elem]
 							     juntar_con([NexToHeadL|TaiLL],Elem,SeguiSeparando),
 							     append(PrimeraParte,SeguiSeparando,LseparConElem).
 
-% palabras(+S,?P)
-% da true si S concatena las sublistas de P separando por 'espacio'.
-% S debe instanciarse ya que si sólo se instancia P da resultados inesperados.
-%palabras(R,[R]):-not(append(_,[espacio | _],R)).
-%palabras(R,[Head | Tail]):-append(Head,[espacio | RTail],R), not(member(espacio,Head)), palabras(RTail,Tail).
-
+% separar_por_palabras(?Lista1,?Elem,?Lista2)
+% da true si Lista2 concatena las sublistas de Lista1 separando por Elem.
 separar_por_palabras([R],Elem,R):-not(append(_,[Elem | _],R)).
-separar_por_palabras([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), juntar_con(Tail,Elem,RTail).
+separar_por_palabras([Head | Tail],Elem,R):-append(Head,[Elem | RTail],R), not(member(Elem,Head)), separar_por_palabras(Tail,Elem,RTail).
 
 % palabras(?S,?P)
-% al menos uno de los dos parámetros debe instanciarse (ver juntar_con/3)
+% al menos uno de los dos parámetros debe instanciarse (ver separar_por_palabras/3)
 palabras(S,P):-separar_por_palabras(P,espacio,S).
-
-
 
 % asignar_var(?A,?MI,?MF)
 % si se instancian las 3 variables, da true cuando MF es el resultado de agregar (A,_variable) a MI en caso de que no estuviera, o MF = MI si ya estaba.
@@ -288,6 +282,11 @@ mensajes_mas_parejos(S,MsjeSinEspacios):- descifrar_sin_espacios(S, MsjeSinEspac
 
 %ej10
 
-
-
+%Con dicc1:
+%ej(3, S), mensajes_mas_parejos(S, M).
+%S = [rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol|...],
+%M = "casa de flor" ;
+%S = [rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol|...],
+%M = "casa flor de" ;
+%false.
 
