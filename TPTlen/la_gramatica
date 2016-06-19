@@ -1,0 +1,53 @@
+//----------------------------tipos de datos, renombres, y otras verduras-----------------------------------//
+
+CTE -> str | bool| NUM | '('CTE')' | FUN
+
+VAR -> var | reg.campo | var[num] | '('VAR')'
+
+NUM -> (+|-)?(num|num.num)
+
+Z -> VAR | CTE | VEC | REG | OPER
+
+VEC -> [((CTE|VEC|REG) SEPV)?] | '('VEC')'
+
+SEPV -> lambda | ,(CTE|VEC|REG) SEPV
+
+
+REG -> {campo : (CTE|VEC|REG) SEPR} | '('REG')'
+
+SEPR -> lambda| ,campo : (CTE|VEC|REG) SEPR
+
+Aclaraciones:
+
+-el tokenizador debe considerar a res como un var
+-puedo tener un campo definido pero vacío?? o sea algo asi como campo{}
+-consideramos que el que escribe el codigo puede ser lo suficientemente mogólico para hacer esto: (((3))) + (4), y lo tenemos salvaguardado=)
+-la aclaracion anterior sirve para todo tipo de operaciones, por lo que no se repetira en futuras secciones.
+-Z es un renombre de cosas, no tiene una utilidad más alla de eso.
+-las comillas simples no existen, si hay comillas simples, es porque el parentesis,? debe ser usado, y no es por facilidad:
+ejemplo -> (VAR|CULO) tenes que elegir entre var o un culo, pero '('VAR|CULO')' es elegi entre var y culo y ponelo entre parentesis
+TENERME PIEDAD, puedo confundir algun parentesis, tratar de entender.
+-Inserte aqui proxima aclaración, borrando este msje.
+
+//----------------------------------------------------------------------------------------------------------//
+
+//---------------------------------------Operadores---------------------------------------------------------//
+
+ASIG -> VAR OPASIG Z
+OPASIG -> = | -= | += | *= | /=
+
+MAT -> Z OPMATBIN Z | OPMATUN VAR | VAR OPMATUN
+OPMATBIN -> + | - | * | ^ | % | /
+OPMATUN -> ++ | --
+
+REL -> Z OPREL Z
+OPREL -> == | != | < | >
+
+LOG -> Z OPLOG Z | not Z
+OPLOG -> and | or
+
+TER -> '('CTE|REL|LOG|VAR')' '?' Z : Z
+
+OPER -> MAT|REL|LOG|TER|'('OPER')'
+
+//----------------------------------------------------------------------------------------------------------//
