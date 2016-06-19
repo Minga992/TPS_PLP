@@ -1,3 +1,10 @@
+//--------------------------------------------main----------------------------------------------------------//
+			 +  ---->supraindice del parentesis de abajo
+S -> (BUCLE | COND | SEN)
+
+//----------------------------------------------------------------------------------------------------------//
+
+
 //----------------------------tipos de datos, renombres, y otras verduras-----------------------------------//
 
 CTE -> str | bool| NUM | '('CTE')' | FUN
@@ -7,6 +14,8 @@ VAR -> var | reg.campo | var[num] | '('VAR')'
 NUM -> (+|-)?(num|num.num)
 
 Z -> VAR | CTE | VEC | REG | OPER
+
+G -> VAR | CTE | REL | LOG
 
 VEC -> [((CTE|VEC|REG) SEPV)?] | '('VEC')'
 
@@ -24,7 +33,7 @@ Aclaraciones:
 -consideramos que el que escribe el codigo puede ser lo suficientemente mogólico para hacer esto: (((3))) + (4), y lo tenemos salvaguardado=)
 -la aclaracion anterior sirve para todo tipo de operaciones, por lo que no se repetira en futuras secciones.
 -Z es un renombre de cosas, no tiene una utilidad más alla de eso.
--las comillas simples no existen, si hay comillas simples, es porque el parentesis,? debe ser usado, y no es por facilidad:
+-las comillas simples no existen, si hay comillas simples, es porque el parentesis o el signo de pregunta (?), debe ser usado, y no es por facilidad:
 ejemplo -> (VAR|CULO) tenes que elegir entre var o un culo, pero '('VAR|CULO')' es elegi entre var y culo y ponelo entre parentesis
 TENERME PIEDAD, puedo confundir algun parentesis, tratar de entender.
 -Inserte aqui proxima aclaración, borrando este msje.
@@ -49,5 +58,50 @@ OPLOG -> and | or
 TER -> '('CTE|REL|LOG|VAR')' '?' Z : Z
 
 OPER -> MAT|REL|LOG|TER|'('OPER')'
+
+//----------------------------------------------------------------------------------------------------------//
+
+//----------------------------------------Funciones disponibles---------------------------------------------//
+
+FUN -> multEsc'('Z , Z (,Z)?')' | cap'('Z')' | colineales'('Z , Z')' | lenght'('Z')' | '('FUN')'
+
+//----------------------------------------------------------------------------------------------------------//
+
+//----------------------------------Sentencias y bloques ---------------------------------------------------//
+
+SEN -> (ASIG | OPMATUN VAR | VAR OPMATUN | print Z) ;
+
+                       + ---> ESTE MAS DEBERIA SER SUPRAINDICE DEL PARENTESIS DE ABAJO... LO ATAMO' CON ALAMBRE
+BL -> {(SEN|COND|BUCLE) } | SEN
+
+//----------------------------------------------------------------------------------------------------------//
+
+//----------------------------------------Condicional-------------------------------------------------------//
+
+COND -> if '('G')' BL (else BL)?
+
+//----------------------------------------------------------------------------------------------------------//
+
+//----------------------------------------Bucles------------------------------------------------------------//
+
+BUCLE -> FOR | WHILE | DOW
+
+FOR -> for '('ASIG? ; G ; (ASIG | OPMATUN VAR | VAR OPMATUN )? ')' BL
+
+WHILE -> while '('G')' BL
+
+DOW -> do BL while '('G')';
+
+//----------------------------------------------------------------------------------------------------------//
+
+//-------------------------------------------Comentarios(en el codigo)--------------------------------------//
+
+COM -> #comment
+
+Aclaraciones:
+
+-En cualquier espacio, principio o fin de todo lo anteriormente escrito, debe ponerse un COM?    esto se debe a que puede haber
+un comentario literalmente donde se te cante el orto, con excepción de el medio de una palabra.
+-comment sabe cuando algo es un comentario, le vamos a pasar la bola al tokenizador para esto, cuando tokenize comment.
 
 //----------------------------------------------------------------------------------------------------------//
