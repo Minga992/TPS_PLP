@@ -42,28 +42,28 @@ TENERME PIEDAD, puedo confundir algun parentesis, tratar de entender.
 
 //---------------------------------------Operadores---------------------------------------------------------//
 
-ASIG -> VAR OPASIG Z
+ASIG -> VAR OPASIG (Z|TER)
 OPASIG -> = | -= | += | *= | /=
 
-MAT -> Z OPMATBIN Z | OPMATUN VAR | VAR OPMATUN
+MAT -> Z OPMATBIN Z | OPMATUN VAR | VAR OPMATUN | '('MAT')'
 OPMATBIN -> + | - | * | ^ | % | /
 OPMATUN -> ++ | --
 
-REL -> Z OPREL Z
+REL -> Z OPREL Z | '('REL')'
 OPREL -> == | != | < | >
 
-LOG -> Z OPLOG Z | not Z
+LOG -> Z OPLOG Z | not Z | '('LOG')'
 OPLOG -> and | or
 
-TER -> '('CTE|REL|LOG|VAR')' '?' Z : Z
+TER -> '('CTE|REL|LOG|VAR')' '?' Z|TER : Z|TER
 
-OPER -> MAT|REL|LOG|TER|'('OPER')'
+OPER -> MAT|REL|LOG
 
 //----------------------------------------------------------------------------------------------------------//
 
 //----------------------------------------Funciones disponibles---------------------------------------------//
 
-FUN -> multEsc'('Z , Z (,Z)?')' | cap'('Z')' | colineales'('Z , Z')' | lenght'('Z')' | '('FUN')'
+FUN -> multEsc'('Z , Z (,Z)?')' | cap'('Z')' | colineales'('Z , Z')' | lenght'('Z')'
 
 //----------------------------------------------------------------------------------------------------------//
 
@@ -72,7 +72,7 @@ FUN -> multEsc'('Z , Z (,Z)?')' | cap'('Z')' | colineales'('Z , Z')' | lenght'('
 SEN -> (ASIG | OPMATUN VAR | VAR OPMATUN | print Z) ;
 
                        + ---> ESTE MAS DEBERIA SER SUPRAINDICE DEL PARENTESIS DE ABAJO... LO ATAMO' CON ALAMBRE
-BL -> {(SEN|COND|BUCLE) } | SEN
+BL -> {(SEN|COND|BUCLE) } | (SEN|COND|BUCLE)
 
 //----------------------------------------------------------------------------------------------------------//
 
