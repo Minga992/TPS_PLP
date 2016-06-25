@@ -1,4 +1,3 @@
-#PREGUNTARRRRR
 reserved = {
 	'begin' : 'BEGIN',
 	'end' : 'END',
@@ -9,8 +8,8 @@ reserved = {
 	'do' : 'DO',
 	'res' : 'RES',
 	'return' : 'RETURN',
-	'true' : 'TRUE',
-	'false' : 'FALSE',
+	'true' : 'BOOL',
+	'false' : 'BOOL',	# OJO FIJATE EL TIPO
 	'AND' : 'AND',
 	'OR' : 'OR',
 	'NOT' : 'NOT'
@@ -20,12 +19,12 @@ reserved = {
 tokens = [
 	#tipos y variables
 	'STR',
-	'BOOL',
+	#'BOOL',
 	'NUM',
 	'VAR',
 	#PREGUNTAAAAAAAAAAAARRRRRRRRRRR
 	#'REG',
-	'CAMPO',
+	#'CAMPO',
 	#signos de puntuacion
 	'PUNTO',
 	'DOSPTOS',
@@ -70,7 +69,7 @@ tokens = [
 	'COMENT'
 ] + list(reserved.values())
 
-#Reglas simple
+#Reglas simples
 t_PUNTO = r"\."
 t_DOSPTOS = r"\:"
 t_COMA = r"\,"
@@ -92,25 +91,25 @@ t_POT = r"\^"
 t_MOD = r"%"
 t_MAYOR = r"\>"
 t_MENOR = r"\<"
-t_NOT = r"NOT"
-t_AND = r"AND"
-t_OR = r"OR"
+#t_NOT = r"NOT"
+#t_AND = r"AND"
+#t_OR = r"OR"
 t_PRINT = r"print"
 t_MULTESC = r"multiplicacionEscalar"
 t_CAP = r"capitalizar"
 t_COLIN = r"colineales"
 t_LENGTH = r"length"
-t_IF = r"if"
-t_ELSE = r"else"
+#t_IF = r"if"
+#t_ELSE = r"else"
 #t_FOR = r"for"
-t_DO = r"do"
-t_WHILE = r"while"
+#t_DO = r"do"
+#t_WHILE = r"while"
 
 
 #wtf
-def t_FOR(token):
-	r"for"
-	return token
+#def t_FOR(token):
+	#r"for"
+	#return token
 
 #Reglas Complejas
 def t_STR(token):
@@ -118,9 +117,13 @@ def t_STR(token):
 	r"\"[^\"]*\""
 	return token
 	
-#def t_BOOL(token):  PREGUNTAAAARRRRRRRRR
-#	r"'true'|'false'"
-#	return token
+#def t_BOOL(token):
+	#r"'true'|'false'"
+	#if token.value is 'true'
+		#token.value = True
+	#else if token.value is 'false'
+		#token.value = False
+	#return token
 
 def t_NUM(token):
 	r"[0-9]+"
@@ -129,7 +132,7 @@ def t_NUM(token):
 	
 def t_VAR(token):
 	r"[a-zA-Z0-9_]+"
-	#token.type = reserved.get(token.value,'VAR')    # Check for reserved words
+	token.type = reserved.get(token.value,'VAR')    # Check for reserved words
 	return token
 
 #PREGUNTAAAAAAAAAAAAAAAAARRRRRR
@@ -142,7 +145,7 @@ def t_COMENT(token):
 	r"\#.*"
 	return token
 
-#PREGUNTAR ACA TMB POR EL TEMA DE STR
+
 #Se ignoran espacios y tabulados
 t_ignore_WHITESPACES = r"[ \t]+"
 

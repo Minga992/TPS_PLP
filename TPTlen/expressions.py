@@ -1,8 +1,5 @@
-#'STR'
+class Expression(object):
 
-class NUM(Expr):
-	def __init__(self, value):
-		self.value = value
-		
 	def evaluate(self):
-		return self.value
+		# Aca se implementa cada tipo de expresion.
+		raise NotImplementedError
