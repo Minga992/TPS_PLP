@@ -11,7 +11,7 @@ def p_expression_cte(subexpr):
 	#subexpr[0]
 
 def p_expression_var(subexpr):
-	'variable : VAR' | 'variable : VAR PUNTO VAR' | 'variable : VAR LCORCH NUM RCORCH'
+	'variable : VAR' | 'variable : VAR PUNTO VAR' | 'variable : VAR LCORCH NUM RCORCH' | 'variable : LCORCH variable RCORCH'
 	#subexpr[0]	
 
 def p_expression_num(subexpr):
@@ -35,7 +35,7 @@ def p_expression_sepv(subexpr):
 	#subexpr[0]
 
 def p_expression_reg(subexpr):
-	'registro : LLLAVE VAR DOSPTOS constante separareg RLLAVE' | 'reg : LLLAVE VAR DOSPTOS vector separareg RLLAVE' | 'registro : LLLAVE VAR DOSPTOS registro separareg RLLAVE' | 'reg : LPAREN registro RPAREN'
+	'registro : LLLAVE VAR DOSPTOS constante separareg RLLAVE' | 'registro : LLLAVE VAR DOSPTOS vector separareg RLLAVE' | 'registro : LLLAVE VAR DOSPTOS registro separareg RLLAVE' | 'registro : LPAREN registro RPAREN'
 	#subexpr[0]
 
 def p_expression_sepr(subexpr):
