@@ -8,8 +8,8 @@ reserved = {
 	'do' : 'DO',
 	'res' : 'RES',
 	'return' : 'RETURN',
-	'true' : 'BOOL',
-	'false' : 'BOOL',	# OJO FIJATE EL TIPO
+	#'true' : 'BOOL',
+	#'false' : 'BOOL',	# OJO FIJATE EL TIPO
 	'AND' : 'AND',
 	'OR' : 'OR',
 	'NOT' : 'NOT'
@@ -19,7 +19,7 @@ reserved = {
 tokens = [
 	#tipos y variables
 	'STR',
-	#'BOOL',
+	'BOOL',
 	'NUM',
 	'VAR',
 	#PREGUNTAAAAAAAAAAAARRRRRRRRRRR
@@ -117,13 +117,13 @@ def t_STR(token):
 	r"\"[^\"]*\""
 	return token
 	
-#def t_BOOL(token):
-	#r"'true'|'false'"
-	#if token.value is 'true'
-		#token.value = True
-	#else if token.value is 'false'
-		#token.value = False
-	#return token
+def t_BOOL(token):
+	r"true | false"
+	if token.value == 'true':
+		token.value = True
+	elif token.value == 'false':
+		token.value = False
+	return token
 
 def t_NUM(token):
 	r"[0-9]+"

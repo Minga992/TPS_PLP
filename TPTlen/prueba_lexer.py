@@ -8,7 +8,7 @@ from ply.lex import lex
 #text += "#Aqui se devuelve el resultado esperado\n"
 #text += "res = b * 0.8;"
 #text = "LALLALALAL\npepe\n999$"
-text = "true"
+text = "x = false\ny = true"
 lexer = lex(module=lexer_rules)
 lexer.input(text)
 
