@@ -1,3 +1,5 @@
+# HACER CASE INSENSITIVE
+
 reserved = {
 	'begin' : 'BEGIN',
 	'end' : 'END',

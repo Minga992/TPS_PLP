@@ -46,18 +46,26 @@ def p_constante_funcion(f):
 
 def p_variable(expr):
 	'''variable : VAR
+				| VAR LCORCH NUM RCORCH
 				| LPAREN variable RPAREN'''
 	#'			| VAR PUNTO VAR'
-	#'			| VAR LCORCH NUM RCORCH'
+	
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
 	#print "variable\n"
+	global variables
 
 	if expr[1] == '(':
 		expr[0] = expr[2]
 	elif len(expr) == 2:
 		expr[0] = Variable(expr[1]) #nombre
+	elif len(expr) == 5: # vector
+		expr[0] = Variable(expr[1])
+		if not(expr[1] in variables):	# si es la primera vez que trato con este vector, aviso
+			variables[expr[0].nombre] = 'vector'
+		
+		
 	#elif len(expr) == 4:
 		#variables[expr[1]] = 'registro'	# ver que pasa con el campo
 	#else:
@@ -214,7 +222,23 @@ def p_asignacion(expr):
 	#print "tengotipo"
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		#print "voyaasignartipo"
-		variables[expr[1].nombre] = tipoZ
+		if (expr[1].nombre in variables):
+			#print "deberia estar aca"
+			if variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
+				#print variables[expr[1].nombre]
+				variables[expr[1].nombre] += tipoZ
+			elif variables[expr[1].nombre][:6] == 'vector': # si ya habia hecho var[numero] = bla o var = [bla], veo que matchee el tipo de ahora
+				#print variables[expr[1].nombre][6:]
+				#print tipoZ
+				#print variables[expr[1].nombre][6:] != tipoZ
+				if variables[expr[1].nombre][6:] != tipoZ:
+					#print "holaaaa"
+					raise SyntaxError
+				#print variables[expr[1].nombre]
+			else:	# es una variable cualquiera, no vector
+				variables[expr[1].nombre] = tipoZ
+		else:
+			variables[expr[1].nombre] = tipoZ
 		
 		#print variables[expr[1].nombre]
 	
@@ -223,6 +247,7 @@ def p_asignacion(expr):
 			raise SyntaxError
 		else:
 			tipoV = variables[expr[1].nombre]
+			#print tipoV
 			if expr[2] == '+=': # es numerico o cadena
 				if not((numericos(tipoV,tipoZ)) | ((tipoV == tipoZ) & (tipoZ == 'str'))):
 					raise SyntaxError
@@ -326,8 +351,12 @@ def p_relacion(expr):
 		tipoZ1 = tipo_segun(expr[1])
 		tipoZ2 = tipo_segun(expr[3])
 		
-		if not(numericos(tipoZ1,tipoZ2) | (tipoZ1 != tipoZ2)): # ojo q no  estoy pensando registros ni vectores
-			raise SyntaxError
+		if len(expr[2]) == 1: # para < y > solo numericos
+			if not(numericos(tipoZ1,tipoZ2)):
+				raise SyntaxError
+		else:
+			if (tipoZ1 != tipoZ2): # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
+				raise SyntaxError
 		
 		expr[0] = Operacion('bool')	
 		
@@ -384,10 +413,11 @@ def p_ternario(expr):
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
+	tipoG = tipo_segun(expr[2])
 	tipoZ1 = tipo_segun(expr[5])
 	tipoZ2 = tipo_segun(expr[7])
 	
-	if (expr[2].tipo != 'bool') | (tipoZ1 != tipoZ2):
+	if (tipoG != 'bool') | (tipoZ1 != tipoZ2):
 		raise SyntaxError
 	else:
 		expr[0] = Operacion(tipoZ1)
@@ -441,16 +471,21 @@ def p_funcion_multesc(expr):
 	'''funcion : MULTESC LPAREN z COMA z RPAREN
 				| MULTESC LPAREN z COMA z COMA z RPAREN'''
 	
-	if (expr[3].tipo != 'vectorint') | (expr[3].tipo != 'vectorfloat') | (expr[5].tipo != 'int') | (expr[5].tipo != 'float'):
+	tipoZ1 = tipo_segun(expr[3])
+	tipoZ2 = tipo_segun(expr[5])
+	tipoZ3 = tipo_segun(expr[7])
+	
+	if (tipoZ1[:6] != 'vector') | (not(numericos(tipoZ1[6:],tipoZ2))):
 		raise SyntaxError
+	
 	if len(expr) == 9:
-		if expr[7].tipo != 'bool':
+		if tipoZ3 != 'bool':
 			raise SyntaxError
-	if (expr[3].tipo == 'vectorfloat') | (expr[5].tipo == 'float'):
+			
+	if (tipoZ1[6:] == 'float') | (tipoZ2 == 'float'):
 		expr[0] = Funcion('vectorfloat')
 	else:
 		expr[0] = Funcion('vectorint')
-	
 	
 #---------------------------------------------------------#
 	
@@ -476,7 +511,7 @@ def p_funcion_colin(expr):
 	tipoZ1 = tipo_segun(expr[3])
 	tipoZ2 = tipo_segun(expr[5])
 	
-	if (tipoZ1[:6] != 'vector') | (tipoZ2[:6] != 'vector') # vectores
+	if (tipoZ1[:6] != 'vector') | (tipoZ2[:6] != 'vector'): # vectores
 		raise SyntaxError
 	elif (tipoZ1[-3:] != 'int') & (tipoZ1[-5:] != 'float') & (tipoZ2[-3:] != 'int') & (tipoZ2[-5:] != 'float'): # numericos
 		raise SyntaxError
@@ -529,9 +564,9 @@ def p_for_sinasig(expr):
 		
 	if len(expr) == 10:
 		if (expr[6] == '++') | (expr[6] == '--') :
-			if variables[expr[7]] != 'int':
+			if variables[expr[7].nombre] != 'int':
 				raise SyntaxError
-		elif variables[expr[6]] != 'int':
+		elif variables[expr[6].nombre] != 'int':
 			raise SyntaxError
 			
 #---------------------------------------------------------#
@@ -549,9 +584,9 @@ def p_for_conasig(expr):
 		
 	if len(expr) == 11:
 		if (expr[7] == '++') | (expr[7] == '--') :
-			if variables[expr[8]] != 'int':
+			if variables[expr[8].nombre] != 'int':
 				raise SyntaxError
-		elif variables[expr[7]] != 'int':
+		elif variables[expr[7].nombre] != 'int':
 			raise SyntaxError
 
 #---------------------------------------------------------#
