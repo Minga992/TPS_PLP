@@ -402,20 +402,14 @@ def p_operLogBinario(op):
 #---------------------------------------------------------#
 
 def p_ternario(expr):
-	'''ternario : LPAREN constante RPAREN PREG z DOSPTOS z
-				| LPAREN constante RPAREN PREG ternario DOSPTOS ternario
-				| LPAREN relacion RPAREN PREG z DOSPTOS z
-				| LPAREN relacion RPAREN PREG ternario DOSPTOS ternario
-				| LPAREN logico RPAREN PREG z DOSPTOS z
-				| LPAREN logico RPAREN PREG ternario DOSPTOS ternario
-				| LPAREN variable RPAREN PREG z DOSPTOS z
-				| LPAREN variable RPAREN PREG ternario DOSPTOS ternario'''
-	
+	'''ternario : g PREG z DOSPTOS z
+				| g PREG ternario DOSPTOS ternario'''
+				
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
-	tipoG = tipo_segun(expr[2])
-	tipoZ1 = tipo_segun(expr[5])
-	tipoZ2 = tipo_segun(expr[7])
+	tipoG = tipo_segun(expr[1])
+	tipoZ1 = tipo_segun(expr[3])
+	tipoZ2 = tipo_segun(expr[5])
 	
 	if (tipoG != 'bool') | (tipoZ1 != tipoZ2):
 		raise SyntaxError
