@@ -42,12 +42,15 @@ class Operacion(Constante):
 	
 	atributo_para_que_compile = 1
 	
-#class Vector(Programa):
-	#
+	
+class Vector(Constante):
+	
+	atributo_para_que_compile = 1
+	
 	#def __init__(self,tipo):
 		#self.tipo = tipo
 		#
-#
+
 #class SepVec(Vector):
 	#
 	#def __init__(self,tipo):

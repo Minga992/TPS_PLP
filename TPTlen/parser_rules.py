@@ -105,8 +105,8 @@ def p_numero(num):
 def p_zeta(expr):
 	'''z : variable
 		| constante
-		| operacion'''
-	#'  | vector
+		| operacion
+		| vector'''
 	#'  | registro
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
@@ -129,34 +129,39 @@ def p_ge(expr):
 
 #---------------------------------------------------------#
 
-#def p_vector(expr):
-	#'vector : LCORCH constante separavec RCORCH'
-	#'		| LCORCH vector separavec RCORCH'
-	#'		| LCORCH registro separavec RCORCH'
-	#'		| LPAREN vector RPAREN'
-	#
-	#if expr[1] == '(':
-		#expr[0] = expr[2]
-	#elif (expr[2].tipo != expr[3].tipo) & expr[3] != 'vacio' :
-		#raise SyntaxError
-	#else:
-		#expr[0] = Vector(expr[2].tipo)
-#
+def p_vector(expr):
+	'''vector : LCORCH constante separavec RCORCH
+			| LCORCH vector separavec RCORCH
+			| LPAREN vector RPAREN'''
+			
+			#| LCORCH registro separavec RCORCH
+	
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	if expr[1] == '(':
+		expr[0] = expr[2]
+	elif (expr[2].tipo != expr[3].tipo) & (expr[3].tipo != 'vacio'):
+		raise SyntaxError
+	else:
+		expr[0] = Vector('vector'+expr[2].tipo)
+
 #---------------------------------------------------------#
-#
-#def p_separavector(expr):
-	#'separavec : empty'
-	#'		   | constante separavec'
-	#'		   | vector separavec'
-	#'		   | registro separavec'
-#
-	#if len(expr) == 2:
-		#expr[0] = SepVec('vacio')
-	#elif (expr[1].tipo != expr[2].tipo) & expr[2] != 'vacio' :
-		#raise SyntaxError
-	#else:
-		#expr[0] = SepVec(expr[1].tipo)
-#
+
+def p_separavector(expr):
+	'''separavec : empty
+				| COMA constante separavec
+				| COMA vector separavec'''
+				#| registro separavec'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+
+	if len(expr) == 2:
+		expr[0] = Vector('vacio')
+	elif (expr[2].tipo != expr[3].tipo) & (expr[3].tipo != 'vacio') :
+		raise SyntaxError
+	else:
+		expr[0] = Vector(expr[2].tipo)
+
 #---------------------------------------------------------#
 #
 #def p_registro(expr):
@@ -245,7 +250,8 @@ def p_operasig(op):
 def p_matematico(expr):
 	'''matematico : z operMatBinario z
 				| operMatUnario variable
-				| variable operMatUnario'''
+				| variable operMatUnario
+				| LPAREN matematico RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
@@ -253,32 +259,27 @@ def p_matematico(expr):
 
 	if len(expr) == 4: 
 		
-		#if type(expr[1]) == Variable:
-			#tipoZ1 = variables[expr[1].nombre]
-		#else:
-			#tipoZ1 = expr[1].tipo
-			#
-		#if type(expr[3]) == Variable:
-			#tipoZ2 = variables[expr[3].nombre]
-		#else:
-			#tipoZ2 = expr[3].tipo
-		tipoZ1 = tipo_segun(expr[1])
-		tipoZ2 = tipo_segun(expr[3])
-			
-		if expr[2] == '+': # es numerico o cadena
-			if not((numericos(tipoZ1,tipoZ2)) | ((tipoZ1 == tipoZ2) & (tipoZ2 == 'str'))):
-				raise SyntaxError
-		elif expr[2] == '%':
-			if not((tipoZ1 == 'int') & (tipoZ1 == tipoZ2)):
-				raise SyntaxError
-		else: # es numerico
-			if not(numericos(tipoZ1,tipoZ2)):
-				raise SyntaxError
+		if expr[1] == '(':
+			expr[0] = expr[2]
 		
-		if (tipoZ1 == 'float') | (tipoZ2 == 'float'):
-			expr[0] = Operacion('float')
-		else:
-			expr[0] = Operacion(tipoZ1)
+		else: 
+			tipoZ1 = tipo_segun(expr[1])
+			tipoZ2 = tipo_segun(expr[3])
+				
+			if expr[2] == '+': # es numerico o cadena
+				if not((numericos(tipoZ1,tipoZ2)) | ((tipoZ1 == tipoZ2) & (tipoZ2 == 'str'))):
+					raise SyntaxError
+			elif expr[2] == '%':
+				if not((tipoZ1 == 'int') & (tipoZ1 == tipoZ2)):
+					raise SyntaxError
+			else: # es numerico
+				if not(numericos(tipoZ1,tipoZ2)):
+					raise SyntaxError
+			
+			if (tipoZ1 == 'float') | (tipoZ2 == 'float'):
+				expr[0] = Operacion('float')
+			else:
+				expr[0] = Operacion(tipoZ1)
 		
 	else: # es entero
 		if (expr[1] == '++') | (expr[1] == '--') :
@@ -436,21 +437,21 @@ def p_bloque(expr):
 	
 #---------------------------------------------------------#
 
-#def p_funcion_multesc(expr):
-	#'funcion : MULTESC LPAREN z COMA z RPAREN'
-	#'		 | MULTESC LPAREN z COMA z COMA z RPAREN'
-	#
-	#if (expr[3].tipo != 'vectorint') | (expr[3].tipo != 'vectorfloat') | (expr[5].tipo != 'int') | (expr[5].tipo != 'float'):
-		#raise SyntaxError
-	#if len(expr) == 9:
-		#if expr[7].tipo != 'bool':
-			#raise SyntaxError
-	#if (expr[3].tipo == 'vectorfloat') | (expr[5].tipo == 'float'):
-		#expr[0] = Funcion('vectorfloat')
-	#else:
-		#expr[0] = Funcion('vectorint')
-	#
-	#
+def p_funcion_multesc(expr):
+	'''funcion : MULTESC LPAREN z COMA z RPAREN
+				| MULTESC LPAREN z COMA z COMA z RPAREN'''
+	
+	if (expr[3].tipo != 'vectorint') | (expr[3].tipo != 'vectorfloat') | (expr[5].tipo != 'int') | (expr[5].tipo != 'float'):
+		raise SyntaxError
+	if len(expr) == 9:
+		if expr[7].tipo != 'bool':
+			raise SyntaxError
+	if (expr[3].tipo == 'vectorfloat') | (expr[5].tipo == 'float'):
+		expr[0] = Funcion('vectorfloat')
+	else:
+		expr[0] = Funcion('vectorint')
+	
+	
 #---------------------------------------------------------#
 	
 def p_funcion_cap(expr):
@@ -467,14 +468,21 @@ def p_funcion_cap(expr):
 	
 #---------------------------------------------------------#
 
-#def p_funcion_colin(expr):
-	#'funcion : COLIN LPAREN z COMA z RPAREN'
-	#
-	#if (expr[3].tipo != 'vectorint') | (expr[3].tipo != 'vectorfloat') | (expr[5].tipo != 'vectorint') | (expr[5].tipo != 'vectorfloat'):
-		#raise SyntaxError
-	#expr[0] = Funcion('bool')
-	#
+def p_funcion_colin(expr):
+	'funcion : COLIN LPAREN z COMA z RPAREN'
 	
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	tipoZ1 = tipo_segun(expr[3])
+	tipoZ2 = tipo_segun(expr[5])
+	
+	if (tipoZ1[:6] != 'vector') | (tipoZ2[:6] != 'vector') # vectores
+		raise SyntaxError
+	elif (tipoZ1[-3:] != 'int') & (tipoZ1[-5:] != 'float') & (tipoZ2[-3:] != 'int') & (tipoZ2[-5:] != 'float'): # numericos
+		raise SyntaxError
+	
+	expr[0] = Funcion('bool')
+
 #---------------------------------------------------------#
 
 def p_funcion_length(expr):
@@ -483,7 +491,7 @@ def p_funcion_length(expr):
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	#if (expr[3].tipo != 'vector') | (expr[3].tipo != 'str'):  # ojo q vale vector de lo q sea
-	if tipo_segun(expr[3]) != 'str':  # ojo q no estoy pensando en vectores
+	if (tipo_segun(expr[3]) != 'str') | (tipo_segun(expr[3])[:6] != 'vector'): 
 		raise SyntaxError
 	
 	expr[0] = Funcion('int')
@@ -585,9 +593,9 @@ def p_codigo(expr):
 
 #---------------------------------------------------------#
 
-#def p_empty(p):
-	#'empty :'
-	#pass
+def p_empty(p):
+	'empty :'
+	pass
 
 #---------------------------------------------------------#
 
