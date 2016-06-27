@@ -7,57 +7,66 @@ class Programa(object):
 
 class Variable(Programa):
 	
-	def __init__(self,valor,tipo,nombre):
+	#def __init__(self,valor,tipo,nombre):
+	def __init__(self,nombre):
 		#self.valor = valor
-		self.tipo = tipo
-		#self.nombre = nombre
+		#self.tipo = tipo
+		self.nombre = nombre
 	
 
 class Constante(Programa):
 	
-	def __init__(self,valor,tipo):
-		self.valor = valor
-		self.tipo = tipo
-	
-	
-class Numero(Programa):
-	
-	def __init__(self,valor,tipo):
-		self.valor = valor
-		self.tipo = tipo
-
-
-class Funcion(Programa):
-	
-	def __init__(self,tipo)
-		self.tipo = tipo
-	
-	
-	
-class Vector(Programa):
-	
+	#def __init__(self,valor,tipo):
 	def __init__(self,tipo):
+		#self.valor = valor
 		self.tipo = tipo
-		
-
-class SepVec(Vector):
 	
-	def __init__(self,tipo):
-		self.tipo = tipo
-		
-		
-class Registro(Programa):
 	
-	tipo = 'registro'
+class Numero(Constante):
 	
-	def __init__(self,campos,tipos_campos):
-		self.campos = campos
-		self.tipos_campos = tipos_campos
+	atributo_para_que_compile = 1
+	#def __init__(self,tipo):
+	#def __init__(self,valor,tipo):
+		#self.valor = valor
+		#self.tipo = tipo
 
 
-class SepVec(Registro):
+class Funcion(Constante):
 	
-class Ternario(Programa):
+	atributo_para_que_compile = 1
+	#def __init__(self,tipo):
+		#self.tipo = tipo
 	
-	def __init__(self, tipo):
-		self.tipo = tipo
+
+class Operacion(Constante):
+	
+	atributo_para_que_compile = 1
+	
+#class Vector(Programa):
+	#
+	#def __init__(self,tipo):
+		#self.tipo = tipo
+		#
+#
+#class SepVec(Vector):
+	#
+	#def __init__(self,tipo):
+		#self.tipo = tipo
+		#
+		#
+#class Registro(Programa):
+	#
+	#tipo = 'registro'
+	#
+	#def __init__(self,campos,tipos_campos):
+		#self.campos = campos
+		#self.tipos_campos = tipos_campos
+#
+#
+#class SepVec(Registro):
+	#
+#
+#class Ternario(Programa):
+	#
+	#def __init__(self, tipo):
+		#self.tipo = tipo

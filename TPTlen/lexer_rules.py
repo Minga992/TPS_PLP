@@ -12,7 +12,12 @@ reserved = {
 	#'false' : 'BOOL',	# OJO FIJATE EL TIPO
 	'AND' : 'AND',
 	'OR' : 'OR',
-	'NOT' : 'NOT'
+	'NOT' : 'NOT',
+	'print' : 'PRINT',
+	'multiplicacionEscalar' : 'MULTESC',
+	'captalizar' : 'CAP',
+	'colineales' : 'COLIN',
+	'length' : 'LENGTH'
 }
 
 
@@ -54,11 +59,11 @@ tokens = [
 	#'AND',
 	#'OR',
 	#funciones
-	'PRINT',
-	'MULTESC',
-	'CAP',
-	'COLIN',
-	'LENGTH',
+	#'PRINT',
+	#'MULTESC',
+	#'CAP',
+	#'COLIN',
+	#'LENGTH',
 	#condicional y bucles
 	#'IF',
 	#'ELSE',
@@ -94,11 +99,11 @@ t_MENOR = r"\<"
 #t_NOT = r"NOT"
 #t_AND = r"AND"
 #t_OR = r"OR"
-t_PRINT = r"print"
-t_MULTESC = r"multiplicacionEscalar"
-t_CAP = r"capitalizar"
-t_COLIN = r"colineales"
-t_LENGTH = r"length"
+#t_PRINT = r"print"
+#t_MULTESC = r"multiplicacionEscalar"
+#t_CAP = r"capitalizar"
+#t_COLIN = r"colineales"
+#t_LENGTH = r"length"
 #t_IF = r"if"
 #t_ELSE = r"else"
 #t_FOR = r"for"
@@ -115,25 +120,40 @@ t_LENGTH = r"length"
 def t_STR(token):
 	#r"\"[\w_\,\)\(\*;\-\=\>/\.{}&:\+\#\[\]<|%!\'@\?~^$`\ ]*\""
 	r"\"[^\"]*\""
+	
 	return token
+	
 	
 def t_BOOL(token):
 	r"true | false"
+	
 	if token.value == 'true':
 		token.value = True
 	elif token.value == 'false':
 		token.value = False
+		
 	return token
+
 
 def t_NUM(token):
 	r"[0-9]+"
+	
 	token.value = int(token.value)
+	
 	return token
+
 	
 def t_VAR(token):
-	r"[a-zA-Z0-9_]+"
+	r"[a-zA-Z][a-zA-Z0-9_]*"
+	
 	token.type = reserved.get(token.value,'VAR')    # Check for reserved words
+	
+	if token.type in ['BEGIN','END','RETURN']:
+		palabra_reservada(token)
+	
 	return token
+
+
 
 #PREGUNTAAAAAAAAAAAAAAAAARRRRRR
 #'REG',
@@ -157,7 +177,16 @@ def t_NEWLINE(token):
 
 def t_error(token):
 	message = "Token desconocido:"
-	message = "\ntype:" + token.type
+	message += "\ntype:" + token.type
+	message += "\nvalue:" + str(token.value)
+	message += "\nline:" + str(token.lineno)
+	message += "\nposition:" + str(token.lexpos)
+	raise Exception(message)
+	
+	
+def palabra_reservada(token):
+	message = "Palabra reservada no utilizable:"
+	message += "\ntype:" + token.type
 	message += "\nvalue:" + str(token.value)
 	message += "\nline:" + str(token.lineno)
 	message += "\nposition:" + str(token.lexpos)

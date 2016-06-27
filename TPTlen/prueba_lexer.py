@@ -8,7 +8,7 @@ from ply.lex import lex
 #text += "#Aqui se devuelve el resultado esperado\n"
 #text += "res = b * 0.8;"
 #text = "LALLALALAL\npepe\n999$"
-text = "x = false\ny = true"
+text = "inicio = \"Hola\";\ni =0;\ndo{ i++;\ninicio += \" \"; \# Se agrega un espacio\nj = length(inicio) * i;\n}while (j % 32 != 0); print (\"Mundo!\");"
 lexer = lex(module=lexer_rules)
 lexer.input(text)
 
