@@ -564,8 +564,8 @@ def p_bucle(expr):
 def p_for_sinasig(expr):
 	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
 			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			| FOR LPAREN PTOCOMA g PTOCOMA operMatUnario variable RPAREN bloque
-			| FOR LPAREN PTOCOMA g PTOCOMA variable operMatUnario RPAREN bloque'''
+			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
+			#| FOR LPAREN PTOCOMA g PTOCOMA variable operMatUnario RPAREN bloque'''
 			
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
