@@ -47,9 +47,8 @@ def p_constante_funcion(f):
 def p_variable(expr):
 	'''variable : VAR
 				| VAR LCORCH NUM RCORCH
-				| LPAREN variable RPAREN'''
-	#'			| VAR PUNTO VAR'
-	
+				| LPAREN variable RPAREN
+				| VAR PUNTO VAR'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
@@ -64,14 +63,18 @@ def p_variable(expr):
 		expr[0] = Variable(expr[1])
 		if not(expr[1] in variables):	# si es la primera vez que trato con este vector, aviso
 			variables[expr[0].nombre] = 'vector'
-		
+	else: # registro.campo
+		if (expr[1] in variables) & (variables[expr[1]] != 'registro'):
+			p_error(0)
+		else:
+			variables[expr[1]] = 'registro'
 		
 	#elif len(expr) == 4:
 		#variables[expr[1]] = 'registro'	# ver que pasa con el campo
 	#else:
 		#if expr[1] in variables:
 			#if variables[expr[1]] != 'vector'+expr[0].tipo:
-				#raise SyntaxError
+				#p_error(0)
 		#else:
 			#variables[expr[1]] = 'vector'+expr[0].tipo
 	
@@ -114,8 +117,8 @@ def p_zeta(expr):
 	'''z : variable
 		| constante
 		| operacion
-		| vector'''
-	#'  | registro
+		| vector
+		| registro'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -140,16 +143,15 @@ def p_ge(expr):
 def p_vector(expr):
 	'''vector : LCORCH constante separavec RCORCH
 			| LCORCH vector separavec RCORCH
-			| LPAREN vector RPAREN'''
-			
-			#| LCORCH registro separavec RCORCH
+			| LCORCH registro separavec RCORCH
+			| LPAREN vector RPAREN'''			
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if expr[1] == '(':
 		expr[0] = expr[2]
 	elif (expr[2].tipo != expr[3].tipo) & (expr[3].tipo != 'vacio'):
-		raise SyntaxError
+		p_error(0)
 	else:
 		expr[0] = Vector('vector'+expr[2].tipo)
 
@@ -158,47 +160,48 @@ def p_vector(expr):
 def p_separavector(expr):
 	'''separavec : empty
 				| COMA constante separavec
-				| COMA vector separavec'''
-				#| registro separavec'''
+				| COMA vector separavec
+				| registro separavec'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
 	if len(expr) == 2:
 		expr[0] = Vector('vacio')
 	elif (expr[2].tipo != expr[3].tipo) & (expr[3].tipo != 'vacio') :
-		raise SyntaxError
+		p_error(0)
 	else:
 		expr[0] = Vector(expr[2].tipo)
 
 #---------------------------------------------------------#
-#
-#def p_registro(expr):
-	#'registro : LLLAVE RLLAVE'
-	#'		  | LLLAVE VAR DOSPTOS constante separareg RLLAVE'
-	#'		  | LLLAVE VAR DOSPTOS vector separareg RLLAVE'
-	#'		  | LLLAVE VAR DOSPTOS registro separareg RLLAVE'
-	#'		  | LPAREN registro RPAREN'
-	#
-	#if expr[1] == '(':
-		#expr[0] = expr[2]
-	#elif len(expr) == 3 : 
-		#expr[0] = Registro([],[])
-	#else:
-		#expr[0] = Registro([expr[2].nombre]+expr[5].campos,[expr[2].tipo]+expr[5].tipos)
-		#
+
+def p_registro(expr):
+	'''registro : LLLAVE RLLAVE
+				| LLLAVE VAR DOSPTOS constante separareg RLLAVE
+				| LLLAVE VAR DOSPTOS vector separareg RLLAVE
+				| LLLAVE VAR DOSPTOS registro separareg RLLAVE
+				| LPAREN registro RPAREN'''
+	
+	if expr[1] == '(':
+		expr[0] = expr[2]
+	elif len(expr) == 3 : 
+		expr[0] = Registro([],[])
+	else:
+		expr[0] = Registro([expr[2]]+expr[5].campos,[expr[4].tipo]+expr[5].tipos_campos)
+		
 #---------------------------------------------------------#
-#
-#def p_separaregistro(expr):
-	#'separaReg : empty'
-	#'		   | COMA VAR DOSPTOS constante separareg'
-	#'		   | COMA VAR DOSPTOS vector separareg'
-	#'		   | COMA VAR DOSPTOS registro separareg'
-	#
-	#if len(expr) == 2 :
-		#expr[0] = Registro([],[])
-	#else:
-		#expr[0] = Registro([expr[4].nombre]+expr[5].campos,[expr[4].tipo]+expr[5].tipos)
-	#
+
+def p_separaregistro(expr):
+	'''separareg : empty
+				| COMA VAR DOSPTOS constante separareg
+				| COMA VAR DOSPTOS vector separareg
+				| COMA VAR DOSPTOS registro separareg'''
+	
+	if len(expr) == 2 :
+		expr[0] = Registro([],[])
+	else:
+		#print type(expr[2])
+		expr[0] = Registro([expr[2]]+expr[5].campos,[expr[4].tipo]+expr[5].tipos_campos)
+	
 #---------------------------------------------------------#
 
 def p_asignacion(expr):
@@ -233,7 +236,7 @@ def p_asignacion(expr):
 				#print variables[expr[1].nombre][6:] != tipoZ
 				if variables[expr[1].nombre][6:] != tipoZ:
 					#print "holaaaa"
-					raise SyntaxError
+					p_error(0)
 				#print variables[expr[1].nombre]
 			else:	# es una variable cualquiera, no vector
 				variables[expr[1].nombre] = tipoZ
@@ -244,16 +247,19 @@ def p_asignacion(expr):
 	
 	else:	# aca la variable ya deberia estar inicializada
 		if not(expr[1].nombre in variables):
-			raise SyntaxError
+			p_error(0)
 		else:
 			tipoV = variables[expr[1].nombre]
 			#print tipoV
 			if expr[2] == '+=': # es numerico o cadena
 				if not((numericos(tipoV,tipoZ)) | ((tipoV == tipoZ) & (tipoZ == 'str'))):
-					raise SyntaxError
+					p_error(0)
 			else: # es numerico
 				if not(numericos(tipoV,tipoZ)):
-					raise SyntaxError
+					p_error(0)
+	
+	print expr[1].nombre
+	print variables[expr[1].nombre]
 
 #---------------------------------------------------------#	
 
@@ -293,13 +299,13 @@ def p_matematico(expr):
 				
 			if expr[2] == '+': # es numerico o cadena
 				if not((numericos(tipoZ1,tipoZ2)) | ((tipoZ1 == tipoZ2) & (tipoZ2 == 'str'))):
-					raise SyntaxError
+					p_error(0)
 			elif expr[2] == '%':
 				if not((tipoZ1 == 'int') & (tipoZ1 == tipoZ2)):
-					raise SyntaxError
+					p_error(0)
 			else: # es numerico
 				if not(numericos(tipoZ1,tipoZ2)):
-					raise SyntaxError
+					p_error(0)
 			
 			if (tipoZ1 == 'float') | (tipoZ2 == 'float'):
 				expr[0] = Operacion('float')
@@ -309,9 +315,9 @@ def p_matematico(expr):
 	else: # es entero
 		if (expr[1] == '++') | (expr[1] == '--') :
 			if variables[expr[2]] != 'int':
-				raise SyntaxError
+				p_error(0)
 		elif variables[expr[1]] != 'int':
-			raise SyntaxError
+			p_error(0)
 		
 		expr[0] = Operacion['int']
 		
@@ -353,10 +359,10 @@ def p_relacion(expr):
 		
 		if len(expr[2]) == 1: # para < y > solo numericos
 			if not(numericos(tipoZ1,tipoZ2)):
-				raise SyntaxError
+				p_error(0)
 		else:
 			if (tipoZ1 != tipoZ2): # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
-				raise SyntaxError
+				p_error(0)
 		
 		expr[0] = Operacion('bool')	
 		
@@ -385,9 +391,9 @@ def p_logico(expr):
 		expr[0] = expr[2]
 	elif len(expr) == 3:	# not
 		if tipo_segun(expr[2]) != 'bool':
-			raise SyntaxError
+			p_error(0)
 	elif (tipo_segun(expr[1]) != 'bool') & (tipo_segun(expr[3].tipo) != 'bool'):
-		raise SyntaxError
+		p_error(0)
 	else:
 		expr[0] = Operacion('bool')
 	
@@ -412,7 +418,7 @@ def p_ternario(expr):
 	tipoZ2 = tipo_segun(expr[5])
 	
 	if (tipoG != 'bool') | (tipoZ1 != tipoZ2):
-		raise SyntaxError
+		p_error(0)
 	else:
 		expr[0] = Operacion(tipoZ1)
 
@@ -445,9 +451,9 @@ def p_sentencia_ctipo(expr):
 	
 	if (expr[1] == '++') | (expr[1] == '--') :
 		if variables[expr[2]] != 'int':
-			raise SyntaxError
+			p_error(0)
 		elif variables[expr[1]] != 'int':
-			raise SyntaxError
+			p_error(0)
 	
 	expr[0] = Operacion('int')
 	
@@ -470,11 +476,11 @@ def p_funcion_multesc(expr):
 	tipoZ3 = tipo_segun(expr[7])
 	
 	if (tipoZ1[:6] != 'vector') | (not(numericos(tipoZ1[6:],tipoZ2))):
-		raise SyntaxError
+		p_error(0)
 	
 	if len(expr) == 9:
 		if tipoZ3 != 'bool':
-			raise SyntaxError
+			p_error(0)
 			
 	if (tipoZ1[6:] == 'float') | (tipoZ2 == 'float'):
 		expr[0] = Funcion('vectorfloat')
@@ -491,7 +497,7 @@ def p_funcion_cap(expr):
 	#print expr[3]
 	
 	if tipo_segun(expr[3]) != 'str':
-		raise SyntaxError
+		p_error(0)
 		
 	expr[0] = Funcion('str')
 	
@@ -506,9 +512,9 @@ def p_funcion_colin(expr):
 	tipoZ2 = tipo_segun(expr[5])
 	
 	if (tipoZ1[:6] != 'vector') | (tipoZ2[:6] != 'vector'): # vectores
-		raise SyntaxError
+		p_error(0)
 	elif (tipoZ1[-3:] != 'int') & (tipoZ1[-5:] != 'float') & (tipoZ2[-3:] != 'int') & (tipoZ2[-5:] != 'float'): # numericos
-		raise SyntaxError
+		p_error(0)
 	
 	expr[0] = Funcion('bool')
 
@@ -521,7 +527,7 @@ def p_funcion_length(expr):
 	
 	#if (expr[3].tipo != 'vector') | (expr[3].tipo != 'str'):  # ojo q vale vector de lo q sea
 	if (tipo_segun(expr[3]) != 'str') | (tipo_segun(expr[3])[:6] != 'vector'): 
-		raise SyntaxError
+		p_error(0)
 	
 	expr[0] = Funcion('int')
 
@@ -534,7 +540,7 @@ def p_condicional(expr):
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if tipo_segun(expr[3]) != 'bool':
-		raise SyntaxError
+		p_error(0)
 	
 #---------------------------------------------------------#
 
@@ -552,16 +558,18 @@ def p_for_sinasig(expr):
 			| FOR LPAREN PTOCOMA g PTOCOMA variable operMatUnario RPAREN bloque'''
 			
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+
+	global variables
 	
 	if tipo_segun(expr[4]) != 'bool':
-		raise SyntaxError
+		p_error(0)
 		
 	if len(expr) == 10:
 		if (expr[6] == '++') | (expr[6] == '--') :
 			if variables[expr[7].nombre] != 'int':
-				raise SyntaxError
+				p_error(0)
 		elif variables[expr[6].nombre] != 'int':
-			raise SyntaxError
+			p_error(0)
 			
 #---------------------------------------------------------#
 			
@@ -573,15 +581,17 @@ def p_for_conasig(expr):
 			
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
+	global variables
+	
 	if tipo_segun(expr[5]) != 'bool':
-		raise SyntaxError
+		p_error(0)
 		
 	if len(expr) == 11:
 		if (expr[7] == '++') | (expr[7] == '--') :
 			if variables[expr[8].nombre] != 'int':
-				raise SyntaxError
+				p_error(0)
 		elif variables[expr[7].nombre] != 'int':
-			raise SyntaxError
+			p_error(0)
 
 #---------------------------------------------------------#
 
@@ -591,7 +601,7 @@ def p_while(expr):
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if tipo_segun(expr[3]) != 'bool':
-		raise SyntaxError	
+		p_error(0)	
 
 #---------------------------------------------------------#
 
@@ -601,7 +611,7 @@ def p_dowhile(expr):
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if tipo_segun(expr[5]) != 'bool':
-		raise SyntaxError	
+		p_error(0)	
 
 #---------------------------------------------------------#
 

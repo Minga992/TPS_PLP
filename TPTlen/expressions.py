@@ -57,15 +57,15 @@ class Vector(Constante):
 		#self.tipo = tipo
 		#
 		#
-#class Registro(Programa):
-	#
-	#tipo = 'registro'
-	#
-	#def __init__(self,campos,tipos_campos):
-		#self.campos = campos
-		#self.tipos_campos = tipos_campos
-#
-#
+class Registro(Programa):
+	
+	tipo = 'registro'
+	
+	def __init__(self,campos,tipos_campos):
+		self.campos = campos
+		self.tipos_campos = tipos_campos
+
+
 #class SepVec(Registro):
 	#
 #
