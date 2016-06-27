@@ -434,10 +434,10 @@ def p_autoincdec(expr):
 	'''autoincdec : operMatUnario variable PTOCOMA
 				| variable operMatUnario PTOCOMA'''
 
-	if (expr[7] == '++') | (expr[7] == '--') :
-		if variables[expr[8].nombre] != 'int':
+	if (expr[1] == '++') | (expr[1] == '--') :
+		if variables[expr[2].nombre] != 'int':
 			p_error(0)
-	elif variables[expr[7].nombre] != 'int':
+	elif variables[expr[1].nombre] != 'int':
 		p_error(0)
 
 #---------------------------------------------------------#	
@@ -574,12 +574,12 @@ def p_for_sinasig(expr):
 	if tipo_segun(expr[4]) != 'bool':
 		p_error(0)
 		
-	if len(expr) == 10:
-		if (expr[6] == '++') | (expr[6] == '--') :
-			if variables[expr[7].nombre] != 'int':
-				p_error(0)
-		elif variables[expr[6].nombre] != 'int':
-			p_error(0)
+	#if len(expr) == 10:
+		#if (expr[6] == '++') | (expr[6] == '--') :
+			#if variables[expr[7].nombre] != 'int':
+				#p_error(0)
+		#elif variables[expr[6].nombre] != 'int':
+			#p_error(0)
 			
 #---------------------------------------------------------#
 			
