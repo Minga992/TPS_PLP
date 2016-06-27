@@ -205,7 +205,8 @@ def p_separaregistro(expr):
 
 def p_asignacion(expr):
 	'''asignacion : variable operasig z
-				| variable operasig ternario'''
+				| variable operasig ternario
+				| RES = z'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	print "asig"
@@ -214,28 +215,30 @@ def p_asignacion(expr):
 	
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		
-		if (expr[1].nombre in variables): # si la variable ya se uso antes
+		if expr[1] != 'res': # no es res, hago todos los chequeos para la variable correspondiente, si es res no me importa
 		
-			if variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
-				variables[expr[1].nombre] += tipoZ
-				
-			elif variables[expr[1].nombre][:6] == 'vector': # si ya habia hecho var[numero] = bla o var = [bla], veo que matchee el tipo de ahora
+			if (expr[1].nombre in variables): # si la variable ya se uso antes
+			
+				if variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
+					variables[expr[1].nombre] += tipoZ
+					
+				elif variables[expr[1].nombre][:6] == 'vector': # si ya habia hecho var[numero] = bla o var = [bla], veo que matchee el tipo de ahora
 
-				if variables[expr[1].nombre][6:] != tipoZ:
-					p_error(0)
+					if variables[expr[1].nombre][6:] != tipoZ:
+						p_error(0)
 
-			else:	# es una variable cualquiera, no vector
+				else:	# es una variable cualquiera, no vector
+					variables[expr[1].nombre] = tipoZ
+					
+					if tipoZ == 'registro':	# reflejo los campos
+						campos_a_variables(expr[1].nombre, expr[3])
+					
+			else:
 				variables[expr[1].nombre] = tipoZ
 				
 				if tipoZ == 'registro':	# reflejo los campos
-					campos_a_variables(expr[1].nombre, expr[3])
-				
-		else:
-			variables[expr[1].nombre] = tipoZ
-			
-			if tipoZ == 'registro':	# reflejo los campos
-					campos_a_variables(expr[1].nombre, expr[3])
-	
+						campos_a_variables(expr[1].nombre, expr[3])
+		
 	else:	# aca la variable ya deberia estar inicializada
 		if not(expr[1].nombre in variables):
 			p_error(0)
@@ -626,16 +629,18 @@ def p_codigo(expr):
 	'''codigo : bucle codigo
 		    | condicional codigo
 	 	    | sentencia codigo
+	 	    | comentario codigo
 		    | bucle
 		    | condicional
-		    | sentencia'''
+		    | sentencia
+		    | comentario'''
 
 	print "codigo"
 
 #---------------------------------------------------------#
 
-#def p_comentario(expr):
-	#'comentario : COMENT'
+def p_comentario(expr):
+	'comentario : COMENT'
 
 #---------------------------------------------------------#
 
