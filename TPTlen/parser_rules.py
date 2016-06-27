@@ -11,6 +11,7 @@ def p_inicial(expr):
 	'start : codigo'
 	
 	#expr[0] = expr[1]
+	#print "inicial\n"
 
 #---------------------------------------------------------#
 
@@ -39,7 +40,7 @@ def p_constante_funcion(f):
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
-	f[0] = Constante(f[1].tipo)
+	f[0] = Funcion(f[1].tipo)
 
 #---------------------------------------------------------#
 
@@ -51,8 +52,10 @@ def p_variable(expr):
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
+	#print "variable\n"
+
 	if expr[1] == '(':
-		expr[2] = expr[0]
+		expr[0] = expr[2]
 	elif len(expr) == 2:
 		expr[0] = Variable(expr[1]) #nombre
 	#elif len(expr) == 4:
@@ -107,6 +110,8 @@ def p_zeta(expr):
 	#'  | registro
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	#print "zeta"
 	
 	expr[0] = expr[1]
 	
@@ -184,8 +189,8 @@ def p_ge(expr):
 #---------------------------------------------------------#
 
 def p_asignacion(expr):
-	'asignacion : variable operasig z'
-	#'			| variable operasig ternario'
+	'''asignacion : variable operasig z
+				| variable operasig ternario'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -193,10 +198,20 @@ def p_asignacion(expr):
 		#tipoZ = variables[expr[3].nombre]
 	#else:
 		#tipoZ = expr[3].tipo
-	tipoZ =	tipo_segun(expr[3])
+	#print expr[0]
+	#print expr[1]
+	#print expr[2]
+	#print expr[3]
+	#print len(expr)
 	
+	global variables
+	tipoZ =	tipo_segun(expr[3])
+	#print "tengotipo"
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
+		#print "voyaasignartipo"
 		variables[expr[1].nombre] = tipoZ
+		
+		#print variables[expr[1].nombre]
 	
 	else:	# aca la variable ya deberia estar inicializada
 		if not(expr[1].nombre in variables):
@@ -219,6 +234,12 @@ def p_operasig(op):
 				| POR IGUAL
 				| DIV IGUAL'''
 	
+	#print "operasig"
+	
+	op[0] = op[1]
+	if len(op) == 3:
+		op[0] += op[2]
+	
 #---------------------------------------------------------#
 
 def p_matematico(expr):
@@ -227,6 +248,8 @@ def p_matematico(expr):
 				| variable operMatUnario'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+
+	global variables
 
 	if len(expr) == 4: 
 		
@@ -244,6 +267,9 @@ def p_matematico(expr):
 			
 		if expr[2] == '+': # es numerico o cadena
 			if not((numericos(tipoZ1,tipoZ2)) | ((tipoZ1 == tipoZ2) & (tipoZ2 == 'str'))):
+				raise SyntaxError
+		elif expr[2] == '%':
+			if not((tipoZ1 == 'int') & (tipoZ1 == tipoZ2)):
 				raise SyntaxError
 		else: # es numerico
 			if not(numericos(tipoZ1,tipoZ2)):
@@ -272,12 +298,17 @@ def p_operMatBinario(op):
 					| POT
 					| MOD
 					| DIV'''
+					
+	op[0] = op[1]
 
 #---------------------------------------------------------#
 
 def p_operMatUnario(op):
 	'''operMatUnario : MAS MAS
 					| MENOS MENOS'''
+					
+	op[0] = op[1]
+	op[0] += op[2]
 
 #---------------------------------------------------------#
 
@@ -306,6 +337,10 @@ def p_operRelacion(op):
 					| ADM IGUAL
 					| MAYOR
 					| MENOR'''
+					
+	op[0] = op[1]
+	if len(op) == 3:
+		op[0] += op[2]
 	
 #---------------------------------------------------------#
 
@@ -331,24 +366,31 @@ def p_logico(expr):
 def p_operLogBinario(op):
 	'''operLogicoBinario : AND
 						| OR'''
+						
+	op[0] = op[1]
 
 #---------------------------------------------------------#
 
-#def p_ternario(expr):
-	#'ternario : LPAREN constante RPAREN PREG z DOSPTOS z'
-	#'		  | LPAREN constante RPAREN PREG ternario DOSPTOS ternario'
-	#'		  | LPAREN relacion RPAREN PREG z DOSPTOS z'
-	#'		  | LPAREN relacion RPAREN PREG ternario DOSPTOS ternario'
-	#'		  | LPAREN logico RPAREN PREG z DOSPTOS z'
-	#'		  | LPAREN logico RPAREN PREG ternario DOSPTOS ternario'
-	#'		  | LPAREN variable RPAREN PREG z DOSPTOS z'
-	#'		  | LPAREN variable RPAREN PREG ternario DOSPTOS ternario'
-	#
-	#if expr[2].tipo != 'bool' | (expr[5].tipo != expr[7].tipo):
-		#raise SyntaxError
-	#else:
-		#expr[0] = Ternario(expr[5].tipo)
-	#
+def p_ternario(expr):
+	'''ternario : LPAREN constante RPAREN PREG z DOSPTOS z
+				| LPAREN constante RPAREN PREG ternario DOSPTOS ternario
+				| LPAREN relacion RPAREN PREG z DOSPTOS z
+				| LPAREN relacion RPAREN PREG ternario DOSPTOS ternario
+				| LPAREN logico RPAREN PREG z DOSPTOS z
+				| LPAREN logico RPAREN PREG ternario DOSPTOS ternario
+				| LPAREN variable RPAREN PREG z DOSPTOS z
+				| LPAREN variable RPAREN PREG ternario DOSPTOS ternario'''
+	
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	tipoZ1 = tipo_segun(expr[5])
+	tipoZ2 = tipo_segun(expr[7])
+	
+	if (expr[2].tipo != 'bool') | (tipoZ1 != tipoZ2):
+		raise SyntaxError
+	else:
+		expr[0] = Operacion(tipoZ1)
+
 #---------------------------------------------------------#
 
 def p_operacion(expr):
@@ -363,6 +405,8 @@ def p_operacion(expr):
 def p_sentencia_stipo(expr):
 	'''sentencia : asignacion PTOCOMA
 				| PRINT z PTOCOMA'''
+				
+	#print "sentencia\n"
 	
 #---------------------------------------------------------#
 
@@ -372,13 +416,15 @@ def p_sentencia_ctipo(expr):
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
+	global variables
+	
 	if (expr[1] == '++') | (expr[1] == '--') :
 		if variables[expr[2]] != 'int':
 			raise SyntaxError
 		elif variables[expr[1]] != 'int':
 			raise SyntaxError
 	
-	expr[0] = Operacion['int']
+	expr[0] = Operacion('int')
 	
 #---------------------------------------------------------#
 
@@ -407,14 +453,18 @@ def p_bloque(expr):
 	#
 #---------------------------------------------------------#
 	
-#def p_funcion_cap(expr):
-	#'funcion : CAP LPAREN z RPAREN'
-	#
-	#if expr[3].tipo != 'str':
-		#raise SyntaxError
-	#expr[0] = Funcion('str')
-	#
-	#
+def p_funcion_cap(expr):
+	'funcion : CAP LPAREN z RPAREN'
+	
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	#print expr[3]
+	
+	if tipo_segun(expr[3]) != 'str':
+		raise SyntaxError
+		
+	expr[0] = Funcion('str')
+	
 #---------------------------------------------------------#
 
 #def p_funcion_colin(expr):
@@ -468,6 +518,13 @@ def p_for_sinasig(expr):
 	
 	if tipo_segun(expr[4]) != 'bool':
 		raise SyntaxError
+		
+	if len(expr) == 10:
+		if (expr[6] == '++') | (expr[6] == '--') :
+			if variables[expr[7]] != 'int':
+				raise SyntaxError
+		elif variables[expr[6]] != 'int':
+			raise SyntaxError
 			
 #---------------------------------------------------------#
 			
@@ -481,6 +538,13 @@ def p_for_conasig(expr):
 	
 	if tipo_segun(expr[5]) != 'bool':
 		raise SyntaxError
+		
+	if len(expr) == 11:
+		if (expr[7] == '++') | (expr[7] == '--') :
+			if variables[expr[8]] != 'int':
+				raise SyntaxError
+		elif variables[expr[7]] != 'int':
+			raise SyntaxError
 
 #---------------------------------------------------------#
 
@@ -499,7 +563,7 @@ def p_dowhile(expr):
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
-	if tipo_segun(expr[3]) != 'bool':
+	if tipo_segun(expr[5]) != 'bool':
 		raise SyntaxError	
 
 #---------------------------------------------------------#
@@ -511,6 +575,8 @@ def p_codigo(expr):
 		    | bucle
 		    | condicional
 		    | sentencia'''
+
+	#print "codigo\n"
 
 #---------------------------------------------------------#
 
@@ -537,11 +603,18 @@ def p_error(token):
 #---------------------------------------------------------#
 
 def numericos(tipo1,tipo2):
+	#print "numericos"
 	return (tipo1 in ['int','float']) & (tipo2 in ['int','float'])
 
+
 def tipo_segun(objeto):
+
+	global variables
+	
 	if type(objeto) == Variable:
-		variable = variables[expr[1].nombre]
+		variable = variables[objeto.nombre]
 	else:
 		variable = objeto.tipo
+		
+	#print "tiposegun"
 	return variable

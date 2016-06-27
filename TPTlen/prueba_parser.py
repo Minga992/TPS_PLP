@@ -9,12 +9,14 @@ parser = yacc(module=parser_rules)
 
 #text = "inicio = \"Hola\";\ni =0;\ndo{ i++;\ninicio += \" \";\n}while (j % 32 != 0); print (\"Mundo!\");"
 #text = "inicio = \"Hola\";\nj = length(inicio);"
-text = "inicio = \"Hola\";\n"
+text = "x = (1<2)?\"si\":\"no\";"
+#text += "x = capitalizar(inicio);"
 #text += "i =0;\n"
 #text += "do{ i++;\n"
 #text += "inicio += \" \"; \n"
-#text += "j = length(inicio);\n"
-#text += "}while (j != 0); print (\"Mundo!\");"
+#text += "j = length(inicio)*i;\n"
+#text += "}while (j % 32 != 0); print (\"Mundo!\");"
+
 ast = parser.parse(text, lexer)
 
 #result = ast.evaluate()

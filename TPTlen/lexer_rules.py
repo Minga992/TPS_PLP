@@ -15,7 +15,7 @@ reserved = {
 	'NOT' : 'NOT',
 	'print' : 'PRINT',
 	'multiplicacionEscalar' : 'MULTESC',
-	'captalizar' : 'CAP',
+	'capitalizar' : 'CAP',
 	'colineales' : 'COLIN',
 	'length' : 'LENGTH'
 }
