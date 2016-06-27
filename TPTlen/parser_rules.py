@@ -206,7 +206,7 @@ def p_separaregistro(expr):
 def p_asignacion(expr):
 	'''asignacion : variable operasig z
 				| variable operasig ternario
-				| RES = z'''
+				| RES IGUAL z'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	print "asig"
