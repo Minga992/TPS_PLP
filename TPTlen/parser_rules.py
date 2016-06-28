@@ -431,8 +431,8 @@ def p_operacion(expr):
 #---------------------------------------------------------#	
 
 def p_autoincdec(expr):
-	'''autoincdec : operMatUnario variable PTOCOMA
-				| variable operMatUnario PTOCOMA'''
+	'''autoincdec : operMatUnario variable
+				| variable operMatUnario'''
 
 	if (expr[1] == '++') | (expr[1] == '--') :
 		if variables[expr[2].nombre] != 'int':
@@ -445,7 +445,7 @@ def p_autoincdec(expr):
 def p_sentencia_(expr):
 	'''sentencia : asignacion PTOCOMA
 				| PRINT z PTOCOMA
-				| autoincdec'''
+				| autoincdec PTOCOMA'''
 				
 	print "sentencia"
 	
