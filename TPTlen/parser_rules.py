@@ -69,13 +69,15 @@ def p_variable(expr):
 			variables[expr[0].nombre] = 'vector'
 			
 	else: # var -> REGISTRO.CAMPO
-		expr[0] = Variable(expr[1]+'.'+expr[3])
+		expr[0] = Variable(expr[1])
+		expr[0].nombre_campo(expr[3])
 		if (expr[1] in variables):
-			if (variables[expr[1]] != 'registro'):
-				p_error(0)
+			if type(variables[expr[1]]) != dict # era otra cosa y ahora es un registro
+			#if (variables[expr[1]] != 'registro'):
+				#p_error(0)
+				variables[expr[1]] = {}
 		else:
-			variables[expr[1]] = 'registro'
-			variables[expr[0].nombre] = 'campo'
+			variables[expr[1]] = {} # es un registro nuevito
 	
 	#print "var"
 	#print variables[expr[1]]
@@ -173,7 +175,7 @@ def p_separavector(expr):
 	'''separavec : empty
 				| COMA constante separavec
 				| COMA vector separavec
-				| registro separavec'''
+				| COMA registro separavec'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
@@ -228,15 +230,18 @@ def p_asignacion(expr):
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		
 		if (expr[1].nombre in variables): # si la variable ya se uso antes
+			
+			if expr[1].campo != 'None': # si es registro.campo = bla
+				variables[expr[1].nombre][expr[1].campo] = tipoZ
 		
-			if variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
+			elif variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
 				variables[expr[1].nombre] += tipoZ
 				
 			elif variables[expr[1].nombre][:6] == 'vector': # si ya habia hecho var[numero] = bla o var = [bla], veo que matchee el tipo de ahora
 
 				if variables[expr[1].nombre][6:] != tipoZ:
 					p_error(0)
-
+					
 			else:	# es una variable cualquiera, no vector
 							
 				if tipoZ == 'registro':	# reflejo los campos
@@ -246,7 +251,6 @@ def p_asignacion(expr):
 					variables[expr[1].nombre] = tipoZ
 				
 		else:
-			
 			
 			if tipoZ == 'registro':	# reflejo los campos
 				variables[expr[1].nombre] = campos_a_dic(expr[3])

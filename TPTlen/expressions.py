@@ -7,11 +7,15 @@ class Programa(object):
 
 class Variable(Programa):
 	
+	campo = 'None' # si se trata de algo tipo reg.campo
 	#def __init__(self,valor,tipo,nombre):
 	def __init__(self,nombre):
 		#self.valor = valor
 		#self.tipo = tipo
 		self.nombre = nombre
+		
+	def nombre_campo(self, nombre):
+		self.campo = nombre
 	
 
 class Constante(Programa):
