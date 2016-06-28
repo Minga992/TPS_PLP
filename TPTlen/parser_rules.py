@@ -536,7 +536,7 @@ def p_funcion_length(expr):
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	#if (expr[3].tipo != 'vector') | (expr[3].tipo != 'str'):  # ojo q vale vector de lo q sea
-	if (tipo_segun(expr[3]) != 'str') | (tipo_segun(expr[3])[:6] != 'vector'): 
+	if (tipo_segun(expr[3]) != 'str') & (tipo_segun(expr[3])[:6] != 'vector'): 
 		p_error(0)
 	
 	expr[0] = Funcion('int')
