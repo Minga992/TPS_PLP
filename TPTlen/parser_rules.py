@@ -11,7 +11,9 @@ def p_inicial(expr):
 	'start : codigo'
 	
 	#expr[0] = expr[1]
-	print "inicial"
+	#print "inicial"
+	
+	#### FORMATO PARA IMPRIMIR ####
 
 #---------------------------------------------------------#
 
@@ -22,7 +24,7 @@ def p_constante_valor(cte):
 				| LPAREN constante RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	print "cte"
+	#print "cte"
 	if cte[1] == '(':
 		cte[0] = cte[2]
 	else:	
@@ -46,6 +48,7 @@ def p_constante_funcion(f):
 
 def p_variable(expr):
 	'''variable : VAR
+				| RES
 				| VAR LCORCH NUM RCORCH
 				| LPAREN variable RPAREN
 				| VAR PUNTO VAR'''
@@ -57,7 +60,7 @@ def p_variable(expr):
 	if expr[1] == '(':	# var -> (var)
 		expr[0] = expr[2]
 		
-	elif len(expr) == 2: # var -> VAR
+	elif len(expr) == 2: # var -> VAR|RES
 		expr[0] = Variable(expr[1]) #nombre
 		
 	elif len(expr) == 5: # var -> VAR[NUM]
@@ -74,7 +77,7 @@ def p_variable(expr):
 			variables[expr[1]] = 'registro'
 			variables[expr[0].nombre] = 'campo'
 	
-	print "var"
+	#print "var"
 	#print variables[expr[1]]
 	
 #---------------------------------------------------------#
@@ -121,10 +124,20 @@ def p_zeta(expr):
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
-	print "zeta"
+	#print "zeta"
 	
 	expr[0] = expr[1]
 	
+#---------------------------------------------------------#
+
+def p_zeta_sin_oper(expr):
+	'''zso : variable
+			| constante
+			| vector
+			| registro'''
+			
+	expr[0] = expr[1]
+
 #---------------------------------------------------------#
 	
 def p_ge(expr):
@@ -134,7 +147,7 @@ def p_ge(expr):
 		| logico'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	print "ge"
+	#print "ge"
 	expr[0] = expr[1]
 
 #---------------------------------------------------------#
@@ -205,39 +218,40 @@ def p_separaregistro(expr):
 
 def p_asignacion(expr):
 	'''asignacion : variable operasig z
-				| variable operasig ternario
-				| RES IGUAL z'''
+				| variable operasig ternario'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	print "asig"
+	#print "asig"
 	global variables
 	tipoZ =	tipo_segun(expr[3])
 	
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		
-		if expr[1] != 'res': # no es res, hago todos los chequeos para la variable correspondiente, si es res no me importa
+		if (expr[1].nombre in variables): # si la variable ya se uso antes
 		
-			if (expr[1].nombre in variables): # si la variable ya se uso antes
-			
-				if variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
-					variables[expr[1].nombre] += tipoZ
+			if variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
+				variables[expr[1].nombre] += tipoZ
+				
+			elif variables[expr[1].nombre][:6] == 'vector': # si ya habia hecho var[numero] = bla o var = [bla], veo que matchee el tipo de ahora
+
+				if variables[expr[1].nombre][6:] != tipoZ:
+					p_error(0)
+
+			else:	# es una variable cualquiera, no vector
+							
+				if tipoZ == 'registro':	# reflejo los campos
+					variables[expr[1].nombre] = campos_a_dic(expr[3])
 					
-				elif variables[expr[1].nombre][:6] == 'vector': # si ya habia hecho var[numero] = bla o var = [bla], veo que matchee el tipo de ahora
-
-					if variables[expr[1].nombre][6:] != tipoZ:
-						p_error(0)
-
-				else:	# es una variable cualquiera, no vector
+				else:
 					variables[expr[1].nombre] = tipoZ
-					
-					if tipoZ == 'registro':	# reflejo los campos
-						campos_a_variables(expr[1].nombre, expr[3])
-					
+				
+		else:
+			
+			
+			if tipoZ == 'registro':	# reflejo los campos
+				variables[expr[1].nombre] = campos_a_dic(expr[3])
 			else:
 				variables[expr[1].nombre] = tipoZ
-				
-				if tipoZ == 'registro':	# reflejo los campos
-						campos_a_variables(expr[1].nombre, expr[3])
 		
 	else:	# aca la variable ya deberia estar inicializada
 		if not(expr[1].nombre in variables):
@@ -264,7 +278,7 @@ def p_operasig(op):
 				| POR IGUAL
 				| DIV IGUAL'''
 					
-	print "operasig"
+	#print "operasig"
 	
 	op[0] = op[1]
 	if len(op) == 3:
@@ -273,12 +287,13 @@ def p_operasig(op):
 #---------------------------------------------------------#
 
 def p_matematico(expr):
-	'''matematico : z operMatBinario z
+	'''matematico : z operMatBinario zso
+				| z operMatBinario LPAREN matematico RPAREN
 				| LPAREN matematico RPAREN'''
 								#| operMatUnario variable
 #| variable operMatUnario
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	print "mat"
+	#print "mat"
 	global variables
 
 	#if len(expr) == 4: 
@@ -288,9 +303,13 @@ def p_matematico(expr):
 	
 	else: 
 		tipoZ1 = tipo_segun(expr[1])
-		tipoZ2 = tipo_segun(expr[3])
-		print tipoZ1
-		print tipoZ2
+		
+		if len(expr)==4:
+			tipoZ2 = tipo_segun(expr[3]) # zso
+		else: 
+			tipoZ2 = tipo_segun(expr[4]) # (mat)
+		#print tipoZ1
+		#print tipoZ2
 			
 		if expr[2] == '+': # es numerico o cadena
 			if not((numericos(tipoZ1,tipoZ2)) | ((tipoZ1 == tipoZ2) & (tipoZ2 == 'str'))):
@@ -325,7 +344,7 @@ def p_operMatBinario(op):
 					| POT
 					| MOD
 					| DIV'''
-	print "mas"			
+	#print "mas"			
 	op[0] = op[1]
 
 #---------------------------------------------------------#
@@ -333,14 +352,15 @@ def p_operMatBinario(op):
 def p_operMatUnario(op):
 	'''operMatUnario : MAS MAS
 					| MENOS MENOS'''
-	print "opmatun"
+	#print "opmatun"
 	op[0] = op[1]
 	op[0] += op[2]
 
 #---------------------------------------------------------#
 
 def p_relacion(expr):
-	'''relacion : z operRelacion z
+	'''relacion : z operRelacion zso
+				| z operRelacion LPAREN operacion RPAREN
 				| LPAREN relacion RPAREN'''
 			  
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
@@ -350,7 +370,11 @@ def p_relacion(expr):
 		
 	else:
 		tipoZ1 = tipo_segun(expr[1])
-		tipoZ2 = tipo_segun(expr[3])
+		
+		if len(expr) == 4:
+			tipoZ2 = tipo_segun(expr[3]) # zso
+		else:
+			tipoZ2 = tipo_segun(expr[4]) # (oper)
 		
 		if len(expr[2]) == 1: # para < y > solo numericos
 			if not(numericos(tipoZ1,tipoZ2)):
@@ -376,7 +400,8 @@ def p_operRelacion(op):
 #---------------------------------------------------------#
 
 def p_logico(expr):
-	'''logico : z operLogicoBinario z
+	'''logico : z operLogicoBinario zso
+			| z operLogicoBinario LPAREN operacion RPAREN
 			| NOT z
 			| LPAREN logico RPAREN'''
 			
@@ -387,10 +412,15 @@ def p_logico(expr):
 	elif len(expr) == 3:	# not
 		if tipo_segun(expr[2]) != 'bool':
 			p_error(0)
-	elif (tipo_segun(expr[1]) != 'bool') & (tipo_segun(expr[3].tipo) != 'bool'):
+	elif (tipo_segun(expr[1]) != 'bool'): #& (tipo_segun(expr[3].tipo) != 'bool'):
 		p_error(0)
-	else:
-		expr[0] = Operacion('bool')
+	elif len(expr) == 4:
+		if tipo_segun(expr[3].tipo) != 'bool':	#zso
+			p_error(0)
+	elif tipo_segun(expr[4].tipo) != 'bool': #  (oper)
+		p_error(0)
+		
+	expr[0] = Operacion('bool')
 	
 #---------------------------------------------------------#
 
@@ -424,7 +454,7 @@ def p_operacion(expr):
 				| relacion
 				| logico'''
 	
-	print "oper"
+	#print "oper"
 	
 	expr[0] = expr[1]
 
@@ -447,7 +477,7 @@ def p_sentencia_(expr):
 				| PRINT z PTOCOMA
 				| autoincdec PTOCOMA'''
 				
-	print "sentencia"
+	#print "sentencia"
 	
 #---------------------------------------------------------#
 
@@ -635,7 +665,11 @@ def p_codigo(expr):
 		    | sentencia
 		    | comentario'''
 
-	print "codigo"
+	#print "codigo"
+	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	
 
 #---------------------------------------------------------#
 
@@ -657,7 +691,7 @@ def p_error(token):
         message += "\nvalue:" + str(token.value)
         message += "\nline:" + str(token.lineno)
         message += "\nposition:" + str(token.lexpos)
-    print "error"
+    #print "error"
     raise Exception(message)
 
 #---------------------------------------------------------#
@@ -680,10 +714,11 @@ def tipo_segun(objeto):
 	return variable
 
 
-def campos_a_variables(var,reg):
+def campos_a_dic(reg):
 	
-	global variables
+	dic = {}
 	
 	for x in range(0,len(reg.campos)):
-		name = var + '.' + reg.campos[x]
-		variables[name] = reg.tipos_campos[x]
+		dic[reg.campos[x]] =  reg.tipos_campos[x]
+		
+	return dic
