@@ -100,6 +100,7 @@ def p_variable(expr):
 			p_error(0)
 			
 		expr[0] = Variable(expr[1])
+		#print expr[3]
 		expr[0].nombre_campo(expr[3])
 		if (expr[1] in variables):
 			if type(variables[expr[1]]) != dict: # era otra cosa y ahora es un registro
@@ -311,12 +312,12 @@ def p_asignacion(expr):
 	#print "asig"
 	global variables
 	tipoZ =	tipo_segun(expr[3])
-	print tipoZ
+	#print tipoZ
 	
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		
 		if (expr[1].nombre in variables): # si la variable ya se uso antes
-			
+			#print expr[1].campo
 			if expr[1].campo != 'None': # si es registro.campo = bla
 				variables[expr[1].nombre][expr[1].campo] = tipoZ
 		
@@ -400,7 +401,7 @@ def p_matematico(expr):
 	
 	else: 
 		tipoZ1 = tipo_segun(expr[1])
-		
+		#print type(expr[1])
 		if len(expr)==4:
 			tipoZ2 = tipo_segun(expr[3]) # zso
 		else: 
@@ -410,6 +411,7 @@ def p_matematico(expr):
 			
 		if expr[2] == '+': # es numerico o cadena
 			if not((numericos(tipoZ1,tipoZ2)) | ((tipoZ1 == tipoZ2) & (tipoZ2 == 'str'))):
+				#print tipoZ1
 				p_error(0)
 		elif expr[2] == '%':
 			if not((tipoZ1 == 'int') & (tipoZ1 == tipoZ2)):
@@ -768,12 +770,12 @@ def p_condicional(expr):
 	'''condicional : IF LPAREN g RPAREN bloque
 				| IF LPAREN g RPAREN bloque ELSE bloque'''
 	
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	## CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if tipo_segun(expr[3]) != 'bool':
 		p_error(0)
 		
-	#### FORMATO PARA IMPRIMIR ####
+	## FORMATO PARA IMPRIMIR ####
 	
 	imprimir = 'if(' + expr[3].impr + ')' + expr[5].impr
 	
@@ -891,14 +893,14 @@ def p_dowhile(expr):
 
 def p_codigo(expr):
 	'''codigo : bucle codigo
-		    | condicional codigo
 	 	    | sentencia codigo
+	 	    | condicional codigo
 	 	    | comentario codigo
 		    | bucle
-		    | condicional
 		    | sentencia
+		    | condicional
 		    | comentario'''
-		    
+
 	#print "codigo"
 	
 	#### FORMATO PARA IMPRIMIR ####
@@ -957,10 +959,14 @@ def tipo_segun(objeto):
 	global variables
 	
 	if type(objeto) == Variable:
-		if objeto.array_elem == 0:
-			variable = variables[objeto.nombre]
-		else:
+		#print objeto.campo
+		if objeto.array_elem == 1:	# es una posicion de un arreglo
 			variable = variables[objeto.nombre][6:]
+		elif objeto.campo != 'None':	# es algo tipo reg.campo
+			print 'alalal'
+			variable = variables[objeto.nombre][objeto.campo]
+		else:		
+			variable = variables[objeto.nombre]
 	else:
 		variable = objeto.tipo
 		
