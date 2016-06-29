@@ -119,7 +119,7 @@ def p_variable(expr):
 	else:
 		expr[0].impr = expr[0].nombre
 		if len(expr) == 4:
-			expr[0].impr += expr[2:]
+			expr[0].impr += '.' + expr[3]
 		elif len(expr) == 5: 
 			#print expr[3]
 			expr[0].impr += '[' + str(expr[3]) + ']'
@@ -324,9 +324,11 @@ def p_asignacion(expr):
 				variables[expr[1].nombre] += tipoZ
 				
 			elif variables[expr[1].nombre][:6] == 'vector': # si ya habia hecho var[numero] = bla o var = [bla], veo que matchee el tipo de ahora
-
-				if variables[expr[1].nombre][6:] != tipoZ:
+				
+				if (expr[1].array_elem == 1) & (variables[expr[1].nombre][6:] != tipoZ):
 					p_error(0)
+				#else:
+					
 					
 			else:	# es una variable cualquiera, no vector
 							
@@ -677,6 +679,8 @@ def p_funcion_multesc(expr):
 	'''funcion : MULTESC LPAREN z COMA z RPAREN
 				| MULTESC LPAREN z COMA z COMA z RPAREN'''
 	
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
 	tipoZ1 = tipo_segun(expr[3])
 	tipoZ2 = tipo_segun(expr[5])
 	tipoZ3 = tipo_segun(expr[7])
@@ -692,6 +696,15 @@ def p_funcion_multesc(expr):
 		expr[0] = Funcion('vectorfloat')
 	else:
 		expr[0] = Funcion('vectorint')
+		
+	#### FORMATO PARA IMPRIMIR ####
+	
+	expr[0].impr = 'multiplicacionEscalar(' + expr[3].impr + + ', ' + expr[5].impr
+	
+	if len(expr) == 9:
+		expr[0].impr += ', ' + expr[7].impr + ')'
+	else:
+		expr[0].impr += ')'
 	
 #---------------------------------------------------------#
 	
@@ -727,6 +740,10 @@ def p_funcion_colin(expr):
 		p_error(0)
 	
 	expr[0] = Funcion('bool')
+	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	expr[0].impr = 'colineales(' + expr[3].impr + ', ' + expr[5].impr + ')'
 
 #---------------------------------------------------------#
 
@@ -828,6 +845,17 @@ def p_for_conasig(expr):
 				#p_error(0)
 		#elif variables[expr[7].nombre] != 'int':
 			#p_error(0)
+			
+	#### FORMATO PARA IMPRIMIR ####
+	
+	imprimir = 'for(' + expr[3].impr + ' ; ' + expr[5].impr + '; '
+	
+	if expr[7] == ')':
+		imprimir += ')' + expr[7].impr
+	else:
+		imprimir += expr[7].impr + ')' + expr[9].impr
+		
+	expr[0] = Codigo(0,imprimir)
 
 #---------------------------------------------------------#
 
@@ -841,10 +869,9 @@ def p_while(expr):
 		
 	#### FORMATO PARA IMPRIMIR ####
 	
-	expr[5] = Codigo(expr[0].acum_tabs)
+	imprimir = 'while(' + expr[3].impr + ')' + expr[5].impr
+	expr[0] = Codigo(0,imprimir)
 	
-	expr[0] = expr[1:4] + indentar(expr[5],1)
-
 #---------------------------------------------------------#
 
 def p_dowhile(expr):
@@ -895,6 +922,10 @@ def p_codigo(expr):
 
 def p_comentario(expr):
 	'comentario : COMENT'
+	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	#expr[0] = Codigo(0,expr[1])
 
 #---------------------------------------------------------#
 
