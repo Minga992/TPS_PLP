@@ -36,6 +36,14 @@ parser = yacc(module=parser_rules)
 #text = "a = 3;b= (a==8); if (b) a= a; c = a==8? a:a;"
 #text = "a = 3==3.4"
 
+#vectores
+#text = "b= [3,4,5] ; b[6] = 3; a = 2 + b[4];"
+text = "b[2] = 3; a= b; c = (a[4] + b[1]) ^ b[8]; a = true; d = a[3];"# if (a) then e = 5;"
+
+
+#registro
+#text = "a = {}; a.campo= 3; b = a.campo + 4;"
+
 ast = parser.parse(text, lexer)
 
 #result = ast.evaluate()
