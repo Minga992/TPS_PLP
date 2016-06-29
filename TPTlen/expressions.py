@@ -7,6 +7,7 @@ class Programa(object):
 
 class Variable(Programa):
 	
+	impr = ""
 	campo = 'None' # si se trata de algo tipo reg.campo
 	#def __init__(self,valor,tipo,nombre):
 	def __init__(self,nombre):
@@ -20,6 +21,7 @@ class Variable(Programa):
 
 class Constante(Programa):
 	
+	impr = ""
 	#def __init__(self,valor,tipo):
 	def __init__(self,tipo):
 		#self.valor = valor
@@ -67,5 +69,8 @@ class Registro(Programa):
 
 class Codigo(Programa):
 	
-	def __init__(self,cant_tabs):
-		self.cant_tabs = cant_tabs
+	#impr = ""
+	#acum_tabs = 0
+	def __init__(self,acum_tabs,impr):
+		self.acum_tabs = acum_tabs
+		self.impr = impr
