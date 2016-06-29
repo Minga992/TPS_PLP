@@ -91,6 +91,7 @@ def p_variable(expr):
 		
 	elif len(expr) == 5: # var -> VAR[NUM]
 		expr[0] = Variable(expr[1])
+		expr[0].array_elem = 1
 		if not(expr[1] in variables):	# si es la primera vez que trato con este vector, aviso
 			variables[expr[0].nombre] = 'vector'
 			
@@ -117,8 +118,11 @@ def p_variable(expr):
 		expr[0].impr = '(' + expr[2].impr + ')'
 	else:
 		expr[0].impr = expr[0].nombre
-		if len(expr) > 2:
-			expr[0] += expr[2:]
+		if len(expr) == 4:
+			expr[0].impr += expr[2:]
+		elif len(expr) == 5: 
+			#print expr[3]
+			expr[0].impr += '[' + str(expr[3]) + ']'
 			
 #---------------------------------------------------------#
 	
@@ -219,6 +223,13 @@ def p_vector(expr):
 		p_error(0)
 	else:
 		expr[0] = Vector('vector'+expr[2].tipo)
+		
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if expr[1] == '(':
+		expr[0].impr = '(' + expr[2].impr + ')'
+	else:
+		expr[0].impr = '[' + expr[2].impr + expr[3].impr + ']'
 
 #---------------------------------------------------------#
 
@@ -236,6 +247,11 @@ def p_separavector(expr):
 		p_error(0)
 	else:
 		expr[0] = Vector(expr[2].tipo)
+		
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if len(expr) > 2:
+		expr[0].impr = ', ' + expr[2].impr + expr[3].impr		
 
 #---------------------------------------------------------#
 
@@ -245,6 +261,8 @@ def p_registro(expr):
 				| LLLAVE VAR DOSPTOS vector separareg RLLAVE
 				| LLLAVE VAR DOSPTOS registro separareg RLLAVE
 				| LPAREN registro RPAREN'''
+				
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	#print "registro"
 	if expr[1] == '(':
 		expr[0] = expr[2]
@@ -252,6 +270,15 @@ def p_registro(expr):
 		expr[0] = Registro([],[])
 	else:
 		expr[0] = Registro([expr[2]]+expr[5].campos,[expr[4].tipo]+expr[5].tipos_campos)
+		
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if expr[1] == '(':
+		expr[0].impr = '(' + expr[2].impr + ')'
+	elif len(expr) == 3 : 
+		expr[0].impr = '{}'
+	else:
+		expr[0].impr = '{' + expr[2] + ': ' + expr[4].impr + expr[5].impr + '}'
 		
 #---------------------------------------------------------#
 
@@ -261,11 +288,18 @@ def p_separaregistro(expr):
 				| COMA VAR DOSPTOS vector separareg
 				| COMA VAR DOSPTOS registro separareg'''
 	
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
 	if len(expr) == 2 :
 		expr[0] = Registro([],[])
 	else:
 		#print type(expr[2])
 		expr[0] = Registro([expr[2]]+expr[5].campos,[expr[4].tipo]+expr[5].tipos_campos)
+		
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if len(expr) > 2 :
+		expr[0].impr = ', ' + expr[2] + ': ' + expr[4].impr + expr[5].impr
 	
 #---------------------------------------------------------#
 
@@ -277,6 +311,7 @@ def p_asignacion(expr):
 	#print "asig"
 	global variables
 	tipoZ =	tipo_segun(expr[3])
+	print tipoZ
 	
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		
@@ -510,6 +545,17 @@ def p_logico(expr):
 		
 	expr[0] = Operacion('bool')
 	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if expr[1] == '(':
+		expr[0].impr = '(' + expr[2].impr + ')'
+	elif len(expr) == 3:	# not
+		expr[0].impr = 'NOT ' + expr[2].impr
+	elif len(expr) == 4:
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+	else:
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + '(' + expr[3].impr + ')'
+		
 #---------------------------------------------------------#
 
 def p_operLogBinario(op):
@@ -880,7 +926,10 @@ def tipo_segun(objeto):
 	global variables
 	
 	if type(objeto) == Variable:
-		variable = variables[objeto.nombre]
+		if objeto.array_elem == 0:
+			variable = variables[objeto.nombre]
+		else:
+			variable = variables[objeto.nombre][6:]
 	else:
 		variable = objeto.tipo
 		
