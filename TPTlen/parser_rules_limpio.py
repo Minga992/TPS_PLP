@@ -47,13 +47,12 @@ def p_zeta_sin_oper(expr):
 			| vector
 			| registro'''
 	
-#def p_ge(expr):
-	#'''g : variable
-		#| constante 
-		#| relacion
-		#| logico'''
-	#
-#
+def p_ge(expr):
+	'''g : variable
+		| constante 
+		| relacion
+		| logico'''
+	
 def p_vector(expr):
 	'''vector : LCORCH constante separavec RCORCH
 			| LCORCH vector separavec RCORCH
@@ -80,78 +79,127 @@ def p_separaregistro(expr):
 				| COMA VAR DOSPTOS vector separareg
 				| COMA VAR DOSPTOS registro separareg'''
 
-#def p_asignacion(expr):
-	#'''asignacion : variable operasig z
-				#| variable operasig ternario'''
-	#
-#
-#def p_operasig(op):
-	#'''operasig : IGUAL
-				#| MAS IGUAL
-				#| MENOS IGUAL
-				#| POR IGUAL
-				#| DIV IGUAL'''
-					#
-#
-#def p_matematico(expr):
+def p_asignacion(expr):
+	'''asignacion : variable operasig z
+				| variable operasig ternario'''
+	
+
+def p_operasig(op):
+	'''operasig : IGUAL
+				| MAS IGUAL
+				| MENOS IGUAL
+				| POR IGUAL
+				| DIV IGUAL'''
+					
+
+def p_matematico(expr):
 	#'''matematico : z operMatBinario zso
 				#| z operMatBinario LPAREN matematico RPAREN
 				#| LPAREN matematico RPAREN'''
-#
-#def p_operMatBinario(op):
-	#'''operMatBinario : MAS
-					#| MENOS
-					#| POR
-					#| POT
-					#| MOD
-					#| DIV'''
-#
-#def p_operMatUnario(op):
-	#'''operMatUnario : MAS MAS
-					#| MENOS MENOS'''
-#
-#def p_relacion(expr):
+				#
+	'''matematico : matprim operMatBinario matf
+			  | LPAREN matematico RPAREN'''
+
+def p_matprim(expr):		   
+	'''matprim : matprim operMatBinario matf
+				| matf'''
+	
+def p_matf(expr):
+	'''matf : zso
+			| LPAREN matematico RPAREN'''
+	
+
+def p_operMatBinario(op):
+	'''operMatBinario : MAS
+					| MENOS
+					| POR
+					| POT
+					| MOD
+					| DIV'''
+
+def p_operMatUnario(op):
+	'''operMatUnario : MAS MAS
+					| MENOS MENOS'''
+
+def p_relacion(expr):
 	#'''relacion : z operRelacion zso
 				#| z operRelacion LPAREN operacion RPAREN
 				#| LPAREN relacion RPAREN'''
 			  #
-#def p_operRelacion(op):
-	#'''operRelacion : IGUAL IGUAL
-					#| ADM IGUAL
-					#| MAYOR
-					#| MENOR'''
-					#
-#
+	'''relacion : relprim operRelacion relf
+			  | LPAREN relacion RPAREN'''
+
+def p_relprim(expr):		   
+	'''relprim : relprim operRelacion relf
+				| relf'''
+	
+def p_relf(expr):
+	'''relf : zso
+			| matematico
+			| LPAREN relacion RPAREN
+			| LPAREN logico RPAREN'''
+			# falta agregarle matematicas
+
+def p_operRelacion(op):
+	'''operRelacion : IGUAL IGUAL
+					| ADM IGUAL
+					| MAYOR
+					| MENOR'''
+					
+
 def p_logico(expr):
-	'''logico : z operLogicoBinario zso
-			| z operLogicoBinario LPAREN operacion RPAREN
-			| NOT z
+	#'''logico : zso operLogicoBinario zso
+			#| zso operLogicoBinario LPAREN operacion RPAREN
+			#| NOT z
+			#| LPAREN logico RPAREN'''
+			
+	#'''logico : logprim OR logt
+			  #| logt AND logf
+			  
+	'''logico : logprim operLogicoBinario logf
+			  | LPAREN logico RPAREN
+			  | NOT z'''
+#
+def p_logprim(expr):
+	#'''logprim : logprim OR logt
+			   #| logt'''			
+			   
+	'''logprim : logprim operLogicoBinario logf
+				| logf'''
+			
+#def p_logt(expr):
+	#'''logt : logt AND logf
+			#| logf'''
+				
+
+def p_logf(expr):
+	'''logf : zso
+			| relacion
 			| LPAREN logico RPAREN'''
 
 def p_operLogBinario(op):
 	'''operLogicoBinario : AND
 						| OR'''
 
-#def p_ternario(expr):
-	#'''ternario : g PREG z DOSPTOS z
-				#| g PREG ternario DOSPTOS ternario'''
-				#
+def p_ternario(expr):
+	'''ternario : g PREG z DOSPTOS z
+				| g PREG ternario DOSPTOS ternario'''
+				
 #
 def p_operacion(expr):
-	#'''operacion : matematico
-				#| relacion
-				#| logico'''
-	'operacion : logico'
-	#
-#def p_autoincdec(expr):
-	#'''autoincdec : operMatUnario variable
-				#| variable operMatUnario'''
-#
+	'''operacion : matematico
+				| relacion
+				| logico'''
+				
+def p_autoincdec(expr):
+	'''autoincdec : operMatUnario variable
+				| variable operMatUnario'''
+
 def p_sentencia_(expr):
-	#'''sentencia : asignacion PTOCOMA
-				#| PRINT z PTOCOMA
-				#| autoincdec PTOCOMA'''
-	'sentencia : PRINT z PTOCOMA'
+	'''sentencia : asignacion PTOCOMA
+				| PRINT z PTOCOMA
+				| autoincdec PTOCOMA'''
+
 #
 #
 #
@@ -177,52 +225,49 @@ def p_funcion_length(expr):
 #
 #
 def p_bloquescond(expr):
-	#'''bloquescond : LLLAVE codigo RLLAVE
-			#| sentencia 
-			#| bucle'''
-	'bloquescond : sentencia'
+	'''bloquescond : LLLAVE codigo RLLAVE
+			| sentencia 
+			| bucle'''
 #
 #
 def p_bloque(expr):
-	#'''bloque : matchedstmt
-				#| openstmt'''
-	'bloque : matchedstmt'
+	'''bloque : matchedstmt
+				| openstmt'''
 					
 def p_matchedstmt(expr):
-	#'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
-					#| bloquescond'''
-	'matchedstmt : bloquescond'
+	'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
+					| bloquescond'''
 					#
-#def p_openstmt(expr):
-	#'''openstmt : IF LPAREN g RPAREN bloque
-				#| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
-	#
+def p_openstmt(expr):
+	'''openstmt : IF LPAREN g RPAREN bloque
+				| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
+	
 
 #-------------------------------------------------------------------------	
 
-#def p_bucle(expr):
-	#'''bucle : for'''
-			#| while
-			#| dowhile'''
+def p_bucle(expr):
+	'''bucle : for
+			| while
+			| dowhile'''
 	#'bucle : dowhile'
 			
-#def p_for_sinasig(expr):
-	#'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
-			#| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			#| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
-
-#def p_for_conasig(expr):
-	#'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN bloque
-			#| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			#| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
-
-#def p_while(expr):
-	#'while : WHILE LPAREN g RPAREN bloque'
-
-
-#def p_dowhile(expr):
-	#'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
+def p_for_sinasig(expr):
+	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
+			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
+			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
 #
+def p_for_conasig(expr):
+	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN bloque
+			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN bloque
+			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
+#
+def p_while(expr):
+	'while : WHILE LPAREN g RPAREN bloque'
+#
+#
+def p_dowhile(expr):
+	'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
+
 
 #
 def p_comentario(expr):
