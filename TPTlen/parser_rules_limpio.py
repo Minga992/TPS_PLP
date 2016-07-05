@@ -226,10 +226,9 @@ def p_funcion_length(expr):
 #
 def p_bloquescond(expr):
 	'''bloquescond : LLLAVE codigo RLLAVE
-			| sentencia 
-			| bucle'''
-#
-#
+					| sentencia 
+					| bucle'''
+
 def p_bloque(expr):
 	'''bloque : matchedstmt
 				| openstmt'''
@@ -237,7 +236,7 @@ def p_bloque(expr):
 def p_matchedstmt(expr):
 	'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
 					| bloquescond'''
-					#
+
 def p_openstmt(expr):
 	'''openstmt : IF LPAREN g RPAREN bloque
 				| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
@@ -249,27 +248,25 @@ def p_bucle(expr):
 	'''bucle : for
 			| while
 			| dowhile'''
-	#'bucle : dowhile'
 			
 def p_for_sinasig(expr):
 	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
 			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
 			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
-#
+
 def p_for_conasig(expr):
 	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN bloque
 			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN bloque
 			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
-#
+
 def p_while(expr):
 	'while : WHILE LPAREN g RPAREN bloque'
-#
-#
+
 def p_dowhile(expr):
 	'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
 
 
-#
+
 def p_comentario(expr):
 	'comentario : COMENT'
 
