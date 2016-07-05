@@ -6,9 +6,15 @@ from expressions import *
 
 def p_inicial(expr):
 	'start : codigo'
+	
+def p_codigo(expr):
+	'''codigo : bloque codigo
+	 	    | comentario codigo
+		    | bloque
+		    | comentario'''
 
 def p_constante_valor(cte):
-	'''constante : STR	
+	'''constante : STR
 				| BOOL
 				| numero
 				| LPAREN constante RPAREN'''
@@ -23,7 +29,6 @@ def p_variable(expr):
 				| LPAREN variable RPAREN
 				| VAR PUNTO VAR'''
 	
-	
 def p_numero(num):
 	'''numero : NUM
 			| NUM PUNTO NUM
@@ -31,38 +36,35 @@ def p_numero(num):
 			| MAS NUM PUNTO NUM
 			| MENOS NUM
 			| MENOS NUM PUNTO NUM'''
-	
-	
+
 def p_zeta(expr):
 	'''z : zso
 		| operacion'''
-	
-
+		
 def p_zeta_sin_oper(expr):
 	'''zso : variable
 			| constante
 			| vector
 			| registro'''
-			
-def p_ge(expr):
-	'''g : variable
-		| constante 
-		| relacion
-		| logico'''
 	
-
+#def p_ge(expr):
+	#'''g : variable
+		#| constante 
+		#| relacion
+		#| logico'''
+	#
+#
 def p_vector(expr):
 	'''vector : LCORCH constante separavec RCORCH
 			| LCORCH vector separavec RCORCH
 			| LCORCH registro separavec RCORCH
 			| LPAREN vector RPAREN'''			
-	
+
 def p_separavector(expr):
 	'''separavec : empty
 				| COMA constante separavec
 				| COMA vector separavec
 				| COMA registro separavec'''
-
 
 def p_registro(expr):
 	'''registro : LLLAVE RLLAVE
@@ -77,84 +79,85 @@ def p_separaregistro(expr):
 				| COMA VAR DOSPTOS constante separareg
 				| COMA VAR DOSPTOS vector separareg
 				| COMA VAR DOSPTOS registro separareg'''
-	
-def p_asignacion(expr):
-	'''asignacion : variable operasig z
-				| variable operasig ternario'''
-	
 
-def p_operasig(op):
-	'''operasig : IGUAL
-				| MAS IGUAL
-				| MENOS IGUAL
-				| POR IGUAL
-				| DIV IGUAL'''
-					
-
-def p_matematico(expr):
-	'''matematico : z operMatBinario zso
-				| z operMatBinario LPAREN matematico RPAREN
-				| LPAREN matematico RPAREN'''
-
-def p_operMatBinario(op):
-	'''operMatBinario : MAS
-					| MENOS
-					| POR
-					| POT
-					| MOD
-					| DIV'''
-
-def p_operMatUnario(op):
-	'''operMatUnario : MAS MAS
-					| MENOS MENOS'''
-
-def p_relacion(expr):
-	'''relacion : z operRelacion zso
-				| z operRelacion LPAREN operacion RPAREN
-				| LPAREN relacion RPAREN'''
-			  
-def p_operRelacion(op):
-	'''operRelacion : IGUAL IGUAL
-					| ADM IGUAL
-					| MAYOR
-					| MENOR'''
-					
-
+#def p_asignacion(expr):
+	#'''asignacion : variable operasig z
+				#| variable operasig ternario'''
+	#
+#
+#def p_operasig(op):
+	#'''operasig : IGUAL
+				#| MAS IGUAL
+				#| MENOS IGUAL
+				#| POR IGUAL
+				#| DIV IGUAL'''
+					#
+#
+#def p_matematico(expr):
+	#'''matematico : z operMatBinario zso
+				#| z operMatBinario LPAREN matematico RPAREN
+				#| LPAREN matematico RPAREN'''
+#
+#def p_operMatBinario(op):
+	#'''operMatBinario : MAS
+					#| MENOS
+					#| POR
+					#| POT
+					#| MOD
+					#| DIV'''
+#
+#def p_operMatUnario(op):
+	#'''operMatUnario : MAS MAS
+					#| MENOS MENOS'''
+#
+#def p_relacion(expr):
+	#'''relacion : z operRelacion zso
+				#| z operRelacion LPAREN operacion RPAREN
+				#| LPAREN relacion RPAREN'''
+			  #
+#def p_operRelacion(op):
+	#'''operRelacion : IGUAL IGUAL
+					#| ADM IGUAL
+					#| MAYOR
+					#| MENOR'''
+					#
+#
 def p_logico(expr):
 	'''logico : z operLogicoBinario zso
 			| z operLogicoBinario LPAREN operacion RPAREN
 			| NOT z
 			| LPAREN logico RPAREN'''
-			
 
 def p_operLogBinario(op):
 	'''operLogicoBinario : AND
 						| OR'''
 
-def p_ternario(expr):
-	'''ternario : g PREG z DOSPTOS z
-				| g PREG ternario DOSPTOS ternario'''
-				
-
+#def p_ternario(expr):
+	#'''ternario : g PREG z DOSPTOS z
+				#| g PREG ternario DOSPTOS ternario'''
+				#
+#
 def p_operacion(expr):
-	'''operacion : matematico
-				| relacion
-				| logico'''
-	
-def p_autoincdec(expr):
-	'''autoincdec : operMatUnario variable
-				| variable operMatUnario'''
-
+	#'''operacion : matematico
+				#| relacion
+				#| logico'''
+	'operacion : logico'
+	#
+#def p_autoincdec(expr):
+	#'''autoincdec : operMatUnario variable
+				#| variable operMatUnario'''
+#
 def p_sentencia_(expr):
-	'''sentencia : asignacion PTOCOMA
-				| PRINT z PTOCOMA
-				| autoincdec PTOCOMA'''
-
-
-
-
-
-
+	#'''sentencia : asignacion PTOCOMA
+				#| PRINT z PTOCOMA
+				#| autoincdec PTOCOMA'''
+	'sentencia : PRINT z PTOCOMA'
+#
+#
+#
+#
+#
+#
 def p_funcion_multesc(expr):
 	'''funcion : MULTESC LPAREN z COMA z RPAREN
 				| MULTESC LPAREN z COMA z COMA z RPAREN'''
@@ -171,34 +174,37 @@ def p_funcion_length(expr):
 	'funcion : LENGTH LPAREN z RPAREN'
 
 #-----------------------------------------------------------------------	
-
-
+#
+#
 def p_bloquescond(expr):
-	'''bloquescond : LLLAVE codigo RLLAVE
-			| sentencia 
-			| bucle'''
-
-
+	#'''bloquescond : LLLAVE codigo RLLAVE
+			#| sentencia 
+			#| bucle'''
+	'bloquescond : sentencia'
+#
+#
 def p_bloque(expr):
-	'''bloque : matchedstmt
-				| openstmt'''
+	#'''bloque : matchedstmt
+				#| openstmt'''
+	'bloque : matchedstmt'
 					
 def p_matchedstmt(expr):
-	'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
-					| bloquescond'''
-					
-def p_openstmt(expr):
-	'''openstmt : IF LPAREN g RPAREN bloque
-				| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
-	
+	#'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
+					#| bloquescond'''
+	'matchedstmt : bloquescond'
+					#
+#def p_openstmt(expr):
+	#'''openstmt : IF LPAREN g RPAREN bloque
+				#| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
+	#
 
 #-------------------------------------------------------------------------	
 
-def p_bucle(expr):
+#def p_bucle(expr):
 	#'''bucle : for'''
 			#| while
 			#| dowhile'''
-	'bucle : dowhile'
+	#'bucle : dowhile'
 			
 #def p_for_sinasig(expr):
 	#'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
@@ -214,22 +220,14 @@ def p_bucle(expr):
 	#'while : WHILE LPAREN g RPAREN bloque'
 
 
-def p_dowhile(expr):
-	'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
+#def p_dowhile(expr):
+	#'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
+#
 
-def p_codigo(expr):
-	'''codigo : bloque codigo
-	 	    | comentario codigo
-		    | bloque
-		    | comentario'''
-
-
+#
 def p_comentario(expr):
 	'comentario : COMENT'
-	
 
 def p_empty(p):
 	'empty :'
 	pass
-
-
