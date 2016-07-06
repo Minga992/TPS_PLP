@@ -939,7 +939,11 @@ def p_closedstmt(expr):
 	if len(expr) == 2:
 		imprimir = expr[1].impr
 	elif len(expr) == 3:
-		imprimir = expr[1].impr + tabular(expr[2])
+		imprimir = expr[1].impr
+		if (expr[1].impr)[0] == '#':
+			imprimir += '\n' + expr[2].impr
+		else:
+			imprimir += tabular(expr[2])
 	elif len(expr) == 4:
 		imprimir = '{\n' + expr[2].impr + '}'
 	else:
