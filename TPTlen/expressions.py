@@ -70,5 +70,7 @@ class Registro(Programa):
 
 class Codigo(Programa):
 	
+	llaves = 0
+	
 	def __init__(self,impr):
 		self.impr = impr

@@ -177,19 +177,21 @@ def p_ge(expr):
 #---------------------------------------------------------#
 
 def p_vector(expr):
-	'''vector : LCORCH constante separavec RCORCH
-			| LCORCH vector separavec RCORCH
-			| LCORCH registro separavec RCORCH
+	#'''vector : LCORCH constante separavec RCORCH
+			#| LCORCH vector separavec RCORCH
+			#| LCORCH registro separavec RCORCH
+			#| LPAREN vector RPAREN'''			
+	'''vector : LCORCH z separavec RCORCH
 			| LPAREN vector RPAREN'''			
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
 	if expr[1] == '(':	# vec -> (vec)
 		expr[0] = expr[2]
-	elif (expr[2].tipo != expr[3].tipo) & (expr[3].tipo != 'vacio'):	
+	elif (tipo_segun(expr[2]) != tipo_segun(expr[3])) & (tipo_segun(expr[3]) != 'vacio'):	
 		p_error(0)
 	else:
-		expr[0] = Vector('vector'+expr[2].tipo)
+		expr[0] = Vector('vector'+tipo_segun(expr[2]))
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -201,19 +203,21 @@ def p_vector(expr):
 #---------------------------------------------------------#
 
 def p_separavector(expr):
+	#'''separavec : empty
+				#| COMA constante separavec
+				#| COMA vector separavec
+				#| COMA registro separavec'''
 	'''separavec : empty
-				| COMA constante separavec
-				| COMA vector separavec
-				| COMA registro separavec'''
+				| COMA z separavec'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
 	if len(expr) == 2:
 		expr[0] = Vector('vacio')
-	elif (expr[2].tipo != expr[3].tipo) & (expr[3].tipo != 'vacio') :
+	elif (tipo_segun(expr[2]) != tipo_segun(expr[3])) & (tipo_segun(expr[3]) != 'vacio') :
 		p_error(0)
 	else:
-		expr[0] = Vector(expr[2].tipo)
+		expr[0] = Vector(tipo_segun(expr[2]))
 
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -224,10 +228,13 @@ def p_separavector(expr):
 #---------------------------------------------------------#
 
 def p_registro(expr):
+	#'''registro : LLLAVE RLLAVE
+				#| LLLAVE VAR DOSPTOS constante separareg RLLAVE
+				#| LLLAVE VAR DOSPTOS vector separareg RLLAVE
+				#| LLLAVE VAR DOSPTOS registro separareg RLLAVE
+				#| LPAREN registro RPAREN'''
 	'''registro : LLLAVE RLLAVE
-				| LLLAVE VAR DOSPTOS constante separareg RLLAVE
-				| LLLAVE VAR DOSPTOS vector separareg RLLAVE
-				| LLLAVE VAR DOSPTOS registro separareg RLLAVE
+				| LLLAVE VAR DOSPTOS z separareg RLLAVE
 				| LPAREN registro RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
@@ -237,7 +244,7 @@ def p_registro(expr):
 	elif len(expr) == 3 : # reg -> {}
 		expr[0] = Registro([],[])
 	else:
-		expr[0] = Registro( [expr[2]]+expr[5].campos , [expr[4].tipo]+expr[5].tipos_campos )
+		expr[0] = Registro( [expr[2]]+expr[5].campos , [tipo_segun(expr[4])]+expr[5].tipos_campos )
 
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -251,17 +258,19 @@ def p_registro(expr):
 #---------------------------------------------------------#
 
 def p_separaregistro(expr):
+	#'''separareg : empty
+				#| COMA VAR DOSPTOS constante separareg
+				#| COMA VAR DOSPTOS vector separareg
+				#| COMA VAR DOSPTOS registro separareg'''
 	'''separareg : empty
-				| COMA VAR DOSPTOS constante separareg
-				| COMA VAR DOSPTOS vector separareg
-				| COMA VAR DOSPTOS registro separareg'''
+				| COMA VAR DOSPTOS z separareg'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if len(expr) == 2 :
 		expr[0] = Registro([],[])
 	else:
-		expr[0] = Registro( [expr[2]]+expr[5].campos , [expr[4].tipo]+expr[5].tipos_campos )
+		expr[0] = Registro( [expr[2]]+expr[5].campos , [tipo_segun(expr[4])]+expr[5].tipos_campos )
 
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -917,13 +926,15 @@ def p_closedstmt(expr):
 	if len(expr) == 2:
 		imprimir = expr[1].impr
 	elif len(expr) == 3:
-		imprimir = expr[1].impr + expr[2].impr
+		imprimir = expr[1].impr + tabular(expr[2])
 	elif len(expr) == 4:
-		imprimir = '{\n' + tabular(expr[2].impr) + '}'
+		imprimir = '{\n' + expr[2].impr + '}'
 	else:
-		imprimir = 'if('+ expr[3].impr + ')' + expr[5].impr + 'else' + expr[7].impr
+		imprimir = 'if('+ expr[3].impr + ')' + tabular(expr[5]) + 'else' + tabular(expr[7])
 
 	expr[0] = Codigo(imprimir)
+	if len(expr) == 4:
+		expr[0].llaves = 1
 
 #---------------------------------------------------------#
 
@@ -941,11 +952,11 @@ def p_openstmt(expr):
 	#### FORMATO PARA IMPRIMIR ####
 	
 	if len(expr) == 3:
-		imprimir = expr[1].impr + expr[2].impr
+		imprimir = expr[1].impr + tabular(expr[2])
 	else:
-		imprimir = 'if(' + expr[3].impr + ')' + expr[5].impr
+		imprimir = 'if(' + expr[3].impr + ')' + tabular(expr[5])
 		if len(expr) > 5:
-			imprimir += 'else' + expr[7].impr
+			imprimir += 'else' + tabular(expr[7])
 	
 	expr[0] = Codigo(imprimir)
 	
@@ -1042,7 +1053,7 @@ def p_dowhile(expr):
 
 	#### FORMATO PARA IMPRIMIR ####
 	
-	imprimir = 'do' + expr[2].impr + 'while(' + expr[5].impr + ');'
+	imprimir = 'do' + tabular(expr[2]) + 'while(' + expr[5].impr + ');\n'
 	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
@@ -1140,20 +1151,53 @@ def campos_a_dic(reg):
 #
 	#return res
 
+def tabular(codigo):
+	
+	lineas = (codigo.impr).splitlines()
+	
+	if codigo.llaves == 1:
+		res = ""	
+		for l in lineas:
+			if l[0] == '{':
+				res += l + '\n'
+			elif l[0] == '}':
+				res += l + '\n'
+			else:
+				res += '\t' + l + '\n'
+	else:
+		res = "\n"	
+		for l in lineas:
+			res += '\t' + l + '\n'
+		
+	return res
 
-def tabular(texto):
+
+def tabular_con_llaves(texto):
 	
 	lineas = texto.splitlines()
 	res = ""
 	
 	for l in lineas:
-		if len(l) > 0:			
+		#if len(l) > 0:			
 			#print 'hola'
-			if l[0] in ['{','}']:
-				res += l + '\n'
-			else:
-				res += '\t' + l + '\n'
+		if l[0] == '{':
+			res += l + '\n'
+		elif l[0] == '}':
+			res += l + '\n'
 		else:
-			res += '\n'
+			res += '\t' + l + '\n'
+		#else:
+			#res += '\n'
+		
+	return res
+	
+	
+def tabular_sin_llaves(texto):
+	
+	lineas = texto.splitlines()
+	res = "\n"
+	
+	for l in lineas:
+		res += '\t' + l + '\n'
 		
 	return res
