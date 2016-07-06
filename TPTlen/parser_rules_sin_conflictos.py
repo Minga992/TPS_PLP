@@ -8,9 +8,9 @@ def p_inicial(expr):
 	'start : codigo'
 	
 def p_codigo(expr):
-	'''codigo : bloque codigo
+	'''codigo : stmt codigo
 	 	    | comentario codigo
-		    | bloque
+		    | stmt
 		    | comentario'''
 
 def p_constante_valor(cte):
@@ -224,46 +224,48 @@ def p_funcion_length(expr):
 #-----------------------------------------------------------------------	
 #
 #
-def p_bloquescond(expr):
-	'''bloquescond : LLLAVE codigo RLLAVE
-					| sentencia 
-					| bucle'''
+# def p_stmtscond(expr):
+	# '''stmtscond : LLLAVE codigo RLLAVE
+					# | sentencia'''
 
-def p_bloque(expr):
-	'''bloque : matchedstmt
-				| openstmt'''
+def p_stmt(expr):
+	'''stmt : closedstmt
+			| openstmt'''
 					
-def p_matchedstmt(expr):
-	'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
-					| bloquescond'''
+def p_closedstmt(expr):
+	'''closedstmt : sentencia 
+					| LLLAVE codigo RLLAVE
+					| dowhile 
+					| IF LPAREN g RPAREN closedstmt ELSE closedstmt
+					| loopheader closedstmt'''
 
 def p_openstmt(expr):
-	'''openstmt : IF LPAREN g RPAREN bloque
-				| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
+	'''openstmt : IF LPAREN g RPAREN stmt
+				| IF LPAREN g RPAREN closedstmt ELSE openstmt
+				| loopheader openstmt'''
 	
 
 #-------------------------------------------------------------------------	
 
 def p_bucle(expr):
-	'''bucle : for
-			| while
-			| dowhile'''
+	'''loopheader : for
+				| while'''
 			
 def p_for_sinasig(expr):
-	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
-			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
+	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN
+			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN
+			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN'''
 
 def p_for_conasig(expr):
-	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN bloque
-			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
+	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN
+			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN
+			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN'''
 
 def p_while(expr):
-	'while : WHILE LPAREN g RPAREN bloque'
+	'while : WHILE LPAREN g RPAREN'
 
 def p_dowhile(expr):
-	'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
+	'dowhile : DO stmt WHILE LPAREN g RPAREN PTOCOMA'
 
 
 
