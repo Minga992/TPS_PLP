@@ -322,10 +322,14 @@ def p_asignacion(expr):
 				#variables[expr[1].nombre] += tipoZ
 			
 			elif expr[1].array_elem == 1: 	# var[num] = bla
-				if (variables[expr[1].nombre][:6] == 'vector') & (variables[expr[1].nombre][6:] != tipoZ): # veo que matchee el tipo de ahora
-					p_error(0)
+				if type(variables[expr[1].nombre]) == dict:
+					variables[expr[1].nombre] = 'vector' + tipoZ
 				elif variables[expr[1].nombre][:6] != 'vector':
 					variables[expr[1].nombre] = 'vector' + tipoZ
+				elif (variables[expr[1].nombre][:6] == 'vector') & (variables[expr[1].nombre][6:] != tipoZ): # veo que matchee el tipo de ahora
+					p_error(0)
+				#elif variables[expr[1].nombre][:6] != 'vector':
+					#variables[expr[1].nombre] = 'vector' + tipoZ
 			
 			#elif variables[expr[1].nombre][:6] == 'vector': # var[num] = bla
 				#print 'aloha'
