@@ -3,6 +3,7 @@
 reserved = {
 	'begin' : 'BEGIN',
 	'end' : 'END',
+	#r"[Ww][Hh][Ii][Ll][Ee]" : 'WHILE',
 	'while' : 'WHILE',
 	'for' : 'FOR',
 	'if' : 'IF',
@@ -16,7 +17,7 @@ reserved = {
 	'OR' : 'OR',
 	'NOT' : 'NOT',
 	'print' : 'PRINT',
-	'multiplicacionEscalar' : 'MULTESC',
+	'multiplicacionescalar' : 'MULTESC',
 	'capitalizar' : 'CAP',
 	'colineales' : 'COLIN',
 	'length' : 'LENGTH'
@@ -127,11 +128,11 @@ def t_STR(token):
 	
 	
 def t_BOOL(token):
-	r"true | false"
+	r"([tT][rR][uU][eE] | [fF][aA][lL][sS][eE])"
 	
-	if token.value == 'true':
+	if (token.value).lower() == 'true':
 		token.value = True
-	elif token.value == 'false':
+	elif (token.value).lower() == 'false':
 		token.value = False
 		
 	return token
@@ -148,7 +149,7 @@ def t_NUM(token):
 def t_VAR(token):
 	r"[a-zA-Z][a-zA-Z0-9_]*"
 	
-	token.type = reserved.get(token.value,'VAR')    # Check for reserved words
+	token.type = reserved.get((token.value).lower(),'VAR')    # Check for reserved words
 	
 	if token.type in ['BEGIN','END','RETURN']:
 		palabra_reservada(token)
