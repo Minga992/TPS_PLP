@@ -10,6 +10,7 @@ class Variable(Programa):
 	impr = ""
 	campo = 'None' # si se trata de algo tipo reg.campo
 	array_elem = 0 # si se trata de algo tipo var[num]
+	#registro = 0
 	#def __init__(self,valor,tipo,nombre):
 	def __init__(self,nombre):
 		#self.valor = valor
@@ -18,6 +19,9 @@ class Variable(Programa):
 		
 	def nombre_campo(self, nombre):
 		self.campo = nombre
+		
+	#def registro(self, reg):
+		#self.registro = reg
 	
 
 class Constante(Programa):

@@ -333,6 +333,8 @@ def p_asignacion(expr):
 	
 				if tipoZ == 'registro':	# reflejo los campos
 					variables[expr[1].nombre] = campos_a_dic(expr[3])
+				elif tipoZ == 'vreg': # reflejo los campos de la variable q es registro
+					variables[expr[1].nombre] = variables[expr[3].nombre]
 				else:
 					#print "hola" + tipoZ
 					variables[expr[1].nombre] = tipoZ
@@ -340,7 +342,10 @@ def p_asignacion(expr):
 		else:	# declaro la variable
 			
 			if tipoZ == 'registro':	# reflejo los campos
-				variables[expr[1].nombre] = campos_a_dic(expr[3])
+				variables[expr[1].nombre] = campos_a_dic(expr[3])				
+		
+			elif tipoZ == 'vreg': # reflejo los campos de la variable q es registro
+				variables[expr[1].nombre] = variables[expr[3].nombre]
 	
 			elif expr[1].array_elem == 1:	# declaro un vector a traves de uno de sus elementos
 				variables[expr[1].nombre] = 'vector' + tipoZ
@@ -918,7 +923,7 @@ def p_closedstmt(expr):
 				| dowhile 
 				| IF LPAREN g RPAREN closedstmt ELSE closedstmt
 				| loopheader closedstmt
-				| comentario'''
+				| comentario closedstmt'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -1129,6 +1134,8 @@ def tipo_segun(objeto):
 		elif objeto.campo != 'None':	# es algo tipo reg.campo
 			#print objeto.campo
 			variable = (variables[objeto.nombre])[objeto.campo]
+		elif type(variables[objeto.nombre]) == dict:
+			variable = 'vreg'
 		else:		
 			variable = variables[objeto.nombre]
 	else:
