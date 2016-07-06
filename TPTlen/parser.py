@@ -8,17 +8,6 @@ from ply.yacc import yacc
 
 
 if __name__ == "__main__":
-	
-    #if len(argv) < 4:
-        #print "Invalid arguments."
-        #print "Use:"
-        #print "  SLSParser [-o SALIDA] [-c ENTRADA | FUENTE]"
-        #exit()
-#
-	#if len(argv) == 4:	# viene con FUENTE
-		#text = argv[3]
-	#else:	# viene con -c ENTRADA
-		#text = arg
 
     text = argv[1]
 

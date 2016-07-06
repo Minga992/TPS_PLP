@@ -9,11 +9,7 @@ variables = {}
 
 def p_inicial(expr):
 	'start : codigo'
-	
-	#### FORMATO PARA IMPRIMIR ####
-	#global variables
-	#print variables
-	#print expr[1].impr
+
 	expr[0] = expr[1]
 
 #---------------------------------------------------------#
@@ -87,24 +83,17 @@ def p_variable(expr):
 
 	elif len(expr) == 5: # var -> VAR[NUM]
 		if tipo_segun(expr[3]) != 'int':
-			p_error(0)
+		    error_semantico(expr,3,"El indice del vector debe ser entero")
 			
 		expr[0] = Variable(expr[1])
 		expr[0].array_elem = 1
-		#if not(expr[1] in variables):	# si es la primera vez que trato con este vector, aviso
-			#variables[expr[0].nombre] = 'vector'
 
 	else: # var -> REGISTRO.CAMPO
 		if expr[1] in ['res','reS','rEs','rES','Res','ReS','REs','RES']: # el campo no puede ser res
-			p_error(0)
+			error_semantico(expr,1,"El campo no puede ser una palabra reservada")
 
 		expr[0] = Variable(expr[1])
 		expr[0].nombre_campo(expr[3])
-		#if (expr[1] in variables):
-			#if type(variables[expr[1]]) != dict: # era otra cosa y ahora es un registro
-				#variables[expr[1]] = {}
-		#else:
-			#variables[expr[1]] = {} # es un registro nuevito
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -179,10 +168,6 @@ def p_ge(expr):
 #---------------------------------------------------------#
 
 def p_vector(expr):
-	#'''vector : LCORCH constante separavec RCORCH
-			#| LCORCH vector separavec RCORCH
-			#| LCORCH registro separavec RCORCH
-			#| LPAREN vector RPAREN'''			
 	'''vector : LCORCH z separavec RCORCH
 			| LPAREN vector RPAREN'''			
 	
@@ -191,7 +176,7 @@ def p_vector(expr):
 	if expr[1] == '(':	# vec -> (vec)
 		expr[0] = expr[2]
 	elif (tipo_segun(expr[2]) != tipo_segun(expr[3])) & (tipo_segun(expr[3]) != 'vacio'):	
-		p_error(0)
+		error_semantico(expr,2,"El vector debe contener elementos del mismo tipo")
 	else:
 		expr[0] = Vector('vector'+tipo_segun(expr[2]))
 	
@@ -205,10 +190,6 @@ def p_vector(expr):
 #---------------------------------------------------------#
 
 def p_separavector(expr):
-	#'''separavec : empty
-				#| COMA constante separavec
-				#| COMA vector separavec
-				#| COMA registro separavec'''
 	'''separavec : empty
 				| COMA z separavec'''
 
@@ -217,7 +198,7 @@ def p_separavector(expr):
 	if len(expr) == 2:
 		expr[0] = Vector('vacio')
 	elif (tipo_segun(expr[2]) != tipo_segun(expr[3])) & (tipo_segun(expr[3]) != 'vacio') :
-		p_error(0)
+		error_semantico(expr,2,"El vector debe contener elementos del mismo tipo")
 	else:
 		expr[0] = Vector(tipo_segun(expr[2]))
 
@@ -230,11 +211,6 @@ def p_separavector(expr):
 #---------------------------------------------------------#
 
 def p_registro(expr):
-	#'''registro : LLLAVE RLLAVE
-				#| LLLAVE VAR DOSPTOS constante separareg RLLAVE
-				#| LLLAVE VAR DOSPTOS vector separareg RLLAVE
-				#| LLLAVE VAR DOSPTOS registro separareg RLLAVE
-				#| LPAREN registro RPAREN'''
 	'''registro : LLLAVE RLLAVE
 				| LLLAVE VAR DOSPTOS z separareg RLLAVE
 				| LPAREN registro RPAREN'''
@@ -260,10 +236,6 @@ def p_registro(expr):
 #---------------------------------------------------------#
 
 def p_separaregistro(expr):
-	#'''separareg : empty
-				#| COMA VAR DOSPTOS constante separareg
-				#| COMA VAR DOSPTOS vector separareg
-				#| COMA VAR DOSPTOS registro separareg'''
 	'''separareg : empty
 				| COMA VAR DOSPTOS z separareg'''
 	
@@ -291,55 +263,33 @@ def p_asignacion(expr):
 	global variables
 	
 	if type(expr[3]) == Variable:	# si aparece una variable del lado izquierdo de la asignacion
-		#print expr[3].nombre
-		#print expr[3].array_elem
-		#print variables[expr[3].nombre]
 		if not(expr[3].nombre in variables):
-			p_error(0)	# opera con variable no inicializada
+			error_semantico(expr,3,"Opera con variable no inicializada")
 		
 		elif (expr[3].campo != 'None') & (type(variables[expr[3].nombre]) != dict):
-			p_error(0)	# accede a campo de variable que no es registro
+			error_semantico(expr,3,"Accede a campo de variable que no es registro")
 		
 		elif expr[3].array_elem == 1:
 			if variables[expr[3].nombre][:6] != 'vector':
-			#print expr[3].nombre
-			#print expr[3].array_elem
-			#print variables[expr[3].nombre][:6]
-				p_error(0)	# accede a indice de variable que no es vector
+				error_semantico(expr,3,"Accede a indice de variable que no es vector")
 	
 	tipoZ =	tipo_segun(expr[3])
-	#print tipoZ
+
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		
 		if (expr[1].nombre in variables): # si la variable ya se uso antes
-			#print 'estoy declarado ' + variables[expr[1].nombre]
-			#print expr[1].campo
-			#print expr[1].array_elem
 			if expr[1].campo != 'None': # registro.campo = bla
 				if type(variables[expr[1].nombre]) != dict:	# esta cambiando de tipo a registro
 					variables[expr[1].nombre] = {}
 				variables[expr[1].nombre][expr[1].campo] = tipoZ
-					
-				
-				#print variables
-		
-			#elif variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
-				#variables[expr[1].nombre] += tipoZ
-			
+
 			elif expr[1].array_elem == 1: 	# var[num] = bla
 				if type(variables[expr[1].nombre]) == dict:
 					variables[expr[1].nombre] = 'vector' + tipoZ
 				elif variables[expr[1].nombre][:6] != 'vector':
 					variables[expr[1].nombre] = 'vector' + tipoZ
 				elif (variables[expr[1].nombre][:6] == 'vector') & (variables[expr[1].nombre][6:] != tipoZ): # veo que matchee el tipo de ahora
-					p_error(0)
-				#elif variables[expr[1].nombre][:6] != 'vector':
-					#variables[expr[1].nombre] = 'vector' + tipoZ
-			
-			#elif variables[expr[1].nombre][:6] == 'vector': # var[num] = bla
-				#print 'aloha'
-				#if (expr[1].array_elem == 1) & (variables[expr[1].nombre][6:] != tipoZ):	# veo que matchee el tipo de ahora
-					#p_error(0)
+					error_semantico(expr,1,"No respeta el tipo del vector")
 
 			else:	# es una variable cualquiera, no var[num] ni reg.campo
 	
@@ -348,7 +298,6 @@ def p_asignacion(expr):
 				elif tipoZ == 'vreg': # reflejo los campos de la variable q es registro
 					variables[expr[1].nombre] = variables[expr[3].nombre]
 				else:
-					#print "hola" + tipoZ
 					variables[expr[1].nombre] = tipoZ
 
 		else:	# declaro la variable
@@ -367,17 +316,17 @@ def p_asignacion(expr):
 
 	else:	# aca la variable ya deberia estar inicializada
 		if not(expr[1].nombre in variables):
-			p_error(0)
+			error_semantico(expr,1,"Variable no inicializada")
 		else:
 			tipoV = variables[expr[1].nombre]
 
 			if expr[2] == '+=': # es numerico o cadena
 				if not((numericos(tipoV,tipoZ)) | ((tipoV == tipoZ) & (tipoZ == 'str'))):
-					p_error(0)
+					error_semantico(expr,2,"El tipo debe ser numerico o cadena")
 			else: # es numerico
 				if not(numericos(tipoV,tipoZ)):
-					p_error(0)
-	#print tipo_segun(expr[1])
+					error_semantico(expr,2,"El tipo debe ser numerico")
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	imprimir = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
@@ -414,15 +363,15 @@ def p_matematico(expr):
 		
 		if expr[2] == '+':
 			if not(numericos(tipo1,tipo2)) | ((tipo1 == 'str') & (tipo2 == 'str')):
-				#print type(expr)
+
 				raise SemanticException('Tipos incompatibles')
 				
 		elif expr[2] == '%':
 			if (tipo1 != 'int') & (tipo2 != 'int'):
-				p_error(0)
+				error_semantico(expr,2,"El tipo debe ser entero")
 		
 		elif not(numericos(tipo1,tipo2)):
-			p_error(0)
+			error_semantico(expr,2,"El tipo debe ser numerico")
 			
 		if (tipo1 == 'float') | (tipo2 == 'float'):
 			expr[0] = Operacion('float')
@@ -452,7 +401,7 @@ def p_matprim(expr):
 		tipo2 = tipo_segun(expr[3])
 		
 		if not(numericos(tipo1,tipo2)):
-			p_error(0)
+			error_semantico(expr,2,"El tipo debe ser numerico")
 			
 		if (tipo1 == 'float') | (tipo2 == 'float'):
 			expr[0] = Operacion('float')
@@ -506,9 +455,9 @@ def p_autoincdec(expr):
 
 	if (expr[1] == '++') | (expr[1] == '--') :
 		if variables[expr[2].nombre] != 'int':
-			p_error(0)
+			error_semantico(expr,2,"El tipo debe ser entero")
 	elif variables[expr[1].nombre] != 'int':
-		p_error(0)
+		error_semantico(expr,1,"El tipo debe ser entero")
 		
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -546,10 +495,9 @@ def p_relacion(expr):
 		
 		if len(expr[2]) == 1: # para < y > solo numericos
 			if not(numericos(tipoZ1,tipoZ2)):
-				p_error(0)
+				error_semantico(expr,2,"El tipo debe ser numerico")
 		elif not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
-			#print "erroooooor"
-			p_error(0)
+			error_semantico(expr,2,"Los tipos deben coincidir")
 		
 		expr[0] = Operacion('bool')	
 
@@ -577,9 +525,9 @@ def p_relprim(expr):
 		
 		if len(expr[2]) == 1: # para < y > solo numericos
 			if not(numericos(tipoZ1,tipoZ2)):
-				p_error(0)
+				error_semantico(expr,2,"El tipo debe ser numerico")
 		elif not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
-				p_error(0)
+				error_semantico(expr,2,"Los tipos deben coinicidir")
 		
 		expr[0] = Operacion('bool')	
 
@@ -607,9 +555,9 @@ def p_relf(expr):
 		
 		if len(expr[2]) == 1: # para < y > solo numericos
 			if not(numericos(tipoZ1,tipoZ2)):
-				p_error(0)
+				error_semantico(expr,2,"El tipo debe ser numerico")
 		elif not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
-				p_error(0)
+				error_semantico(expr,2,"Los tipos deben coincidir")
 		
 		expr[0] = Operacion('bool')	
 
@@ -644,13 +592,13 @@ def p_logico(expr):
 		expr[0] = expr[2]
 	elif len(expr) == 3:	# not
 		if tipo_segun(expr[2]) != 'bool':
-			p_error(0)
+			error_semantico(expr,2,"El tipo debe ser bool")
 	else:
 		tipo1 = tipo_segun(expr[1])
 		tipo2 = tipo_segun(expr[3])
 		
 		if (tipo1 != 'bool') | (tipo1 != 'bool'):
-			p_error(0)
+			error_semantico(expr,2,"El tipo debe ser bool")
 		
 	expr[0] = Operacion('bool')
 	
@@ -678,7 +626,7 @@ def p_logprim(expr):
 		tipo2 = tipo_segun(expr[3])
 		
 		if (tipo1 != 'bool') | (tipo1 != 'bool'):
-			p_error(0)
+			error_semantico(expr,2,"El tipo debe ser bool")
 		
 	expr[0] = Operacion('bool')
 	
@@ -730,7 +678,7 @@ def p_ternario(expr):
 	tipoZ2 = tipo_segun(expr[5])
 	
 	if (tipoG != 'bool') | (tipoZ1 != tipoZ2):
-		p_error(0)
+		error_semantico(expr,1,"La condicion debe ser booleana y las operaciones deben tener el mismo tipo")
 	else:
 		expr[0] = Operacion(tipoZ1)
 
@@ -779,11 +727,11 @@ def p_funcion_multesc(expr):
 	tipoZ3 = tipo_segun(expr[7])
 	
 	if (tipoZ1[:6] != 'vector') | (not(numericos(tipoZ1[6:],tipoZ2))):
-		p_error(0)
+		error_semantico(expr,1,"multiplicacionEscalar(vector,numerico[,bool])")
 	
 	if len(expr) == 9:
 		if tipoZ3 != 'bool':
-			p_error(0)
+			error_semantico(expr,1,"multiplicacionEscalar(vector,numerico[,bool])")
 
 	if (tipoZ1[6:] == 'float') | (tipoZ2 == 'float'):
 		expr[0] = Funcion('vectorfloat')
@@ -807,7 +755,7 @@ def p_funcion_cap(expr):
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if tipo_segun(expr[3]) != 'str':
-		p_error(0)
+		error_semantico(expr,1,"capitalizar(cadena)")
 
 	expr[0] = Funcion('str')
 	
@@ -826,9 +774,9 @@ def p_funcion_colin(expr):
 	tipoZ2 = tipo_segun(expr[5])
 	
 	if (tipoZ1[:6] != 'vector') | (tipoZ2[:6] != 'vector'): # vectores
-		p_error(0)
+		error_semantico(expr,1,"colineales(vectornumerico,vectornumerico)")
 	elif (tipoZ1[-3:] != 'int') & (tipoZ1[-5:] != 'float') & (tipoZ2[-3:] != 'int') & (tipoZ2[-5:] != 'float'): # numericos
-		p_error(0)
+		error_semantico(expr,1,"colineales(vectornumerico,vectornumerico)")
 	
 	expr[0] = Funcion('bool')
 	
@@ -844,7 +792,7 @@ def p_funcion_length(expr):
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if (tipo_segun(expr[3]) != 'str') & (tipo_segun(expr[3])[:6] != 'vector'): 
-		p_error(0)
+		error_semantico(expr,1,"length(cadena o vector)")
 	
 	expr[0] = Funcion('int')
 	
@@ -854,87 +802,6 @@ def p_funcion_length(expr):
 
 #---------------------------------------------------------#
 #---------------------------------------------------------#
-
-#def p_bloquescond(expr):
-	#'''bloquescond : LLLAVE codigo RLLAVE
-			#| sentencia 
-			#| bucle'''
-
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print 'bloquescond'
-	#if len(expr) == 2:
-		#expr[0] = expr[1]
-	#else:
-		#expr[0] = expr[2]
-
-	#### FORMATO PARA IMPRIMIR ####
-	
-	#if len(expr) > 2:
-		#imprimir = '{\n' + tabular(expr[2].impr) + '}'
-	#else:
-		#imprimir = '\n' + expr[1].impr
-		#
-	#expr[0] = Codigo(imprimir)
-
-#---------------------------------------------------------#
-
-#def p_bloque(expr):
-	#'''bloque : matchedstmt
-				#| openstmt'''
-	#print 'bloque'
-	#expr[0] = expr[1]
-	
-	#### FORMATO PARA IMPRIMIR ####
-	
-	#expr[0].impr = '\n' + expr[1].impr
-	
-#---------------------------------------------------------#
-
-#def p_matchedstmt(expr):
-	#'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
-					#| bloquescond'''
-
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print 'matchedstmt'
-	#if len(expr) == 2:
-		#expr[0] = expr[1]
-	#elif tipo_segun(expr[3]) != 'bool':
-		#p_error(0)
-
-	#### FORMATO PARA IMPRIMIR ####
-	
-	#if len(expr) > 2:
-		#imprimir = 'if(' + expr[3].impr + ')' + tabular(expr[5].impr) + '\nelse' + tabular(expr[7].impr)
-		#expr[0] = Codigo(imprimir)
-
-#---------------------------------------------------------#
-
-#def p_openstmt(expr):
-	#'''openstmt : IF LPAREN g RPAREN bloque
-				#| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
-
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	
-	#if tipo_segun(expr[3]) != 'bool':
-		#p_error(0)
-
-	#### FORMATO PARA IMPRIMIR ####
-	
-	#imprimir = 'if(' + expr[3].impr + ')' + expr[5].impr 
-	#if len(expr) > 6:
-		#imprimir += '\nelse' + expr[7].impr
-	#expr[0] = Codigo(imprimir)
-
-#---------------------------------------------------------#
-
-#def p_bucle(expr):
-	#'''bucle : for
-			#| while
-			#| dowhile'''
-#
-	#expr[0] = expr[1]
-
-#---------------------------------------------------------#	
 
 def p_stmt(expr):
 	'''stmt : closedstmt
@@ -956,7 +823,7 @@ def p_closedstmt(expr):
 	
 	if len(expr) > 4:	# if (g) bla...
 		if tipo_segun(expr[3]) != 'bool':
-			p_error(0)
+			error_semantico(expr,3,"La guarda debe ser booleana")
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -989,7 +856,7 @@ def p_openstmt(expr):
 	
 	if len(expr) > 3:
 		if tipo_segun(expr[3]) != 'bool':
-			p_error[0]
+			error_semantico(expr,3,"La guarda debe ser booleana")
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -1013,9 +880,6 @@ def p_bucle(expr):
 #---------------------------------------------------------#
 
 def p_for_sinasig(expr):
-	#'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
-			#| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			#| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
 	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN
 			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN 
 			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN'''
@@ -1025,7 +889,7 @@ def p_for_sinasig(expr):
 	global variables
 	
 	if tipo_segun(expr[4]) != 'bool':
-		p_error(0)
+		error_semantico(expr,4,"La guarda debe ser booleana")
 
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -1041,9 +905,6 @@ def p_for_sinasig(expr):
 #---------------------------------------------------------#
 
 def p_for_conasig(expr):
-	#'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN bloque
-			#| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			#| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
 	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN
 			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN
 			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN'''
@@ -1053,7 +914,7 @@ def p_for_conasig(expr):
 	global variables
 	
 	if tipo_segun(expr[5]) != 'bool':
-		p_error(0)
+		error_semantico(expr,5,"La guarda debe ser booleana")
 
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -1070,12 +931,11 @@ def p_for_conasig(expr):
 
 def p_while(expr):
 	'while : WHILE LPAREN g RPAREN'
-	#'while : WHILE LPAREN g RPAREN bloque'
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if tipo_segun(expr[3]) != 'bool':
-		p_error(0)	
+		error_semantico(expr,3,"La guarda debe ser booleana")
 		
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -1085,13 +945,12 @@ def p_while(expr):
 #---------------------------------------------------------#
 
 def p_dowhile(expr):
-	#'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
 	'dowhile : DO stmt WHILE LPAREN g RPAREN PTOCOMA'
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if tipo_segun(expr[5]) != 'bool':
-		p_error(0)	
+		error_semantico(expr,5,"La guarda debe ser booleana")
 
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -1101,20 +960,12 @@ def p_dowhile(expr):
 #---------------------------------------------------------#
 
 def p_codigo(expr):
-	#'''codigo : bloque codigo
-	 	    #| comentario codigo
-		    #| bloque
-		    #| comentario'''
-	#'''codigo : stmt codigo
-	 	    #| comentario codigo
-		    #| stmt
-		    #| comentario'''
 	'''codigo : stmt codigo
 		    | stmt
 		    | comentario'''
 	
 	#### FORMATO PARA IMPRIMIR ####
-	#print 'codigo'
+	
 	imprimir = expr[1].impr
 	
 	if len(expr) == 3:
@@ -1140,16 +991,19 @@ def p_empty(p):
 #---------------------------------------------------------#
 #---------------------------------------------------------#
 
-def p_error(token):
-    message = "[Syntax error]"
-    if token is not None:
-        message += "\ntype:" + token.type
-        message += "\nvalue:" + str(token.value)
-        message += "\nline:" + str(token.lineno)
-        message += "\nposition:" + str(token.lexpos)
-    else:
-		message += " At end of line"
-    raise Exception(message)
+def p_error(expr):
+	message = "[Syntax error]"
+	message += "\nline:" + str(expr.lineno(0))
+	raise Exception(message)
+    
+#---------------------------------------------------------#
+
+def error_semantico(expr,n,msg):
+	message = "[Semantic error]"
+	message += "\n"+msg
+	message += "\nline:" + str(expr.lineno(n))
+	message += "\nindex:" + str(expr.lexpos(n))
+	raise Exception(message)
 
 #---------------------------------------------------------#
 #---------------------------------------------------------#
