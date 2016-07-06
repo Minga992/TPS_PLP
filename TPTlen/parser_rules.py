@@ -315,7 +315,11 @@ def p_asignacion(expr):
 			#print expr[1].campo
 			#print expr[1].array_elem
 			if expr[1].campo != 'None': # registro.campo = bla
+				if type(variables[expr[1].nombre]) != dict:	# esta cambiando de tipo a registro
+					variables[expr[1].nombre] = {}
 				variables[expr[1].nombre][expr[1].campo] = tipoZ
+					
+				
 				#print variables
 		
 			#elif variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
