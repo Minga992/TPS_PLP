@@ -66,7 +66,7 @@ def p_constante_funcion(f):
 def p_variable(expr):
 	'''variable : VAR
 				| RES
-				| VAR LCORCH NUM RCORCH
+				| VAR LCORCH z RCORCH
 				| LPAREN variable RPAREN
 				| VAR PUNTO VAR'''
 	
@@ -84,6 +84,9 @@ def p_variable(expr):
 			expr[0] = Variable(expr[1]) #nombre
 
 	elif len(expr) == 5: # var -> VAR[NUM]
+		if tipo_segun(expr[3]) != 'int':
+			p_error(0)
+			
 		expr[0] = Variable(expr[1])
 		expr[0].array_elem = 1
 		#if not(expr[1] in variables):	# si es la primera vez que trato con este vector, aviso
@@ -110,7 +113,7 @@ def p_variable(expr):
 		if len(expr) == 4:
 			expr[0].impr += '.' + expr[3]
 		elif len(expr) == 5: 
-			expr[0].impr += '[' + str(expr[3]) + ']'
+			expr[0].impr += '[' + expr[3].impr + ']'
 
 #---------------------------------------------------------#
 #---------------------------------------------------------#
