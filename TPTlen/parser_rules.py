@@ -11,7 +11,7 @@ def p_inicial(expr):
 	'start : codigo'
 	
 	#### FORMATO PARA IMPRIMIR ####
-	#print 'inicial'
+
 	print expr[1].impr
 
 #---------------------------------------------------------#
@@ -24,7 +24,7 @@ def p_constante_valor(cte):
 				| LPAREN constante RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print 'constante'
+
 	if cte[1] == '(':
 		cte[0] = Constante(cte[2].tipo)
 	else:	
@@ -71,7 +71,7 @@ def p_variable(expr):
 				| VAR PUNTO VAR'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print 'variable'
+
 	global variables
 
 	if expr[1] == '(':	# var -> (var)
@@ -124,7 +124,7 @@ def p_numero(num):
 			| MENOS NUM PUNTO NUM'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print 'numero'
+
 	if len(num) <= 2 :
 		num[0] = Numero('int')
 	else:
@@ -157,8 +157,7 @@ def p_zeta_sin_oper(expr):
 			| constante
 			| vector
 			| registro'''
-	#print 'zso'
-	#print tipo_segun(expr[1])
+
 	expr[0] = expr[1]
 
 #---------------------------------------------------------#
@@ -274,7 +273,7 @@ def p_asignacion(expr):
 				| variable operasig ternario'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print 'asignacion'
+
 	global variables
 	
 	if type(expr[3]) == Variable:	# si aparece una variable del lado izquierdo de la asignacion
@@ -285,7 +284,10 @@ def p_asignacion(expr):
 		elif (expr[3].campo != 'None') & (type(variables[expr[3].nombre]) != dict):
 			p_error(0)	# accede a campo de variable que no es registro
 		
-		elif (expr[3].array_elem == 1) & (variables[expr[3].nombre][6:] != 'vector'):
+		elif (expr[3].array_elem == 1) & (variables[expr[3].nombre][:6] != 'vector'):
+			print expr[3].nombre
+			print expr[3].array_elem
+			print variables[expr[3].nombre][:6]
 			p_error(0)	# accede a indice de variable que no es vector
 	
 	tipoZ =	tipo_segun(expr[3])
@@ -349,7 +351,7 @@ def p_operasig(op):
 				| MENOS IGUAL
 				| POR IGUAL
 				| DIV IGUAL'''
-	#print 'opasig'
+
 	op[0] = op[1]
 	if len(op) == 3:
 		op[0] += op[2]
@@ -362,7 +364,7 @@ def p_matematico(expr):
 				| LPAREN matematico RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print 'matematico'
+
 	if expr[1] == '(':	# mat -> (mat)
 		expr[0] = expr[2]
 	
@@ -390,7 +392,7 @@ def p_matematico(expr):
 def p_matprim(expr):		   
 	'''matprim : matprim operMatBinario matf
 				| matf'''
-	#print 'matprim'
+
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if len(expr) == 2:
@@ -415,10 +417,10 @@ def p_matf(expr):
 			| LPAREN matematico RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print 'matf'
+
 	if len(expr) == 2:
 		expr[0] = expr[1]
-		#print tipo_segun(expr[1])
+
 	else:
 		expr[0] = expr[2]
 
@@ -436,7 +438,7 @@ def p_operMatBinario(op):
 					| POT
 					| MOD
 					| DIV'''
-	#print 'opmatbin'
+
 	op[0] = op[1]
 
 #---------------------------------------------------------#
@@ -688,7 +690,7 @@ def p_operacion(expr):
 	'''operacion : matematico
 				| relacion
 				| logico'''
-	#print 'operacion'
+
 	expr[0] = expr[1]
 
 #---------------------------------------------------------#	
@@ -700,7 +702,7 @@ def p_sentencia_(expr):
 				| autoincdec PTOCOMA'''
 
 	#### FORMATO PARA IMPRIMIR ####
-	#print 'sentencia'
+
 	if len(expr) == 3:
 		imprimir = expr[1].impr + ';'#'\n'
 	else:
@@ -798,91 +800,162 @@ def p_funcion_length(expr):
 #---------------------------------------------------------#
 #---------------------------------------------------------#
 
-def p_bloquescond(expr):
-	'''bloquescond : LLLAVE codigo RLLAVE
-			| sentencia 
-			| bucle'''
+#def p_bloquescond(expr):
+	#'''bloquescond : LLLAVE codigo RLLAVE
+			#| sentencia 
+			#| bucle'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	#print 'bloquescond'
-	if len(expr) == 2:
-		expr[0] = expr[1]
-	else:
-		expr[0] = expr[2]
+	#if len(expr) == 2:
+		#expr[0] = expr[1]
+	#else:
+		#expr[0] = expr[2]
 
 	#### FORMATO PARA IMPRIMIR ####
 	
-	if len(expr) > 2:
-		imprimir = '{\n' + tabular(expr[2].impr) + '}'
-	else:
-		imprimir = '\n' + expr[1].impr
-		
-	expr[0] = Codigo(imprimir)
+	#if len(expr) > 2:
+		#imprimir = '{\n' + tabular(expr[2].impr) + '}'
+	#else:
+		#imprimir = '\n' + expr[1].impr
+		#
+	#expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
 
-def p_bloque(expr):
-	'''bloque : matchedstmt
-				| openstmt'''
+#def p_bloque(expr):
+	#'''bloque : matchedstmt
+				#| openstmt'''
 	#print 'bloque'
-	expr[0] = expr[1]
+	#expr[0] = expr[1]
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
-	expr[0].impr = '\n' + expr[1].impr
+	#expr[0].impr = '\n' + expr[1].impr
 	
 #---------------------------------------------------------#
 
-def p_matchedstmt(expr):
-	'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
-					| bloquescond'''
+#def p_matchedstmt(expr):
+	#'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
+					#| bloquescond'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	#print 'matchedstmt'
-	if len(expr) == 2:
-		expr[0] = expr[1]
-	elif tipo_segun(expr[3]) != 'bool':
-		p_error(0)
+	#if len(expr) == 2:
+		#expr[0] = expr[1]
+	#elif tipo_segun(expr[3]) != 'bool':
+		#p_error(0)
 
 	#### FORMATO PARA IMPRIMIR ####
 	
-	if len(expr) > 2:
-		imprimir = 'if(' + expr[3].impr + ')' + tabular(expr[5].impr) + '\nelse' + tabular(expr[7].impr)
-		expr[0] = Codigo(imprimir)
+	#if len(expr) > 2:
+		#imprimir = 'if(' + expr[3].impr + ')' + tabular(expr[5].impr) + '\nelse' + tabular(expr[7].impr)
+		#expr[0] = Codigo(imprimir)
+
+#---------------------------------------------------------#
+
+#def p_openstmt(expr):
+	#'''openstmt : IF LPAREN g RPAREN bloque
+				#| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	#if tipo_segun(expr[3]) != 'bool':
+		#p_error(0)
+
+	#### FORMATO PARA IMPRIMIR ####
+	
+	#imprimir = 'if(' + expr[3].impr + ')' + expr[5].impr 
+	#if len(expr) > 6:
+		#imprimir += '\nelse' + expr[7].impr
+	#expr[0] = Codigo(imprimir)
+
+#---------------------------------------------------------#
+
+#def p_bucle(expr):
+	#'''bucle : for
+			#| while
+			#| dowhile'''
+#
+	#expr[0] = expr[1]
+
+#---------------------------------------------------------#	
+
+def p_stmt(expr):
+	'''stmt : closedstmt
+			| openstmt'''
+
+	expr[0] = expr[1]
+
+#---------------------------------------------------------#
+
+def p_closedstmt(expr):
+	'''closedstmt : sentencia 
+				| LLLAVE codigo RLLAVE
+				| dowhile 
+				| IF LPAREN g RPAREN closedstmt ELSE closedstmt
+				| loopheader closedstmt'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	if len(expr) > 4:	# if (g) bla...
+		if tipo_segun(expr[3]) != 'bool':
+			p_error(0)
+	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if len(expr) == 2:
+		imprimir = expr[1].impr
+	elif len(expr) == 3:
+		imprimir = expr[1].impr + expr[2].impr
+	elif len(expr) == 4:
+		imprimir = '{\n' + expr[2].impr + '}'
+	else:
+		imprimir = 'if('+ expr[3].impr + ')' + expr[5].impr + 'else' + expr[7].impr
+
+	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
 
 def p_openstmt(expr):
-	'''openstmt : IF LPAREN g RPAREN bloque
-				| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
-
+	'''openstmt : IF LPAREN g RPAREN stmt
+				| IF LPAREN g RPAREN closedstmt ELSE openstmt
+				| loopheader openstmt'''
+	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
-	if tipo_segun(expr[3]) != 'bool':
-		p_error(0)
-
+	if len(expr) > 3:
+		if tipo_segun(expr[3]) != 'bool':
+			p_error[0]
+	
 	#### FORMATO PARA IMPRIMIR ####
 	
-	imprimir = 'if(' + expr[3].impr + ')' + expr[5].impr 
-	if len(expr) > 6:
-		imprimir += '\nelse' + expr[7].impr
+	if len(expr) == 3:
+		imprimir = expr[1].impr + expr[2].impr
+	else:
+		imprimir = 'if(' + expr[3].impr + ')' + expr[5].impr
+		if len(expr) > 5:
+			imprimir += 'else' + expr[7].impr
+	
 	expr[0] = Codigo(imprimir)
-
+	
 #---------------------------------------------------------#
 
 def p_bucle(expr):
-	'''bucle : for
-			| while
-			| dowhile'''
+	'''loopheader : for
+				| while'''
 
 	expr[0] = expr[1]
-	
+
 #---------------------------------------------------------#
 
 def p_for_sinasig(expr):
-	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
-			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
+	#'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
+			#| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
+			#| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
+	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN
+			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN 
+			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
@@ -896,18 +969,21 @@ def p_for_sinasig(expr):
 	imprimir = 'for( ; ' + expr[4].impr + '; '
 	
 	if expr[6] == ')':
-		imprimir += ')' + expr[7].impr
+		imprimir += ')'# + expr[7].impr
 	else:
-		imprimir += expr[6].impr + ')' + expr[8].impr
+		imprimir += expr[6].impr + ')'# + expr[8].impr
 
 	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
 
 def p_for_conasig(expr):
-	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN bloque
-			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN bloque
-			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
+	#'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN bloque
+			#| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN bloque
+			#| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
+	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN
+			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN
+			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -921,16 +997,17 @@ def p_for_conasig(expr):
 	imprimir = 'for(' + expr[3].impr + ' ; ' + expr[5].impr + '; '
 	
 	if expr[7] == ')':
-		imprimir += ')' + expr[7].impr
+		imprimir += ')'# + expr[7].impr
 	else:
-		imprimir += expr[7].impr + ')' + expr[9].impr
+		imprimir += expr[7].impr + ')'# + expr[9].impr
 		
 	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
 
 def p_while(expr):
-	'while : WHILE LPAREN g RPAREN bloque'
+	'while : WHILE LPAREN g RPAREN'
+	#'while : WHILE LPAREN g RPAREN bloque'
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -939,13 +1016,14 @@ def p_while(expr):
 		
 	#### FORMATO PARA IMPRIMIR ####
 	
-	imprimir = 'while(' + expr[3].impr + ')' + expr[5].impr
+	imprimir = 'while(' + expr[3].impr + ')'# + expr[5].impr
 	expr[0] = Codigo(imprimir)
 	
 #---------------------------------------------------------#
 
 def p_dowhile(expr):
-	'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
+	#'dowhile : DO bloque WHILE LPAREN g RPAREN PTOCOMA'
+	'dowhile : DO stmt WHILE LPAREN g RPAREN PTOCOMA'
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -960,9 +1038,13 @@ def p_dowhile(expr):
 #---------------------------------------------------------#
 
 def p_codigo(expr):
-	'''codigo : bloque codigo
+	#'''codigo : bloque codigo
+	 	    #| comentario codigo
+		    #| bloque
+		    #| comentario'''
+	'''codigo : stmt codigo
 	 	    | comentario codigo
-		    | bloque
+		    | stmt
 		    | comentario'''
 	
 	#### FORMATO PARA IMPRIMIR ####
