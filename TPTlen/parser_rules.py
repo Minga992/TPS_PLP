@@ -289,18 +289,21 @@ def p_asignacion(expr):
 	global variables
 	
 	if type(expr[3]) == Variable:	# si aparece una variable del lado izquierdo de la asignacion
-		
+		#print expr[3].nombre
+		#print expr[3].array_elem
+		#print variables[expr[3].nombre]
 		if not(expr[3].nombre in variables):
 			p_error(0)	# opera con variable no inicializada
 		
 		elif (expr[3].campo != 'None') & (type(variables[expr[3].nombre]) != dict):
 			p_error(0)	# accede a campo de variable que no es registro
 		
-		elif (expr[3].array_elem == 1) & (variables[expr[3].nombre][:6] != 'vector'):
+		elif expr[3].array_elem == 1:
+			if variables[expr[3].nombre][:6] != 'vector':
 			#print expr[3].nombre
 			#print expr[3].array_elem
 			#print variables[expr[3].nombre][:6]
-			p_error(0)	# accede a indice de variable que no es vector
+				p_error(0)	# accede a indice de variable que no es vector
 	
 	tipoZ =	tipo_segun(expr[3])
 	#print tipoZ
@@ -312,6 +315,7 @@ def p_asignacion(expr):
 			#print expr[1].array_elem
 			if expr[1].campo != 'None': # registro.campo = bla
 				variables[expr[1].nombre][expr[1].campo] = tipoZ
+				#print variables
 		
 			#elif variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
 				#variables[expr[1].nombre] += tipoZ
@@ -913,7 +917,8 @@ def p_closedstmt(expr):
 				| LLLAVE codigo RLLAVE
 				| dowhile 
 				| IF LPAREN g RPAREN closedstmt ELSE closedstmt
-				| loopheader closedstmt'''
+				| loopheader closedstmt
+				| comentario'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -1063,10 +1068,12 @@ def p_codigo(expr):
 	 	    #| comentario codigo
 		    #| bloque
 		    #| comentario'''
+	#'''codigo : stmt codigo
+	 	    #| comentario codigo
+		    #| stmt
+		    #| comentario'''
 	'''codigo : stmt codigo
-	 	    | comentario codigo
-		    | stmt
-		    | comentario'''
+		    | stmt'''
 	
 	#### FORMATO PARA IMPRIMIR ####
 	#print 'codigo'
@@ -1120,7 +1127,7 @@ def tipo_segun(objeto):
 		if objeto.array_elem == 1:	# es una posicion de un arreglo
 			variable = variables[objeto.nombre][6:]
 		elif objeto.campo != 'None':	# es algo tipo reg.campo
-			print objeto.campo
+			#print objeto.campo
 			variable = (variables[objeto.nombre])[objeto.campo]
 		else:		
 			variable = variables[objeto.nombre]
