@@ -70,8 +70,5 @@ class Registro(Programa):
 
 class Codigo(Programa):
 	
-	#impr = ""
-	#acum_tabs = 0
-	def __init__(self,acum_tabs,impr):
-		self.acum_tabs = acum_tabs
+	def __init__(self,impr):
 		self.impr = impr

@@ -10,14 +10,11 @@ variables = {}
 def p_inicial(expr):
 	'start : codigo'
 	
-	#expr[0] = expr[1]
-	#print "inicial"
-	
 	#### FORMATO PARA IMPRIMIR ####
-	#expr[1] = Codigo(0)
-	#expr[0] = expr[1]
+	#print 'inicial'
 	print expr[1].impr
 
+#---------------------------------------------------------#
 #---------------------------------------------------------#
 
 def p_constante_valor(cte):
@@ -27,20 +24,17 @@ def p_constante_valor(cte):
 				| LPAREN constante RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print "cte"
+	#print 'constante'
 	if cte[1] == '(':
 		cte[0] = Constante(cte[2].tipo)
 	else:	
 		if type(cte[1]) == str:
-			#print 'str'
 			cte[0] = Constante('str')
 		elif type(cte[1]) == bool:
-			#print 'bool'
 			cte[0] = Constante('bool')
 		else: # es un numero
-			#print 'numero'
 			cte[0] = Constante(cte[1].tipo)
-			
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	if cte[1] == '(':
@@ -51,7 +45,6 @@ def p_constante_valor(cte):
 		elif type(cte[1]) == bool:
 			cte[0].impr = str(cte[1])
 		else: # es un numero
-			#print cte[1].impr
 			cte[0].impr = cte[1].impr
 
 #---------------------------------------------------------#
@@ -68,6 +61,7 @@ def p_constante_funcion(f):
 	f[0].impr = f[1].impr
 
 #---------------------------------------------------------#
+#---------------------------------------------------------#
 
 def p_variable(expr):
 	'''variable : VAR
@@ -77,7 +71,7 @@ def p_variable(expr):
 				| VAR PUNTO VAR'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print "var"
+	#print 'variable'
 	global variables
 
 	if expr[1] == '(':	# var -> (var)
@@ -88,30 +82,24 @@ def p_variable(expr):
 			expr[0] = Variable('res')
 		else:
 			expr[0] = Variable(expr[1]) #nombre
-		
+
 	elif len(expr) == 5: # var -> VAR[NUM]
 		expr[0] = Variable(expr[1])
 		expr[0].array_elem = 1
-		if not(expr[1] in variables):	# si es la primera vez que trato con este vector, aviso
-			variables[expr[0].nombre] = 'vector'
-			
+		#if not(expr[1] in variables):	# si es la primera vez que trato con este vector, aviso
+			#variables[expr[0].nombre] = 'vector'
+
 	else: # var -> REGISTRO.CAMPO
 		if expr[1] in ['res','reS','rEs','rES','Res','ReS','REs','RES']: # el campo no puede ser res
 			p_error(0)
-			
+
 		expr[0] = Variable(expr[1])
-		#print expr[3]
 		expr[0].nombre_campo(expr[3])
-		if (expr[1] in variables):
-			if type(variables[expr[1]]) != dict: # era otra cosa y ahora es un registro
-			#if (variables[expr[1]] != 'registro'):
-				#p_error(0)
-				variables[expr[1]] = {}
-		else:
-			variables[expr[1]] = {} # es un registro nuevito
-	
-	#print expr[1]
-	#print variables[expr[1]]
+		#if (expr[1] in variables):
+			#if type(variables[expr[1]]) != dict: # era otra cosa y ahora es un registro
+				#variables[expr[1]] = {}
+		#else:
+			#variables[expr[1]] = {} # es un registro nuevito
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -122,9 +110,9 @@ def p_variable(expr):
 		if len(expr) == 4:
 			expr[0].impr += '.' + expr[3]
 		elif len(expr) == 5: 
-			#print expr[3]
 			expr[0].impr += '[' + str(expr[3]) + ']'
-			
+
+#---------------------------------------------------------#
 #---------------------------------------------------------#
 	
 def p_numero(num):
@@ -136,12 +124,12 @@ def p_numero(num):
 			| MENOS NUM PUNTO NUM'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print num
+	#print 'numero'
 	if len(num) <= 2 :
 		num[0] = Numero('int')
 	else:
 		num[0] = Numero('float')
-		
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	if len(num) == 2:
@@ -153,38 +141,14 @@ def p_numero(num):
 	else:
 		num[0].impr = num[1]+str(num[2])+'.'+str(num[4])
 	
-	#if num[1] == '+':
-		#if len(num) == 3:
-			#num[0] = Numero(+num[2],int)
-		#else:
-			#num[0] = Numero(float('+'+str(num[2])+'.'+str(num[4])),float)
-	#elif num[1] == '-':
-		#if len(num) == 3:
-			#num[0] = Numero(-num[2],int)
-		#else:
-			#num[0] = Numero(float('-'+str(num[2])+'.'+str(num[4])),float)
-	#else:
-		#if len(num) == 2:
-			#num[0] = Numero('int')
-		#else:
-			#num[0] = Numero(float(str(num[2])+'.'+str(num[4])),float)
-	
+#---------------------------------------------------------#
 #---------------------------------------------------------#
 	
 def p_zeta(expr):
-	'''z : variable
-		| constante
-		| operacion
-		| vector
-		| registro'''
-	
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	
-	#print "zeta"
+	'''z : zso
+		| operacion'''
 	
 	expr[0] = expr[1]
-	#print expr[0].impr
-	#### FORMATO PARA IMPRIMIR ####
 	
 #---------------------------------------------------------#
 
@@ -193,7 +157,8 @@ def p_zeta_sin_oper(expr):
 			| constante
 			| vector
 			| registro'''
-			
+	#print 'zso'
+	#print tipo_segun(expr[1])
 	expr[0] = expr[1]
 
 #---------------------------------------------------------#
@@ -204,10 +169,9 @@ def p_ge(expr):
 		| relacion
 		| logico'''
 	
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print "ge"
 	expr[0] = expr[1]
 
+#---------------------------------------------------------#
 #---------------------------------------------------------#
 
 def p_vector(expr):
@@ -217,14 +181,14 @@ def p_vector(expr):
 			| LPAREN vector RPAREN'''			
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print "vector"
-	if expr[1] == '(':
+
+	if expr[1] == '(':	# vec -> (vec)
 		expr[0] = expr[2]
-	elif (expr[2].tipo != expr[3].tipo) & (expr[3].tipo != 'vacio'):
+	elif (expr[2].tipo != expr[3].tipo) & (expr[3].tipo != 'vacio'):	
 		p_error(0)
 	else:
 		expr[0] = Vector('vector'+expr[2].tipo)
-		
+	
 	#### FORMATO PARA IMPRIMIR ####
 	
 	if expr[1] == '(':
@@ -248,12 +212,13 @@ def p_separavector(expr):
 		p_error(0)
 	else:
 		expr[0] = Vector(expr[2].tipo)
-		
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	if len(expr) > 2:
 		expr[0].impr = ', ' + expr[2].impr + expr[3].impr		
 
+#---------------------------------------------------------#
 #---------------------------------------------------------#
 
 def p_registro(expr):
@@ -262,16 +227,16 @@ def p_registro(expr):
 				| LLLAVE VAR DOSPTOS vector separareg RLLAVE
 				| LLLAVE VAR DOSPTOS registro separareg RLLAVE
 				| LPAREN registro RPAREN'''
-				
+
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print "registro"
-	if expr[1] == '(':
+
+	if expr[1] == '(':	# reg -> (reg)
 		expr[0] = expr[2]
-	elif len(expr) == 3 : 
+	elif len(expr) == 3 : # reg -> {}
 		expr[0] = Registro([],[])
 	else:
-		expr[0] = Registro([expr[2]]+expr[5].campos,[expr[4].tipo]+expr[5].tipos_campos)
-		
+		expr[0] = Registro( [expr[2]]+expr[5].campos , [expr[4].tipo]+expr[5].tipos_campos )
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	if expr[1] == '(':
@@ -280,7 +245,7 @@ def p_registro(expr):
 		expr[0].impr = '{}'
 	else:
 		expr[0].impr = '{' + expr[2] + ': ' + expr[4].impr + expr[5].impr + '}'
-		
+
 #---------------------------------------------------------#
 
 def p_separaregistro(expr):
@@ -294,14 +259,14 @@ def p_separaregistro(expr):
 	if len(expr) == 2 :
 		expr[0] = Registro([],[])
 	else:
-		#print type(expr[2])
-		expr[0] = Registro([expr[2]]+expr[5].campos,[expr[4].tipo]+expr[5].tipos_campos)
-		
+		expr[0] = Registro( [expr[2]]+expr[5].campos , [expr[4].tipo]+expr[5].tipos_campos )
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	if len(expr) > 2 :
 		expr[0].impr = ', ' + expr[2] + ': ' + expr[4].impr + expr[5].impr
 	
+#---------------------------------------------------------#
 #---------------------------------------------------------#
 
 def p_asignacion(expr):
@@ -309,43 +274,55 @@ def p_asignacion(expr):
 				| variable operasig ternario'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print "asig"
+	#print 'asignacion'
 	global variables
+	
+	if type(expr[3]) == Variable:	# si aparece una variable del lado izquierdo de la asignacion
+		
+		if not(expr[3].nombre in variables):
+			p_error(0)	# opera con variable no inicializada
+		
+		elif (expr[3].campo != 'None') & (type(variables[expr[3].nombre]) != dict):
+			p_error(0)	# accede a campo de variable que no es registro
+		
+		elif (expr[3].array_elem == 1) & (variables[expr[3].nombre][6:] != 'vector'):
+			p_error(0)	# accede a indice de variable que no es vector
+	
 	tipoZ =	tipo_segun(expr[3])
-	#print tipoZ
 	
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		
 		if (expr[1].nombre in variables): # si la variable ya se uso antes
-			#print expr[1].campo
-			if expr[1].campo != 'None': # si es registro.campo = bla
+			
+			if expr[1].campo != 'None': # registro.campo = bla
 				variables[expr[1].nombre][expr[1].campo] = tipoZ
 		
-			elif variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
-				variables[expr[1].nombre] += tipoZ
+			#elif variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
+				#variables[expr[1].nombre] += tipoZ
 				
-			elif variables[expr[1].nombre][:6] == 'vector': # si ya habia hecho var[numero] = bla o var = [bla], veo que matchee el tipo de ahora
-				
-				if (expr[1].array_elem == 1) & (variables[expr[1].nombre][6:] != tipoZ):
+			elif variables[expr[1].nombre][:6] == 'vector': # var[num] = bla
+			
+				if (expr[1].array_elem == 1) & (variables[expr[1].nombre][6:] != tipoZ):	# veo que matchee el tipo de ahora
 					p_error(0)
-				#else:
-					
-					
-			else:	# es una variable cualquiera, no vector
-							
+	
+			else:	# es una variable cualquiera, no var[num] ni reg.campo
+	
 				if tipoZ == 'registro':	# reflejo los campos
 					variables[expr[1].nombre] = campos_a_dic(expr[3])
-					
 				else:
 					variables[expr[1].nombre] = tipoZ
-				
-		else:
+
+		else:	# declaro la variable
 			
 			if tipoZ == 'registro':	# reflejo los campos
 				variables[expr[1].nombre] = campos_a_dic(expr[3])
+	
+			elif expr[1].array_elem == 1:	# declaro un vector a traves de uno de sus elementos
+				variables[expr[1].nombre] = 'vector' + tipoZ
+
 			else:
 				variables[expr[1].nombre] = tipoZ
-		
+
 	else:	# aca la variable ya deberia estar inicializada
 		if not(expr[1].nombre in variables):
 			p_error(0)
@@ -359,13 +336,10 @@ def p_asignacion(expr):
 				if not(numericos(tipoV,tipoZ)):
 					p_error(0)
 	
-	#print expr[1].nombre
-	#print variables[expr[1].nombre]
-	
 	#### FORMATO PARA IMPRIMIR ####
 	
 	imprimir = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
-	expr[0] = Codigo(0,imprimir)
+	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#	
 
@@ -375,78 +349,84 @@ def p_operasig(op):
 				| MENOS IGUAL
 				| POR IGUAL
 				| DIV IGUAL'''
-					
-	#print "operasig"
-	
+	#print 'opasig'
 	op[0] = op[1]
 	if len(op) == 3:
 		op[0] += op[2]
 	
 #---------------------------------------------------------#
-
+#---------------------------------------------------------#
+	
 def p_matematico(expr):
-	'''matematico : z operMatBinario zso
-				| z operMatBinario LPAREN matematico RPAREN
+	'''matematico : matprim operMatBinario matf
 				| LPAREN matematico RPAREN'''
-								#| operMatUnario variable
-#| variable operMatUnario
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print "mat"
-	global variables
 
-	#if len(expr) == 4: 
-		
-	if expr[1] == '(':
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	#print 'matematico'
+	if expr[1] == '(':	# mat -> (mat)
 		expr[0] = expr[2]
 	
-	else: 
-		tipoZ1 = tipo_segun(expr[1])
-		#print type(expr[1])
-		if len(expr)==4:
-			tipoZ2 = tipo_segun(expr[3]) # zso
-		else: 
-			tipoZ2 = tipo_segun(expr[4]) # (mat)
-		#print tipoZ1
-		#print tipoZ2
-			
-		if expr[2] == '+': # es numerico o cadena
-			if not((numericos(tipoZ1,tipoZ2)) | ((tipoZ1 == tipoZ2) & (tipoZ2 == 'str'))):
-				#print tipoZ1
-				p_error(0)
-		elif expr[2] == '%':
-			if not((tipoZ1 == 'int') & (tipoZ1 == tipoZ2)):
-				p_error(0)
-		else: # es numerico
-			if not(numericos(tipoZ1,tipoZ2)):
-				p_error(0)
+	else:
+		tipo1 = tipo_segun(expr[1])
+		tipo2 = tipo_segun(expr[3])
 		
-		if (tipoZ1 == 'float') | (tipoZ2 == 'float'):
+		if not(numericos(tipo1,tipo2)):
+			p_error(0)
+			
+		if (tipo1 == 'float') | (tipo2 == 'float'):
 			expr[0] = Operacion('float')
 		else:
-			expr[0] = Operacion(tipoZ1)
-		
-	#else: # es entero
-		#if (expr[1] == '++') | (expr[1] == '--') :
-			#if variables[expr[2]] != 'int':
-				#p_error(0)
-		#elif variables[expr[1]] != 'int':
-			#p_error(0)
-		#
-		#expr[0] = Operacion['int']
-	
+			expr[0] = Operacion('int')
+			
 	#### FORMATO PARA IMPRIMIR ####
 	
-	if expr[1] == '(':
-		imprimir = '(' + expr[2].impr + ')'
+	if expr[1] == '(':	# mat -> (mat)
+		expr[0].impr = '(' + expr[2].impr + ')'
 	else:
-		imprimir = expr[1].impr + ' ' + expr[2] + ' '
-		if len(expr) == 4:
-			imprimir += expr[3].impr
-		else:
-			imprimir += '(' + expr[4].impr + ')'
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+
+#---------------------------------------------------------#
+
+def p_matprim(expr):		   
+	'''matprim : matprim operMatBinario matf
+				| matf'''
+	#print 'matprim'
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
-	expr[0].impr = imprimir
+	if len(expr) == 2:
+		expr[0] = expr[1]
+
+	else:
+		tipo1 = tipo_segun(expr[1])
+		tipo2 = tipo_segun(expr[3])
 		
+		if not(numericos(tipo1,tipo2)):
+			p_error(0)
+
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if len(expr) > 2:
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+	
+#---------------------------------------------------------#
+
+def p_matf(expr):
+	'''matf : zso
+			| LPAREN matematico RPAREN'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	#print 'matf'
+	if len(expr) == 2:
+		expr[0] = expr[1]
+		#print tipo_segun(expr[1])
+	else:
+		expr[0] = expr[2]
+
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if len(expr) > 2:
+		expr[0].impr = '(' + expr[2].impr + ')'
+
 #---------------------------------------------------------#
 
 def p_operMatBinario(op):
@@ -456,155 +436,17 @@ def p_operMatBinario(op):
 					| POT
 					| MOD
 					| DIV'''
-	#print "mas"			
+	#print 'opmatbin'
 	op[0] = op[1]
 
 #---------------------------------------------------------#
-
-def p_operMatUnario(op):
-	'''operMatUnario : MAS MAS
-					| MENOS MENOS'''
-	#print "opmatun"
-	op[0] = op[1]
-	op[0] += op[2]
-
 #---------------------------------------------------------#
-
-def p_relacion(expr):
-	'''relacion : z operRelacion zso
-				| z operRelacion LPAREN operacion RPAREN
-				| LPAREN relacion RPAREN'''
-			  
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-
-	if expr[1] == '(':
-		expr[0] = expr[2]
-		
-	else:
-		tipoZ1 = tipo_segun(expr[1])
-		
-		if len(expr) == 4:
-			tipoZ2 = tipo_segun(expr[3]) # zso
-		else:
-			tipoZ2 = tipo_segun(expr[4]) # (oper)
-		
-		if len(expr[2]) == 1: # para < y > solo numericos
-			if not(numericos(tipoZ1,tipoZ2)):
-				p_error(0)
-		else:
-			#print tipoZ1
-			#print tipoZ2
-			if not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
-				p_error(0)
-		
-		expr[0] = Operacion('bool')	
-		
-	#### FORMATO PARA IMPRIMIR ####
-	
-	if expr[1] == '(':
-		imprimir = '(' + expr[2].impr + ')'
-	else:
-		imprimir = expr[1].impr + ' ' + expr[2] + ' '
-		if len(expr) == 4:
-			imprimir += expr[3].impr
-		else:
-			imprimir += '(' + expr[4].impr + ')'
-	
-	expr[0].impr = imprimir
-		
-#---------------------------------------------------------#
-
-def p_operRelacion(op):
-	'''operRelacion : IGUAL IGUAL
-					| ADM IGUAL
-					| MAYOR
-					| MENOR'''
-					
-	op[0] = op[1]
-	if len(op) == 3:
-		op[0] += op[2]
-	
-#---------------------------------------------------------#
-
-def p_logico(expr):
-	'''logico : z operLogicoBinario zso
-			| z operLogicoBinario LPAREN operacion RPAREN
-			| NOT z
-			| LPAREN logico RPAREN'''
-			
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	
-	if expr[1] == '(':
-		expr[0] = expr[2]
-	elif len(expr) == 3:	# not
-		if tipo_segun(expr[2]) != 'bool':
-			p_error(0)
-	elif (tipo_segun(expr[1]) != 'bool'): #& (tipo_segun(expr[3].tipo) != 'bool'):
-		p_error(0)
-	elif len(expr) == 4:
-		if tipo_segun(expr[3].tipo) != 'bool':	#zso
-			p_error(0)
-	elif tipo_segun(expr[4].tipo) != 'bool': #  (oper)
-		p_error(0)
-		
-	expr[0] = Operacion('bool')
-	
-	#### FORMATO PARA IMPRIMIR ####
-	
-	if expr[1] == '(':
-		expr[0].impr = '(' + expr[2].impr + ')'
-	elif len(expr) == 3:	# not
-		expr[0].impr = 'NOT ' + expr[2].impr
-	elif len(expr) == 4:
-		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
-	else:
-		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + '(' + expr[3].impr + ')'
-		
-#---------------------------------------------------------#
-
-def p_operLogBinario(op):
-	'''operLogicoBinario : AND
-						| OR'''
-						
-	op[0] = op[1]
-
-#---------------------------------------------------------#
-
-def p_ternario(expr):
-	'''ternario : g PREG z DOSPTOS z
-				| g PREG ternario DOSPTOS ternario'''
-				
-	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	
-	tipoG = tipo_segun(expr[1])
-	tipoZ1 = tipo_segun(expr[3])
-	tipoZ2 = tipo_segun(expr[5])
-	
-	if (tipoG != 'bool') | (tipoZ1 != tipoZ2):
-		p_error(0)
-	else:
-		expr[0] = Operacion(tipoZ1)
-		
-	#### FORMATO PARA IMPRIMIR ####
-	
-	expr[0].impr = expr[1].impr + ' ? ' + expr[3].impr + ' : ' + expr[5].impr
-
-#---------------------------------------------------------#
-
-def p_operacion(expr):
-	'''operacion : matematico
-				| relacion
-				| logico'''
-	
-	#print "oper"
-	
-	expr[0] = expr[1]
-
-#---------------------------------------------------------#	
 
 def p_autoincdec(expr):
 	'''autoincdec : operMatUnario variable
 				| variable operMatUnario'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
 	if (expr[1] == '++') | (expr[1] == '--') :
 		if variables[expr[2].nombre] != 'int':
@@ -619,62 +461,254 @@ def p_autoincdec(expr):
 	else:
 		imprimir = expr[1].impr + expr[2]
 		
-	expr[0] = Codigo(0,imprimir)
+	expr[0] = Codigo(imprimir)
 
+#---------------------------------------------------------#
+
+def p_operMatUnario(op):
+	'''operMatUnario : MAS MAS
+					| MENOS MENOS'''
+
+	op[0] = op[1]
+	op[0] += op[2]
+
+#---------------------------------------------------------#
+#---------------------------------------------------------#
+
+def p_relacion(expr):
+	'''relacion : relprim operRelacion relf
+			  | LPAREN relacion RPAREN'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+
+	if expr[1] == '(':	# rel -> (rel)
+		expr[0] = expr[2]
+	
+	else:
+		tipoZ1 = tipo_segun(expr[1])
+		tipoZ2 = tipo_segun(expr[3])
+		
+		if len(expr[2]) == 1: # para < y > solo numericos
+			if not(numericos(tipoZ1,tipoZ2)):
+				p_error(0)
+		elif not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
+				p_error(0)
+		
+		expr[0] = Operacion('bool')	
+
+	#### FORMATO PARA IMPRIMIR ####
+
+	if expr[1] == '(':
+		expr[0].impr = '(' + expr[2].impr + ')'
+	else:
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+	
+#---------------------------------------------------------#
+
+def p_relprim(expr):		   
+	'''relprim : relprim operRelacion relf
+				| relf'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+
+	if len(expr) == 2: 
+		expr[0] = expr[1]
+
+	else:
+		tipoZ1 = tipo_segun(expr[1])
+		tipoZ2 = tipo_segun(expr[3])
+		
+		if len(expr[2]) == 1: # para < y > solo numericos
+			if not(numericos(tipoZ1,tipoZ2)):
+				p_error(0)
+		elif not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
+				p_error(0)
+		
+		expr[0] = Operacion('bool')	
+
+	#### FORMATO PARA IMPRIMIR ####
+
+	if len(expr) > 2:
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+
+#---------------------------------------------------------#
+
+def p_relf(expr):
+	'''relf : zso
+			| matematico
+			| LPAREN relacion RPAREN
+			| LPAREN logico RPAREN'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+
+	if len(expr) == 2: 
+		expr[0] = expr[1]
+
+	else:
+		tipoZ1 = tipo_segun(expr[1])
+		tipoZ2 = tipo_segun(expr[3])
+		
+		if len(expr[2]) == 1: # para < y > solo numericos
+			if not(numericos(tipoZ1,tipoZ2)):
+				p_error(0)
+		elif not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
+				p_error(0)
+		
+		expr[0] = Operacion('bool')	
+
+	#### FORMATO PARA IMPRIMIR ####
+
+	if len(expr) > 2:
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+
+#---------------------------------------------------------#
+
+def p_operRelacion(op):
+	'''operRelacion : IGUAL IGUAL
+					| ADM IGUAL
+					| MAYOR
+					| MENOR'''
+
+	op[0] = op[1]
+	if len(op) == 3:
+		op[0] += op[2]
+	
+#---------------------------------------------------------#
+#---------------------------------------------------------#
+
+def p_logico(expr):
+	'''logico : logprim operLogicoBinario logf
+			  | LPAREN logico RPAREN
+			  | NOT z'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	if expr[1] == '(':
+		expr[0] = expr[2]
+	elif len(expr) == 3:	# not
+		if tipo_segun(expr[2]) != 'bool':
+			p_error(0)
+	else:
+		tipo1 = tipo_segun(expr[1])
+		tipo2 = tipo_segun(expr[3])
+		
+		if (tipo1 != 'bool') | (tipo1 != 'bool'):
+			p_error(0)
+		
+	expr[0] = Operacion('bool')
+	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if expr[1] == '(':
+		expr[0].impr = '(' + expr[2].impr + ')'
+	elif len(expr) == 3:	# not
+		expr[0].impr = 'NOT ' + expr[2].impr
+	else:
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+
+#---------------------------------------------------------#
+
+def p_logprim(expr):
+	'''logprim : logprim operLogicoBinario logf
+				| logf'''
+	
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	if len(expr) == 2:
+		expr[0] = expr[1]
+	else:
+		tipo1 = tipo_segun(expr[1])
+		tipo2 = tipo_segun(expr[3])
+		
+		if (tipo1 != 'bool') | (tipo1 != 'bool'):
+			p_error(0)
+		
+	expr[0] = Operacion('bool')
+	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if len(expr) > 2:
+		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+
+#---------------------------------------------------------#
+
+def p_logf(expr):
+	'''logf : zso
+			| relacion
+			| LPAREN logico RPAREN'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	if expr[1] == '(':
+		expr[0] = expr[2]
+	else:
+		expr[0] = expr[1]
+
+	expr[0] = Operacion('bool')
+	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if expr[1] == '(':
+		expr[0].impr = '(' + expr[2].impr + ')'
+
+#---------------------------------------------------------#
+
+def p_operLogBinario(op):
+	'''operLogicoBinario : AND
+						| OR'''
+
+	op[0] = op[1]
+
+#---------------------------------------------------------#
+#---------------------------------------------------------#
+
+def p_ternario(expr):
+	'''ternario : g PREG z DOSPTOS z
+				| g PREG ternario DOSPTOS ternario'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	
+	tipoG = tipo_segun(expr[1])
+	tipoZ1 = tipo_segun(expr[3])
+	tipoZ2 = tipo_segun(expr[5])
+	
+	if (tipoG != 'bool') | (tipoZ1 != tipoZ2):
+		p_error(0)
+	else:
+		expr[0] = Operacion(tipoZ1)
+
+	#### FORMATO PARA IMPRIMIR ####
+	
+	expr[0].impr = expr[1].impr + ' ? ' + expr[3].impr + ' : ' + expr[5].impr
+
+#---------------------------------------------------------#
+#---------------------------------------------------------#
+
+def p_operacion(expr):
+	'''operacion : matematico
+				| relacion
+				| logico'''
+	#print 'operacion'
+	expr[0] = expr[1]
+
+#---------------------------------------------------------#	
 #---------------------------------------------------------#	
 
 def p_sentencia_(expr):
 	'''sentencia : asignacion PTOCOMA
 				| PRINT z PTOCOMA
 				| autoincdec PTOCOMA'''
-				
-	#print "sentencia"
+
 	#### FORMATO PARA IMPRIMIR ####
-	
+	#print 'sentencia'
 	if len(expr) == 3:
-		imprimir = expr[1].impr + ';\n'
+		imprimir = expr[1].impr + ';'#'\n'
 	else:
-		imprimir = 'print ' + expr[2].impr + ';\n'
-		
-	expr[0] = Codigo(0,imprimir)
+		imprimir = 'print ' + expr[2].impr + ';'#'\n'
+
+	expr[0] = Codigo(imprimir)
 	
 #---------------------------------------------------------#
-
-#def p_sentencia_ctipo(expr):
-	#'''sentencia : operMatUnario variable PTOCOMA
-				#| variable operMatUnario PTOCOMA'''
-	#
-	### CHEQUEO Y ASIGNACION DE TIPOS ####
-	#print "unario?"
-	#global variables
-	#
-	#if (expr[1] == '++') | (expr[1] == '--') :
-		#if variables[expr[2]] != 'int':
-			#p_error(0)
-		#elif variables[expr[1]] != 'int':
-			#p_error(0)
-	#
-	#expr[0] = Operacion('int')
-	#
-#---------------------------------------------------------#
-
-def p_bloque(expr):
-	'''bloque : LLLAVE codigo RLLAVE
-			| sentencia 
-			| condicional
-			| bucle'''
-	
-	#### FORMATO PARA IMPRIMIR ####
-	
-	if len(expr) == 2:
-		imprimir = '\n' + tabular(expr[1].impr)# + '\n'
-	else:
-		#expr[2].acum_tabs += 1
-		#expr[0] = expr[1] + '\n' + expr[2] + '\n' + expr[3]
-		imprimir = '{\n' + tabular(expr[2].impr) + '}'
-		
-	expr[0] = Codigo(0,imprimir)
-	
 #---------------------------------------------------------#
 
 def p_funcion_multesc(expr):
@@ -693,12 +727,12 @@ def p_funcion_multesc(expr):
 	if len(expr) == 9:
 		if tipoZ3 != 'bool':
 			p_error(0)
-			
+
 	if (tipoZ1[6:] == 'float') | (tipoZ2 == 'float'):
 		expr[0] = Funcion('vectorfloat')
 	else:
 		expr[0] = Funcion('vectorint')
-		
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	expr[0].impr = 'multiplicacionEscalar(' + expr[3].impr + + ', ' + expr[5].impr
@@ -715,11 +749,9 @@ def p_funcion_cap(expr):
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
-	#print expr[3]
-	
 	if tipo_segun(expr[3]) != 'str':
 		p_error(0)
-		
+
 	expr[0] = Funcion('str')
 	
 	#### FORMATO PARA IMPRIMIR ####
@@ -754,7 +786,6 @@ def p_funcion_length(expr):
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
-	#if (expr[3].tipo != 'vector') | (expr[3].tipo != 'str'):  # ojo q vale vector de lo q sea
 	if (tipo_segun(expr[3]) != 'str') & (tipo_segun(expr[3])[:6] != 'vector'): 
 		p_error(0)
 	
@@ -765,56 +796,101 @@ def p_funcion_length(expr):
 	expr[0].impr = 'length(' + expr[3].impr + ')'
 
 #---------------------------------------------------------#
+#---------------------------------------------------------#
 
-def p_condicional(expr):
-	'''condicional : IF LPAREN g RPAREN bloque
-				| IF LPAREN g RPAREN bloque ELSE bloque'''
+def p_bloquescond(expr):
+	'''bloquescond : LLLAVE codigo RLLAVE
+			| sentencia 
+			| bucle'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	#print 'bloquescond'
+	if len(expr) == 2:
+		expr[0] = expr[1]
+	else:
+		expr[0] = expr[2]
+
+	#### FORMATO PARA IMPRIMIR ####
 	
-	## CHEQUEO Y ASIGNACION DE TIPOS ####
+	if len(expr) > 2:
+		imprimir = '{\n' + tabular(expr[2].impr) + '}'
+	else:
+		imprimir = '\n' + expr[1].impr
+		
+	expr[0] = Codigo(imprimir)
+
+#---------------------------------------------------------#
+
+def p_bloque(expr):
+	'''bloque : matchedstmt
+				| openstmt'''
+	#print 'bloque'
+	expr[0] = expr[1]
+	
+	#### FORMATO PARA IMPRIMIR ####
+	
+	expr[0].impr = '\n' + expr[1].impr
+	
+#---------------------------------------------------------#
+
+def p_matchedstmt(expr):
+	'''matchedstmt : IF LPAREN g RPAREN matchedstmt ELSE matchedstmt
+					| bloquescond'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
+	#print 'matchedstmt'
+	if len(expr) == 2:
+		expr[0] = expr[1]
+	elif tipo_segun(expr[3]) != 'bool':
+		p_error(0)
+
+	#### FORMATO PARA IMPRIMIR ####
+	
+	if len(expr) > 2:
+		imprimir = 'if(' + expr[3].impr + ')' + tabular(expr[5].impr) + '\nelse' + tabular(expr[7].impr)
+		expr[0] = Codigo(imprimir)
+
+#---------------------------------------------------------#
+
+def p_openstmt(expr):
+	'''openstmt : IF LPAREN g RPAREN bloque
+				| IF LPAREN g RPAREN matchedstmt ELSE openstmt'''
+
+	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if tipo_segun(expr[3]) != 'bool':
 		p_error(0)
-		
-	## FORMATO PARA IMPRIMIR ####
+
+	#### FORMATO PARA IMPRIMIR ####
 	
-	imprimir = 'if(' + expr[3].impr + ')' + expr[5].impr
-	
+	imprimir = 'if(' + expr[3].impr + ')' + expr[5].impr 
 	if len(expr) > 6:
 		imprimir += '\nelse' + expr[7].impr
-		
-	expr[0] = Codigo(0,imprimir)
-	
+	expr[0] = Codigo(imprimir)
+
 #---------------------------------------------------------#
 
 def p_bucle(expr):
 	'''bucle : for
 			| while
 			| dowhile'''
-			
+
 	expr[0] = expr[1]
 	
 #---------------------------------------------------------#
-			
+
 def p_for_sinasig(expr):
 	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN bloque
 			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN bloque
 			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
-			#| FOR LPAREN PTOCOMA g PTOCOMA variable operMatUnario RPAREN bloque'''
-			
+
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
 	global variables
 	
 	if tipo_segun(expr[4]) != 'bool':
 		p_error(0)
-		
-	#if len(expr) == 10:
-		#if (expr[6] == '++') | (expr[6] == '--') :
-			#if variables[expr[7].nombre] != 'int':
-				#p_error(0)
-		#elif variables[expr[6].nombre] != 'int':
-			#p_error(0)
-			
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	imprimir = 'for( ; ' + expr[4].impr + '; '
@@ -823,31 +899,23 @@ def p_for_sinasig(expr):
 		imprimir += ')' + expr[7].impr
 	else:
 		imprimir += expr[6].impr + ')' + expr[8].impr
-		
-	expr[0] = Codigo(0,imprimir)
-			
+
+	expr[0] = Codigo(imprimir)
+
 #---------------------------------------------------------#
-			
+
 def p_for_conasig(expr):
 	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN bloque
 			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN bloque
 			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN bloque'''
-			#| FOR LPAREN asignacion PTOCOMA g PTOCOMA variable operMatUnario RPAREN bloque
-			
+
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	global variables
 	
 	if tipo_segun(expr[5]) != 'bool':
 		p_error(0)
-		
-	#if len(expr) == 11:
-		#if (expr[7] == '++') | (expr[7] == '--') :
-			#if variables[expr[8].nombre] != 'int':
-				#p_error(0)
-		#elif variables[expr[7].nombre] != 'int':
-			#p_error(0)
-			
+
 	#### FORMATO PARA IMPRIMIR ####
 	
 	imprimir = 'for(' + expr[3].impr + ' ; ' + expr[5].impr + '; '
@@ -857,7 +925,7 @@ def p_for_conasig(expr):
 	else:
 		imprimir += expr[7].impr + ')' + expr[9].impr
 		
-	expr[0] = Codigo(0,imprimir)
+	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
 
@@ -872,7 +940,7 @@ def p_while(expr):
 	#### FORMATO PARA IMPRIMIR ####
 	
 	imprimir = 'while(' + expr[3].impr + ')' + expr[5].impr
-	expr[0] = Codigo(0,imprimir)
+	expr[0] = Codigo(imprimir)
 	
 #---------------------------------------------------------#
 
@@ -883,42 +951,28 @@ def p_dowhile(expr):
 	
 	if tipo_segun(expr[5]) != 'bool':
 		p_error(0)	
-		
+
 	#### FORMATO PARA IMPRIMIR ####
 	
-	imprimir = 'do' + expr[2].impr + 'while(' + expr[5].impr + ');\n'
-	expr[0] = Codigo(0,imprimir)
+	imprimir = 'do' + expr[2].impr + 'while(' + expr[5].impr + ');'
+	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
 
 def p_codigo(expr):
-	'''codigo : bucle codigo
-	 	    | sentencia codigo
-	 	    | condicional codigo
+	'''codigo : bloque codigo
 	 	    | comentario codigo
-		    | bucle
-		    | sentencia
-		    | condicional
+		    | bloque
 		    | comentario'''
-
-	#print "codigo"
 	
 	#### FORMATO PARA IMPRIMIR ####
-	
+	#print 'codigo'
 	imprimir = expr[1].impr
 	
 	if len(expr) == 3:
 		imprimir += expr[2].impr
-		
-	expr[0] = Codigo(0,imprimir)
 	
-	#expr[1] = Codigo(expr[0].acum_tabs)
-	#
-	#expr[0] = imprimir_tabs(expr[0].acum_tabs) + expr[1].impr + '\n'
-	#
-	#if len(expr) == 3:
-		#expr[2] = Codigo(expr[0].acum_tabs)
-		#expr[0] += expr[2].impr + '\n'
+	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
 
@@ -927,7 +981,7 @@ def p_comentario(expr):
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
-	#expr[0] = Codigo(0,expr[1])
+	expr[0] = Codigo(expr[1])
 
 #---------------------------------------------------------#
 
@@ -963,8 +1017,8 @@ def tipo_segun(objeto):
 		if objeto.array_elem == 1:	# es una posicion de un arreglo
 			variable = variables[objeto.nombre][6:]
 		elif objeto.campo != 'None':	# es algo tipo reg.campo
-			print 'alalal'
-			variable = variables[objeto.nombre][objeto.campo]
+			print objeto.campo
+			variable = (variables[objeto.nombre])[objeto.campo]
 		else:		
 			variable = variables[objeto.nombre]
 	else:
@@ -985,14 +1039,14 @@ def campos_a_dic(reg):
 
 #---------------------------------------------------------#
 
-def imprimir_tabs(cant):
-	
-	res = ""
-	
-	for x in range(0,cant):
-		res += '\n'
-
-	return res
+#def imprimir_tabs(cant):
+	#
+	#res = ""
+	#
+	#for x in range(0,cant):
+		#res += '\n'
+#
+	#return res
 
 
 def tabular(texto):
@@ -1001,6 +1055,13 @@ def tabular(texto):
 	res = ""
 	
 	for l in lineas:
-		res += '\t' + l + '\n'
+		if len(l) > 0:			
+			#print 'hola'
+			if l[0] in ['{','}']:
+				res += l + '\n'
+			else:
+				res += '\t' + l + '\n'
+		else:
+			res += '\n'
 		
 	return res
