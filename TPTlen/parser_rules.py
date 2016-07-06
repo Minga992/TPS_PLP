@@ -288,33 +288,40 @@ def p_asignacion(expr):
 			p_error(0)	# accede a campo de variable que no es registro
 		
 		elif (expr[3].array_elem == 1) & (variables[expr[3].nombre][:6] != 'vector'):
-			print expr[3].nombre
-			print expr[3].array_elem
-			print variables[expr[3].nombre][:6]
+			#print expr[3].nombre
+			#print expr[3].array_elem
+			#print variables[expr[3].nombre][:6]
 			p_error(0)	# accede a indice de variable que no es vector
 	
 	tipoZ =	tipo_segun(expr[3])
-	
+	#print tipoZ
 	if expr[2] == '=':	# asigno una variable -> inicializo o piso su tipo
 		
 		if (expr[1].nombre in variables): # si la variable ya se uso antes
-			
+			#print 'estoy declarado ' + variables[expr[1].nombre]
+			#print expr[1].campo
+			#print expr[1].array_elem
 			if expr[1].campo != 'None': # registro.campo = bla
 				variables[expr[1].nombre][expr[1].campo] = tipoZ
 		
 			#elif variables[expr[1].nombre] == 'vector': # si estoy haciendo var[numero] = bla por primera vez, pongo el tipo vectorbla
 				#variables[expr[1].nombre] += tipoZ
-				
-			elif variables[expr[1].nombre][:6] == 'vector': # var[num] = bla
 			
-				if (expr[1].array_elem == 1) & (variables[expr[1].nombre][6:] != tipoZ):	# veo que matchee el tipo de ahora
+			elif expr[1].array_elem == 1: 	# var[num] = bla
+				if (variables[expr[1].nombre][:6] != 'vector') | (variables[expr[1].nombre][6:] != tipoZ): # veo que matchee el tipo de ahora
 					p_error(0)
-	
+			
+			#elif variables[expr[1].nombre][:6] == 'vector': # var[num] = bla
+				#print 'aloha'
+				#if (expr[1].array_elem == 1) & (variables[expr[1].nombre][6:] != tipoZ):	# veo que matchee el tipo de ahora
+					#p_error(0)
+
 			else:	# es una variable cualquiera, no var[num] ni reg.campo
 	
 				if tipoZ == 'registro':	# reflejo los campos
 					variables[expr[1].nombre] = campos_a_dic(expr[3])
 				else:
+					#print "hola" + tipoZ
 					variables[expr[1].nombre] = tipoZ
 
 		else:	# declaro la variable
@@ -340,7 +347,7 @@ def p_asignacion(expr):
 			else: # es numerico
 				if not(numericos(tipoV,tipoZ)):
 					p_error(0)
-	
+	#print tipo_segun(expr[1])
 	#### FORMATO PARA IMPRIMIR ####
 	
 	imprimir = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
@@ -707,9 +714,9 @@ def p_sentencia_(expr):
 	#### FORMATO PARA IMPRIMIR ####
 
 	if len(expr) == 3:
-		imprimir = expr[1].impr + ';'#'\n'
+		imprimir = expr[1].impr + ';\n'
 	else:
-		imprimir = 'print ' + expr[2].impr + ';'#'\n'
+		imprimir = 'print ' + expr[2].impr + ';\n'
 
 	expr[0] = Codigo(imprimir)
 	
@@ -912,7 +919,7 @@ def p_closedstmt(expr):
 	elif len(expr) == 3:
 		imprimir = expr[1].impr + expr[2].impr
 	elif len(expr) == 4:
-		imprimir = '{\n' + expr[2].impr + '}'
+		imprimir = '{\n' + tabular(expr[2].impr) + '}'
 	else:
 		imprimir = 'if('+ expr[3].impr + ')' + expr[5].impr + 'else' + expr[7].impr
 
