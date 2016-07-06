@@ -955,7 +955,7 @@ def p_openstmt(expr):
 		imprimir = expr[1].impr + tabular(expr[2])
 	else:
 		imprimir = 'if(' + expr[3].impr + ')' + tabular(expr[5])
-		if len(expr) > 5:
+		if len(expr) > 6:
 			imprimir += 'else' + tabular(expr[7])
 	
 	expr[0] = Codigo(imprimir)
