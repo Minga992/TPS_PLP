@@ -66,6 +66,7 @@ class Vector(Constante):
 class Registro(Programa):
 	
 	tipo = 'registro'
+	impr = ""
 	
 	def __init__(self,campos,tipos_campos):
 		self.campos = campos
