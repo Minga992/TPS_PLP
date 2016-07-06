@@ -2,65 +2,69 @@
 
 Aclaraciones: no se considera var nada reservado, escribilo mejor
 
+las expresiones regulares siguen los simbolos que entiende ply
+
 \subsection{Tokens}
 
 \begin{table}[!htb]
 \begin{center}
 \begin{tabular}{| l | l | l |}
 \hline
-Nombre Token & Símbolo representado & Expresión Regular\\
+Nom Token & Símbolo representado & Expr Regular\\
 \hline
-STR 	& cadena de caracteres entre comillas dobles & 2 \\
+STR 	& cadena de caracteres entre comillas dobles & "[\^"]*" \\
 \hline
-BOOL & true o false & 2 \\
+BOOL & true o false & ([tT][rR][uU][eE] | \\
+
+	& 				& [fF][aA][lL][sS][eE]) \\
 \hline
-NUM 	& cualquier cadena numérica & 2 \\
+NUM 	& cualquier cadena numérica & [0-9]+ \\
 \hline
-VAR 	& cadena alfanumérica con '_' que comienza en una letra & 2 \\
+VAR 	& cadena alfanumérica con '_' que comienza en una letra & [a-zA-Z][a-zA-Z0-9_] \\
 \hline
-PUNTO & '.' & 2 \\
+PUNTO & '.' & . \\
 \hline
-DOSPTOS	& ':' & 2 \\
+DOSPTOS	& ':' & : \\
 \hline
-COMA & ',' & 2 \\
+COMA & ',' & , \\
 \hline
-ADM & '!' & 2 \\
+ADM & '!' & ! \\
 \hline
-PREG & '?' & 2 \\
+PREG & '?' & ? \\
 \hline
-PTOCOMA 	& ';' & 2 \\
+PTOCOMA 	& ';' & ; \\
 \hline
-LCORCH & '[' & 2 \\
+LCORCH & '[' & [ \\
 \hline
-RCORCH & ']' & 2 \\
+RCORCH & ']' & ] \\
 \hline
-LPAREN & '(' & 2 \\
+LPAREN & '(' & ( \\
 \hline
-RPAREN & ')' & 2 \\
+RPAREN & ')' & ) \\
 \hline
-LLLAVE & '\{' & 2 \\
+LLLAVE & '\{' & \{ \\
 \hline
-RLLAVE& '\}' & 2 \\
+RLLAVE& '\}' & \} \\
 \hline
-MAS & '+' & 2 \\
+MAS & '+' & + \\
 \hline
-MENOS & '-' & 2 \\
+MENOS & '-' & - \\
 \hline
-IGUAL & '=' & 2 \\
+IGUAL & '=' & = \\
 \hline
-POR & '*' & 2 \\
+POR & '*' & * \\
 \hline
-DIV & '/' & 2 \\
+DIV & '/' & / \\
 \hline
-POT & '\^' & 2 \\
+POT & '\^' & \^ \\
 \hline
-MOD & '\% ' & 2 \\
+MOD & '\% ' & \% \\
 \hline
-MAYOR & '>' & 2 \\
+MAYOR & '\>' & \> \\
 \hline
 MENOR & '<' & 2 \\
 \hline
-COMENT & un '\# ' seguido de cualquier cadena de caracteres, hasta el primer salto de línea & 2 \\
+COMENT &'\# ' seguido de cualquier cadena de caracteres, hasta el primer salto de línea & 2 \\
 \hline
 BEGIN & 'begin' en cualquier combinación de mayúsculas y minúsculas & 2 \\
 \hline
