@@ -1,1 +1,51 @@
-\subsection{La Solución}
+\section{La Solución}
+
+En el Apéndice 1 se encuentra el código fuente del parser.
+
+\subsection{Atributos}
+
+Los no terminales de la gramática fueron asociados a clases creadas en Python, cada una con ciertos atributos necesarios para el análisis de tipado y el formateo del código.
+
+\begin{itemize}
+\item Las variables se asocian a la clase Variable, que contiene los siguientes atributos:
+	\begin{itemize}
+	\item {\it nombre} Contiene un string con el nombre de la variable.
+	\item {\it impr} Contiene un string con el formato imprimible de la variable.
+	\item {\it campo} Contiene un string con el nombre del campo, en caso de que se trate de una variable del tipo {\tt registro.campo}.
+	\item {\it array_elem} Contiene un entero (0 o 1) que indica si se trata de una variable del tipo {\tt variable[indice]}.
+	\end{itemize}
+\item Los números, las funciones, operaciones y vectores se asocian a subclases de la clase Constante, que contiene los siguientes atributos:
+	\begin{itemize}
+	\item {\it tipo} Contiene un string con el tipo del elemento.
+	\item {\it impr} Contiene un string con el formato imprimible del elemento.
+	\end{itemize}
+\item Los registros se asocian a la clase Registro, que contiene los siguientes atributos:
+	\begin{itemize}
+	\item {\it tipo} Es constantemente 'registro'.
+	\item {\it impr} Contiene un string con el formato imprimible del registro.
+	\end{itemize}
+\item Las sentencias, bloques de código, ciclos, condicionales y comentarios se asocian a la clase Código, que contiene los siguientes atributos:
+	\begin{itemize}
+	\item {\it llaves} Contiene un entero (0 o 1) que indica si se trata de un bloque encerrado entre llaves o no.
+	\item {\it impr} Contiene un string con el formato imprimible del registro.
+	\end{itemize}
+\end{itemize}
+
+
+\subsection{Manejo de variables}
+
+Para el correcto chequeo de tipos de las variables, como el tipo de las mismas puede variar, se decidió implementar un diccionario global \{variable : tipo\}.  Las claves del diccinario son los nombres de variable, y los valores son strings con el tipo correspondiente.
+
+Un caso especial son los registros.  Para ello, aprovechando la versatilidad en cuanto a tipado de Python, el valor asociado a una variable de tipo registro es un nuevo diccionario \{campo : tipo\}, cuyas claves son los campos del registro, y sus valores son los tipos correspondientes.
+
+Por otro lado, si se trata de una variable de tipo vector, el tipo que se coloca en el diccionario es {\tt vectortipo}, donde {\tt tipo} es el tipo de los elementos del vector.  Esto es importante al chequear, por ejemplo, que si se declara un vector de enteros, no se pueda asignar a una posición del mismo una cadena.
+
+Al cambiar el tipo de una variable, o del campo de un registro, simplemente se reemplaza el valor en el diccionario.
+
+\subsection{Manejo de palabras reservadas}
+
+Como se mencionó anteriormente, el tokenizador evita que las variables tomen nombres de palabras reservadas, escritas con cualquier combinación de mayúsculas y minúsculas.  Estas palabras reservadas son enviadas a su token correspondiente.
+
+Por cuestiones prácticas, se tomó la decisión de 'normalizar' las palabras reservadas al dar el formato final al código.  Esta 'normalización' lleva las palabras reservadas a minúsculas, independientemente de cómo fueron escritas en el código original, salvo la función {\tt multiplicacionEscalar} que contiene la 'E' mayúscula, y los operadores lógicos {\tt AND, OR} Y {\tt NOT} que se llevan a mayúsculas.
+
+En cuanto a la variable de sistema {\tt res}, también se normaliza a minúsculas, y si se utiliza repetidas veces en el código original, variando la combinación de mayúsculas y minúsculas, se asocia siempre a la misma variable.  Por ejemplo, {\tt res = 0;} y {\tt ReS = 1;} refieren a la misma variable.  Esto es importante a la hora de chequear los tipos.
