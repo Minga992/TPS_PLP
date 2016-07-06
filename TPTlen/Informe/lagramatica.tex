@@ -1,18 +1,19 @@
 \section{La gramatica}
 
-Aclaraciones: no se considera var nada reservado, escribilo mejor
-
-las expresiones regulares siguen los simbolos que entiende ply
-
-CCMM Cualquier Combinación de mayúsculas y minúsculas
+En esta sección se muestra cómo se realizó la tokenización de las expresiones válidas en este leguaje, una primer gramática que acepta estas expresiones, y las transformaciones que se realizaron a la misma hasta llegar a la gramática implementada.
 
 \subsection{Tokens}
+
+En este pequeño lenguaje de scripting, existen palabras reservadas que no pueden usarse como nombres de variables, tanto en mayúsculas como en minúsculas, y el proceso de tokenización tiene en cuenta este aspecto.
+
+El Cuadro \ref{tab-tokens} describe, para cada token definido, el símbolo que representa y la expresión regular asociada, con el formato aceptado por Python.
 
 \begin{table}[!htb]
 \begin{center}
 \begin{tabular}{| l | l | l |}
 \hline
-Nom Token & Símbolo representado & Expr Regular\\
+{\bf TOKEN} & {\bf Símbolo representado} & {\bf Expr Regular}\\
+\hline
 \hline
 STR 	& cadena de caracteres entre comillas dobles & "[$\wedge$"]*" \\
 \hline
@@ -108,10 +109,12 @@ LENGTH & 'length' CCMM & [lL][eE][nN][gG][tT][hH] \\
 
 \end{tabular}
 \end{center}
-\caption{Tokens de la grmática}\label{tab-tokens}
+\caption{Tokens de la garmática}\label{tab-tokens}
 \end{table}
 
 %\vspace*{0.5cm}
+
+Nota: CCMM significa 'Cualquier Combinación de mayúsculas y minúsculas'
 
 \newpage
 
