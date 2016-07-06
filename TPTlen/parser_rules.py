@@ -11,9 +11,10 @@ def p_inicial(expr):
 	'start : codigo'
 	
 	#### FORMATO PARA IMPRIMIR ####
-	global variables
-	print variables
-	print expr[1].impr
+	#global variables
+	#print variables
+	#print expr[1].impr
+	expr[0] = expr[1]
 
 #---------------------------------------------------------#
 #---------------------------------------------------------#
@@ -413,7 +414,8 @@ def p_matematico(expr):
 		
 		if expr[2] == '+':
 			if not(numericos(tipo1,tipo2)) | ((tipo1 == 'str') & (tipo2 == 'str')):
-				p_error(0)
+				#print type(expr)
+				raise SemanticException('Tipos incompatibles')
 				
 		elif expr[2] == '%':
 			if (tipo1 != 'int') & (tipo2 != 'int'):
@@ -980,7 +982,8 @@ def p_closedstmt(expr):
 def p_openstmt(expr):
 	'''openstmt : IF LPAREN g RPAREN stmt
 				| IF LPAREN g RPAREN closedstmt ELSE openstmt
-				| loopheader openstmt'''
+				| loopheader openstmt
+				| comentario openstmt'''
 	
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -1107,7 +1110,8 @@ def p_codigo(expr):
 		    #| stmt
 		    #| comentario'''
 	'''codigo : stmt codigo
-		    | stmt'''
+		    | stmt
+		    | comentario'''
 	
 	#### FORMATO PARA IMPRIMIR ####
 	#print 'codigo'
@@ -1143,6 +1147,8 @@ def p_error(token):
         message += "\nvalue:" + str(token.value)
         message += "\nline:" + str(token.lineno)
         message += "\nposition:" + str(token.lexpos)
+    else:
+		message += " At end of line"
     raise Exception(message)
 
 #---------------------------------------------------------#
