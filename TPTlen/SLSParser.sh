@@ -16,9 +16,7 @@ elif [ "$#" -eq 4 ]; then
 		echo "$USO"
 	else
 		SALIDA="$2"
-		#cat "$4"
 		FUENTE=$(<"$4")
-		#echo "$FUENTE" 
 	fi
 else
     echo "Illegal number of parameters\n"

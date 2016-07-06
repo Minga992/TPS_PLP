@@ -1,7 +1,3 @@
-class SemanticException(Exception):
-    pass
-    
-
 class Programa(object):
 
 	def imprimir(self):
@@ -15,11 +11,8 @@ class Variable(Programa):
 	impr = ""
 	campo = 'None' # si se trata de algo tipo reg.campo
 	array_elem = 0 # si se trata de algo tipo var[num]
-	#registro = 0
-	#def __init__(self,valor,tipo,nombre):
+
 	def __init__(self,nombre):
-		#self.valor = valor
-		#self.tipo = tipo
 		self.nombre = nombre
 		
 	def nombre_campo(self, nombre):
@@ -27,17 +20,13 @@ class Variable(Programa):
 		
 	def imprimir(self):
 		return impr
-		
-	#def registro(self, reg):
-		#self.registro = reg
 	
 
 class Constante(Programa):
 	
 	impr = ""
-	#def __init__(self,valor,tipo):
+
 	def __init__(self,tipo):
-		#self.valor = valor
 		self.tipo = tipo
 		
 	def imprimir(self):
@@ -47,17 +36,11 @@ class Constante(Programa):
 class Numero(Constante):
 	
 	atributo_para_que_compile = 1
-	#def __init__(self,tipo):
-	#def __init__(self,valor,tipo):
-		#self.valor = valor
-		#self.tipo = tipo
 
 
 class Funcion(Constante):
 	
 	atributo_para_que_compile = 1
-	#def __init__(self,tipo):
-		#self.tipo = tipo
 	
 
 class Operacion(Constante):
@@ -68,10 +51,6 @@ class Operacion(Constante):
 class Vector(Constante):
 	
 	atributo_para_que_compile = 1
-	
-	#def __init__(self,tipo):
-		#self.tipo = tipo
-		#
 
 
 class Registro(Programa):
