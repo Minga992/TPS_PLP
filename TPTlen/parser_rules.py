@@ -411,7 +411,15 @@ def p_matematico(expr):
 		tipo1 = tipo_segun(expr[1])
 		tipo2 = tipo_segun(expr[3])
 		
-		if not(numericos(tipo1,tipo2)):
+		if expr[2] == '+':
+			if not(numericos(tipo1,tipo2)) | ((tipo1 == 'str') & (tipo2 == 'str')):
+				p_error(0)
+				
+		elif expr[2] == '%':
+			if (tipo1 != 'int') & (tipo2 != 'int'):
+				p_error(0)
+		
+		elif not(numericos(tipo1,tipo2)):
 			p_error(0)
 			
 		if (tipo1 == 'float') | (tipo2 == 'float'):
@@ -538,7 +546,8 @@ def p_relacion(expr):
 			if not(numericos(tipoZ1,tipoZ2)):
 				p_error(0)
 		elif not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
-				p_error(0)
+			#print "erroooooor"
+			p_error(0)
 		
 		expr[0] = Operacion('bool')	
 
@@ -1125,6 +1134,7 @@ def p_empty(p):
 	pass
 
 #---------------------------------------------------------#
+#---------------------------------------------------------#
 
 def p_error(token):
     message = "[Syntax error]"
@@ -1133,15 +1143,16 @@ def p_error(token):
         message += "\nvalue:" + str(token.value)
         message += "\nline:" + str(token.lineno)
         message += "\nposition:" + str(token.lexpos)
-    #print "error"
     raise Exception(message)
 
 #---------------------------------------------------------#
+#---------------------------------------------------------#
 
 def numericos(tipo1,tipo2):
-	#print "numericos"
+
 	return (tipo1 in ['int','float']) & (tipo2 in ['int','float'])
 
+#---------------------------------------------------------#
 
 def tipo_segun(objeto):
 
@@ -1161,6 +1172,7 @@ def tipo_segun(objeto):
 		
 	return variable
 
+#---------------------------------------------------------#
 
 def campos_a_dic(reg):
 	
@@ -1171,6 +1183,7 @@ def campos_a_dic(reg):
 		
 	return dic
 
+#---------------------------------------------------------#
 #---------------------------------------------------------#
 
 def tabular(codigo):
