@@ -1,0 +1,108 @@
+\section{La gramatica}
+
+Aclaraciones: no se considera var nada reservado, escribilo mejor
+
+\subsection{Tokens}
+
+\begin{table}[!htb]
+\begin{center}
+\begin{tabular}{| l | l | l |}
+\hline
+Nombre Token & Símbolo representado & Expresión Regular\\
+\hline
+STR 	& cadena de caracteres entre comillas dobles & 2 \\
+\hline
+BOOL & true o false & 2 \\
+\hline
+NUM 	& cualquier cadena numérica & 2 \\
+\hline
+VAR 	& cadena alfanumérica con '_' que comienza en una letra & 2 \\
+\hline
+PUNTO & '.' & 2 \\
+\hline
+DOSPTOS	& ':' & 2 \\
+\hline
+COMA & ',' & 2 \\
+\hline
+ADM & '!' & 2 \\
+\hline
+PREG & '?' & 2 \\
+\hline
+PTOCOMA 	& ';' & 2 \\
+\hline
+LCORCH & '[' & 2 \\
+\hline
+RCORCH & ']' & 2 \\
+\hline
+LPAREN & '(' & 2 \\
+\hline
+RPAREN & ')' & 2 \\
+\hline
+LLLAVE & '\{' & 2 \\
+\hline
+RLLAVE& '\}' & 2 \\
+\hline
+MAS & '+' & 2 \\
+\hline
+MENOS & '-' & 2 \\
+\hline
+IGUAL & '=' & 2 \\
+\hline
+POR & '*' & 2 \\
+\hline
+DIV & '/' & 2 \\
+\hline
+POT & '\^' & 2 \\
+\hline
+MOD & '\% ' & 2 \\
+\hline
+MAYOR & '>' & 2 \\
+\hline
+MENOR & '<' & 2 \\
+\hline
+COMENT & un '\# ' seguido de cualquier cadena de caracteres, hasta el primer salto de línea & 2 \\
+\hline
+BEGIN & 'begin' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+END & 'end' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+WHILE & 'while' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+FOR & 'for' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+IF & 'if' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+ELSE & 'else' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+DO & 'do' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+RES & 'res' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+RETURN & 'return' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+AND & 'and' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+OR & 'or' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+NOT 	& 'not' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+PRINT & 'print' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+MULTESC & 'multiplicacionescalar' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+CAP & 'capitalizar' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+COLIN & 'colineales' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+LENGTH & 'length' en cualquier combinación de mayúsculas y minúsculas & 2 \\
+\hline
+
+\end{tabular}
+\end{center}
+\caption{Tokens de la grmática}\label{tab-tokens}
+\end{table}
+
+%\vspace*{0.5cm}
+
+
+\subsection{Primer Gramatica}
