@@ -25,3 +25,17 @@ Se provee el código fuente de este parser, el cual consta de los siguientes arc
 
 Para correr el programa, es necesario que todos los archivos fuente se encuentren en el mismo directorio.
 
+El programa deberá recibir el código fuente a procesar, y retornará el código resultante. Se puede especificar un nombre de archivo de entrada, y en caso de que no se especifique, se esperará recibir la cadena a procesar por standard input (stdin). En caso de no especificar un archivo de salida, el resultado se imprimirá por standard ouput (stout).
+En caso de que hubiera algún problema en la llamada, se terminará el programa y se mostrarán los detalles por standard error (stderr). 
+
+Se ejecuta desde consola de la siguiente manera:
+
+{\tt ./SLSParser [-o SALIDA] [-c ENTRADA | FUENTE]}
+
+Las opciones son las siguientes:
+
+\begin{itemize}
+\item {\bf -o SALIDA} Se especifica un archivo de salida para el código formateado
+\item {\bf -c ENTRADA} Se especifica el nombre del archivo de entrada con el código fuente.  Si el archivo no se encuentra en el mismo directorio que el código fuente, se deberá colocar su ruta absoluta.
+\item {\bf FUENTE} Cadena con el código fuente.
+\end{itemize}

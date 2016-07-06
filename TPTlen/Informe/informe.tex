@@ -38,18 +38,18 @@
 
 
 \begin{document}
-
-\lstset{
-  language=C++,                    % (cambiar al lenguaje correspondiente)
-  backgroundcolor=\color{white},   % choose the background color
-  basicstyle=\footnotesize,        % size of fonts used for the code
-  breaklines=true,                 % automatic line breaking only at whitespace
-  captionpos=b,                    % sets the caption-position to bottom
-  commentstyle=\color{red},    % comment style
-  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
-  keywordstyle=\color{blue},       % keyword style
-  stringstyle=\color{blue},     % string literal style
-}
+%
+%\lstset{
+%  language=C++,                    % (cambiar al lenguaje correspondiente)
+%  backgroundcolor=\color{white},   % choose the background color
+%  basicstyle=\footnotesize,        % size of fonts used for the code
+%  breaklines=true,                 % automatic line breaking only at whitespace
+%  captionpos=b,                    % sets the caption-position to bottom
+%  commentstyle=\color{red},    % comment style
+%  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+%  keywordstyle=\color{blue},       % keyword style
+%  stringstyle=\color{blue},     % string literal style
+%}
 
 \thispagestyle{empty}
 \materia{Teoría de Lenguajes}
@@ -106,6 +106,13 @@
 \newpage
 
 \input{conclusiones}
+
+\newpage
+
+\section{Apendice 1: Código}
+
+\lstset{language=Python, breaklines=true, basicstyle=\scriptsize, commentstyle=\color{blue}, numbers=left, stepnumber=1, tabsize=4}
+\lstinputlisting[language=Python]{../parserrules.py}
 
 \end{document}
 
