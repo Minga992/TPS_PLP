@@ -1,9 +1,6 @@
-# HACER CASE INSENSITIVE
-
 reserved = {
 	'begin' : 'BEGIN',
 	'end' : 'END',
-	#r"[Ww][Hh][Ii][Ll][Ee]" : 'WHILE',
 	'while' : 'WHILE',
 	'for' : 'FOR',
 	'if' : 'IF',
@@ -11,8 +8,6 @@ reserved = {
 	'do' : 'DO',
 	'res' : 'RES',
 	'return' : 'RETURN',
-	#'true' : 'BOOL',
-	#'false' : 'BOOL',	# OJO FIJATE EL TIPO
 	'AND' : 'AND',
 	'OR' : 'OR',
 	'NOT' : 'NOT',
@@ -23,16 +18,12 @@ reserved = {
 	'length' : 'LENGTH'
 }
 
-
 tokens = [
 	#tipos y variables
 	'STR',
 	'BOOL',
 	'NUM',
 	'VAR',
-	#PREGUNTAAAAAAAAAAAARRRRRRRRRRR
-	#'REG',
-	#'CAMPO',
 	#signos de puntuacion
 	'PUNTO',
 	'DOSPTOS',
@@ -57,25 +48,10 @@ tokens = [
 	'MOD',
 	'MAYOR',
 	'MENOR',
-	#signos logicos
-	#'NOT',
-	#'AND',
-	#'OR',
-	#funciones
-	#'PRINT',
-	#'MULTESC',
-	#'CAP',
-	#'COLIN',
-	#'LENGTH',
-	#condicional y bucles
-	#'IF',
-	#'ELSE',
-	#'FOR',
-	#'DO',
-	#'WHILE',
 	#comentarios
 	'COMENT'
 ] + list(reserved.values())
+
 
 #Reglas simples
 t_PUNTO = r"\."
@@ -99,29 +75,10 @@ t_POT = r"\^"
 t_MOD = r"%"
 t_MAYOR = r"\>"
 t_MENOR = r"\<"
-#t_NOT = r"NOT"
-#t_AND = r"AND"
-#t_OR = r"OR"
-#t_PRINT = r"print"
-#t_MULTESC = r"multiplicacionEscalar"
-#t_CAP = r"capitalizar"
-#t_COLIN = r"colineales"
-#t_LENGTH = r"length"
-#t_IF = r"if"
-#t_ELSE = r"else"
-#t_FOR = r"for"
-#t_DO = r"do"
-#t_WHILE = r"while"
 
-
-#wtf
-#def t_FOR(token):
-	#r"for"
-	#return token
 
 #Reglas Complejas
 def t_STR(token):
-	#r"\"[\w_\,\)\(\*;\-\=\>/\.{}&:\+\#\[\]<|%!\'@\?~^$`\ ]*\""
 	r"\"[^\"]*\""
 	
 	return token
@@ -156,13 +113,6 @@ def t_VAR(token):
 	
 	return token
 
-
-
-#PREGUNTAAAAAAAAAAAAAAAAARRRRRR
-#'REG',
-
-#def t_CAMPO(token):
-	#r" "
 
 def t_COMENT(token):
 	r"\#.*"

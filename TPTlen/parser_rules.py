@@ -443,6 +443,11 @@ def p_matprim(expr):
 		
 		if not(numericos(tipo1,tipo2)):
 			p_error(0)
+			
+		if (tipo1 == 'float') | (tipo2 == 'float'):
+			expr[0] = Operacion('float')
+		else:
+			expr[0] = Operacion('int')
 
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -1143,11 +1148,9 @@ def tipo_segun(objeto):
 	global variables
 	
 	if type(objeto) == Variable:
-		#print objeto.campo
 		if objeto.array_elem == 1:	# es una posicion de un arreglo
 			variable = variables[objeto.nombre][6:]
 		elif objeto.campo != 'None':	# es algo tipo reg.campo
-			#print objeto.campo
 			variable = (variables[objeto.nombre])[objeto.campo]
 		elif type(variables[objeto.nombre]) == dict:
 			variable = 'vreg'
@@ -1156,7 +1159,6 @@ def tipo_segun(objeto):
 	else:
 		variable = objeto.tipo
 		
-	#print "tiposegun"
 	return variable
 
 
@@ -1170,15 +1172,6 @@ def campos_a_dic(reg):
 	return dic
 
 #---------------------------------------------------------#
-
-#def imprimir_tabs(cant):
-	#
-	#res = ""
-	#
-	#for x in range(0,cant):
-		#res += '\n'
-#
-	#return res
 
 def tabular(codigo):
 	
@@ -1197,36 +1190,5 @@ def tabular(codigo):
 		res = "\n"	
 		for l in lineas:
 			res += '\t' + l + '\n'
-		
-	return res
-
-
-def tabular_con_llaves(texto):
-	
-	lineas = texto.splitlines()
-	res = ""
-	
-	for l in lineas:
-		#if len(l) > 0:			
-			#print 'hola'
-		if l[0] == '{':
-			res += l + '\n'
-		elif l[0] == '}':
-			res += l + '\n'
-		else:
-			res += '\t' + l + '\n'
-		#else:
-			#res += '\n'
-		
-	return res
-	
-	
-def tabular_sin_llaves(texto):
-	
-	lineas = texto.splitlines()
-	res = "\n"
-	
-	for l in lineas:
-		res += '\t' + l + '\n'
 		
 	return res
