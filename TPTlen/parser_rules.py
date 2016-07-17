@@ -962,7 +962,7 @@ def p_dowhile(expr):
 def p_codigo(expr):
 	'''codigo : stmt codigo
 		    | stmt
-		    | comentario'''
+		    | comentariosfinales'''
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -981,6 +981,16 @@ def p_comentario(expr):
 	#### FORMATO PARA IMPRIMIR ####
 	
 	expr[0] = Codigo(expr[1])
+
+#---------------------------------------------------------# NUEVOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
+def p_comentariosfinales(expr):
+ '''comentariosfinales : comentario
+      | comentario comentariosfinales'''
+ 
+ #### FORMATO PARA IMPRIMIR ####
+ 
+# expr[0] = Codigo(expr[1])
 
 #---------------------------------------------------------#
 
