@@ -682,7 +682,7 @@ def p_ternario(expr):
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
 	if expr[1] == '(':
-		expr[0] = expr[1]
+		expr[0] = expr[2]
 	else:
 		tipoG = tipo_segun(expr[1])
 		tipoZ1 = tipo_segun(expr[3])
