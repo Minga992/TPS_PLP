@@ -363,8 +363,7 @@ def p_matematico(expr):
 		
 		if expr[2] == '+':
 			if not(numericos(tipo1,tipo2)) | ((tipo1 == 'str') & (tipo2 == 'str')):
-
-				raise SemanticException('Tipos incompatibles')
+				error_semantico(expr,2,"Tipos incompatibles")
 				
 		elif expr[2] == '%':
 			if (tipo1 != 'int') & (tipo2 != 'int'):
@@ -372,8 +371,10 @@ def p_matematico(expr):
 		
 		elif not(numericos(tipo1,tipo2)):
 			error_semantico(expr,2,"El tipo debe ser numerico")
-			
-		if (tipo1 == 'float') | (tipo2 == 'float'):
+		
+		if (tipo1 == 'str'):
+			expr[0] = Operacion('str')
+		elif (tipo1 == 'float') | (tipo2 == 'float'):
 			expr[0] = Operacion('float')
 		else:
 			expr[0] = Operacion('int')
@@ -400,10 +401,20 @@ def p_matprim(expr):
 		tipo1 = tipo_segun(expr[1])
 		tipo2 = tipo_segun(expr[3])
 		
-		if not(numericos(tipo1,tipo2)):
+		if expr[2] == '+':
+			if not(numericos(tipo1,tipo2)) | ((tipo1 == 'str') & (tipo2 == 'str')):
+				error_semantico(expr,2,"Tipos incompatibles")
+				
+		elif expr[2] == '%':
+			if (tipo1 != 'int') & (tipo2 != 'int'):
+				error_semantico(expr,2,"El tipo debe ser entero")
+		
+		elif not(numericos(tipo1,tipo2)):
 			error_semantico(expr,2,"El tipo debe ser numerico")
 			
-		if (tipo1 == 'float') | (tipo2 == 'float'):
+		if (tipo1 == 'str'):
+			expr[0] = Operacion('str')
+		elif (tipo1 == 'float') | (tipo2 == 'float'):
 			expr[0] = Operacion('float')
 		else:
 			expr[0] = Operacion('int')
@@ -714,12 +725,14 @@ def p_funcion_multesc(expr):
 	
 	tipoZ1 = tipo_segun(expr[3])
 	tipoZ2 = tipo_segun(expr[5])
-	tipoZ3 = tipo_segun(expr[7])
+	#tipoZ3 = tipo_segun(expr[7])
 	
 	if (tipoZ1[:6] != 'vector') | (not(numericos(tipoZ1[6:],tipoZ2))):
 		error_semantico(expr,1,"multiplicacionEscalar(vector,numerico[,bool])")
 	
 	if len(expr) == 9:
+		tipoZ3 = tipo_segun(expr[7])
+		
 		if tipoZ3 != 'bool':
 			error_semantico(expr,1,"multiplicacionEscalar(vector,numerico[,bool])")
 

@@ -12,7 +12,7 @@ reserved = {
 	'OR' : 'OR',
 	'NOT' : 'NOT',
 	'print' : 'PRINT',
-	'multiplicacionescalar' : 'MULTESC',
+	'multiplicacionEscalar' : 'MULTESC',
 	'capitalizar' : 'CAP',
 	'colineales' : 'COLIN',
 	'length' : 'LENGTH'
@@ -115,7 +115,7 @@ def t_VAR(token):
 	token.type = reserved.get(token.value,'VAR')
 	
 	if token.type == 'VAR':
-		if (token.value).lower() in (reserved.keys()+['begin','end','return','true','false']):
+		if (token.value).lower() in (reserved.keys()+['begin','end','return','true','false','multiplicacionescalar']):
 			palabra_reservada(token)
 	
 	#token.type = reserved.get((token.value).lower(),'VAR')    # Check for reserved words
