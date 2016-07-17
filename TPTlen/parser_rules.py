@@ -139,7 +139,7 @@ def p_numero(num):
 
 def p_granzeta(expr):
 	'''granz : z
-		| ternario'''
+			| ternario'''
 	
 	expr[0] = expr[1]
 
@@ -681,18 +681,24 @@ def p_ternario(expr):
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
-	tipoG = tipo_segun(expr[1])
-	tipoZ1 = tipo_segun(expr[3])
-	tipoZ2 = tipo_segun(expr[5])
-	
-	if (tipoG != 'bool') | (tipoZ1 != tipoZ2):
-		error_semantico(expr,1,"La condicion debe ser booleana y las operaciones deben tener el mismo tipo")
+	if expr[1] == '(':
+		expr[0] = expr[1]
 	else:
-		expr[0] = Operacion(tipoZ1)
+		tipoG = tipo_segun(expr[1])
+		tipoZ1 = tipo_segun(expr[3])
+		tipoZ2 = tipo_segun(expr[5])
+		
+		if (tipoG != 'bool') | (tipoZ1 != tipoZ2):
+			error_semantico(expr,1,"La condicion debe ser booleana y las operaciones deben tener el mismo tipo")
+		else:
+			expr[0] = Operacion(tipoZ1)
 
 	#### FORMATO PARA IMPRIMIR ####
 	
-	expr[0].impr = expr[1].impr + ' ? ' + expr[3].impr + ' : ' + expr[5].impr
+	if expr[1] == '(':
+		expr[0].impr = '(' + expr[2].impr + ')'
+	else:
+		expr[0].impr = expr[1].impr + ' ? ' + expr[3].impr + ' : ' + expr[5].impr
 
 #---------------------------------------------------------#
 #---------------------------------------------------------#
@@ -750,7 +756,7 @@ def p_funcion_multesc(expr):
 
 	#### FORMATO PARA IMPRIMIR ####
 	
-	expr[0].impr = 'multiplicacionEscalar(' + expr[3].impr + + ', ' + expr[5].impr
+	expr[0].impr = 'multiplicacionEscalar(' + expr[3].impr + ', ' + expr[5].impr
 	
 	if len(expr) == 9:
 		expr[0].impr += ', ' + expr[7].impr + ')'
