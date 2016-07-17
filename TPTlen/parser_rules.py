@@ -1001,8 +1001,10 @@ def p_empty(p):
 #---------------------------------------------------------#
 
 def p_error(expr):
+	#print expr
 	message = "[Syntax error]"
-	message += "\nline:" + str(expr.lineno(0))
+	message += "\nline:" + str(expr.lineno)
+	message += "\nindex:" + str(expr.lexpos)
 	raise Exception(message)
     
 #---------------------------------------------------------#
