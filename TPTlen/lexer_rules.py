@@ -117,6 +117,8 @@ def t_VAR(token):
 	if token.type == 'VAR':
 		if (token.value).lower() in (reserved.keys()+['begin','end','return','true','false','multiplicacionescalar']):
 			palabra_reservada(token)
+		elif (token.value).upper() in reserved.keys():
+			palabra_reservada(token)
 	
 	#token.type = reserved.get((token.value).lower(),'VAR')    # Check for reserved words
 	#
