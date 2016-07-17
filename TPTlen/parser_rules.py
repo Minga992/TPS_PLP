@@ -41,7 +41,7 @@ def p_constante_valor(cte):
 		if type(cte[1]) == str:
 			cte[0].impr = cte[1]
 		elif type(cte[1]) == bool:
-			cte[0].impr = str(cte[1])
+			cte[0].impr = str(cte[1]).lower()
 		else: # es un numero
 			cte[0].impr = cte[1].impr
 
@@ -550,21 +550,12 @@ def p_relf(expr):
 		expr[0] = expr[1]
 
 	else:
-		tipoZ1 = tipo_segun(expr[1])
-		tipoZ2 = tipo_segun(expr[3])
-		
-		if len(expr[2]) == 1: # para < y > solo numericos
-			if not(numericos(tipoZ1,tipoZ2)):
-				error_semantico(expr,2,"El tipo debe ser numerico")
-		elif not(numericos(tipoZ1,tipoZ2) | (tipoZ1 == tipoZ2)) : # para == y != vale cualquier tipo siempre y cuando sean los dos el mismo
-				error_semantico(expr,2,"Los tipos deben coincidir")
-		
 		expr[0] = Operacion('bool')	
 
 	#### FORMATO PARA IMPRIMIR ####
 
 	if len(expr) > 2:
-		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
+		expr[0].impr = '(' + expr[2].impr + ')'
 
 #---------------------------------------------------------#
 
@@ -628,7 +619,7 @@ def p_logprim(expr):
 		if (tipo1 != 'bool') | (tipo1 != 'bool'):
 			error_semantico(expr,2,"El tipo debe ser bool")
 		
-	expr[0] = Operacion('bool')
+		expr[0] = Operacion('bool')
 	
 	#### FORMATO PARA IMPRIMIR ####
 	
@@ -643,17 +634,16 @@ def p_logf(expr):
 			| LPAREN logico RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-	
-	if expr[1] == '(':
-		expr[0] = expr[2]
-	else:
+
+	if len(expr) == 2: 
 		expr[0] = expr[1]
 
-	expr[0] = Operacion('bool')
-	
+	else:
+		expr[0] = Operacion('bool')	
+
 	#### FORMATO PARA IMPRIMIR ####
-	
-	if expr[1] == '(':
+
+	if len(expr) > 2:
 		expr[0].impr = '(' + expr[2].impr + ')'
 
 #---------------------------------------------------------#
@@ -861,7 +851,11 @@ def p_openstmt(expr):
 	#### FORMATO PARA IMPRIMIR ####
 	
 	if len(expr) == 3:
-		imprimir = expr[1].impr + tabular(expr[2])
+		imprimir = expr[1].impr
+		if (expr[1].impr)[0] == '#':
+			imprimir += '\n' + expr[2].impr
+		else:
+			imprimir += tabular(expr[2])
 	else:
 		imprimir = 'if(' + expr[3].impr + ')' + tabular(expr[5])
 		if len(expr) > 6:
@@ -1016,8 +1010,8 @@ def p_error(expr):
 def error_semantico(expr,n,msg):
 	message = "[Semantic error]"
 	message += "\n"+msg
-	message += "\nline:" + str(expr.lineno(n))
-	message += "\nindex:" + str(expr.lexpos(n))
+	message += "\nline:" + expr.lineno(n)
+	message += "\nindex:" + expr.lexpos(n)
 	raise Exception(message)
 
 #---------------------------------------------------------#
