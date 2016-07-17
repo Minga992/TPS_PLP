@@ -985,12 +985,17 @@ def p_comentario(expr):
 #---------------------------------------------------------# NUEVOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
 def p_comentariosfinales(expr):
- '''comentariosfinales : comentario
-      | comentario comentariosfinales'''
+	'''comentariosfinales : comentario
+						| comentario comentariosfinales'''
+
+	#### FORMATO PARA IMPRIMIR ####
  
- #### FORMATO PARA IMPRIMIR ####
- 
-# expr[0] = Codigo(expr[1])
+	imprimir = expr[1].impr
+	
+	if len(expr) == 3:
+		imprimir += '\n' + expr[2].impr
+	
+	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
 
