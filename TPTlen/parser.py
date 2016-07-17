@@ -6,6 +6,7 @@ from sys import argv, exit
 from ply.lex import lex
 from ply.yacc import yacc
 
+#yacc.parse(data,tracking=True)
 
 if __name__ == "__main__":
 
@@ -14,7 +15,7 @@ if __name__ == "__main__":
     lexer = lex(module=lexer_rules)
     parser = yacc(module=parser_rules)
 
-    expression = parser.parse(text, lexer)
+    expression = parser.parse(text, lexer,tracking=1)
 
     result = expression.imprimir()
     print result

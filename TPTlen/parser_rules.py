@@ -83,7 +83,7 @@ def p_variable(expr):
 
 	elif len(expr) == 5: # var -> VAR[NUM]
 		if tipo_segun(expr[3]) != 'int':
-		    error_semantico(expr,3,"El indice del vector debe ser entero")
+			error_semantico(expr,3,"El indice del vector debe ser entero")
 			
 		expr[0] = Variable(expr[1])
 		expr[0].array_elem = 1
@@ -1010,8 +1010,8 @@ def p_error(expr):
 def error_semantico(expr,n,msg):
 	message = "[Semantic error]"
 	message += "\n"+msg
-	message += "\nline:" + expr.lineno(n)
-	message += "\nindex:" + expr.lexpos(n)
+	message += "\nline:" + str(expr.lineno(n))
+	message += "\nindex:" + str(expr.lexpos(n))
 	raise Exception(message)
 
 #---------------------------------------------------------#
