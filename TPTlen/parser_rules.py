@@ -136,6 +136,13 @@ def p_numero(num):
 		num[0].impr = num[1]+str(num[2])+'.'+str(num[4])
 	
 #---------------------------------------------------------#
+
+def p_granzeta(expr):
+	'''granz : z
+		| ternario'''
+	
+	expr[0] = expr[1]
+
 #---------------------------------------------------------#
 	
 def p_zeta(expr):
@@ -669,8 +676,8 @@ def p_operLogBinario(op):
 #---------------------------------------------------------#
 
 def p_ternario(expr):
-	'''ternario : g PREG z DOSPTOS z
-				| g PREG ternario DOSPTOS ternario'''
+	'''ternario : g PREG granz DOSPTOS granz
+				| LPAREN ternario RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
