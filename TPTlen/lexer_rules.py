@@ -1,13 +1,13 @@
 reserved = {
-	'begin' : 'BEGIN',
-	'end' : 'END',
+	#'begin' : 'BEGIN',
+	#'end' : 'END',
 	'while' : 'WHILE',
 	'for' : 'FOR',
 	'if' : 'IF',
 	'else' : 'ELSE',
 	'do' : 'DO',
 	'res' : 'RES',
-	'return' : 'RETURN',
+	#'return' : 'RETURN',
 	'AND' : 'AND',
 	'OR' : 'OR',
 	'NOT' : 'NOT',
@@ -85,12 +85,18 @@ def t_STR(token):
 	
 	
 def t_BOOL(token):
-	r"([tT][rR][uU][eE] | [fF][aA][lL][sS][eE])"
+	#r"([tT][rR][uU][eE] | [fF][aA][lL][sS][eE])"
+	r"(true|false)"
 	
-	if (token.value).lower() == 'true':
+	if token.value == 'true':
 		token.value = True
-	elif (token.value).lower() == 'false':
+	elif token.value == 'false':
 		token.value = False
+	
+	#if (token.value).lower() == 'true':
+		#token.value = True
+	#elif (token.value).lower() == 'false':
+		#token.value = False
 		
 	return token
 
@@ -106,10 +112,16 @@ def t_NUM(token):
 def t_VAR(token):
 	r"[a-zA-Z][a-zA-Z0-9_]*"
 	
-	token.type = reserved.get((token.value).lower(),'VAR')    # Check for reserved words
+	token.type = reserved.get(token.value,'VAR')
 	
-	if token.type in ['BEGIN','END','RETURN']:
-		palabra_reservada(token)
+	if token.type == 'VAR':
+		if (token.value).lower() in (reserved.keys()+['begin','end','return','true','false']):
+			palabra_reservada(token)
+	
+	#token.type = reserved.get((token.value).lower(),'VAR')    # Check for reserved words
+	#
+	#if token.type in ['BEGIN','END','RETURN']:
+		#palabra_reservada(token)
 	
 	return token
 
