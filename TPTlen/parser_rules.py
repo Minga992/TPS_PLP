@@ -64,7 +64,7 @@ def p_constante_funcion(f):
 def p_variable(expr):
 	'''variable : VAR
 				| RES
-				| VAR LCORCH z RCORCH
+				| variable LCORCH z RCORCH
 				| LPAREN variable RPAREN
 				| VAR PUNTO VAR'''
 	
@@ -81,12 +81,12 @@ def p_variable(expr):
 		else:
 			expr[0] = Variable(expr[1]) #nombre
 
-	elif len(expr) == 5: # var -> VAR[NUM]
+	elif len(expr) == 5: # var -> var[NUM]
 		if tipo_segun(expr[3]) != 'int':
 			error_semantico(expr,3,"El indice del vector debe ser entero")
 			
-		expr[0] = Variable(expr[1])
-		expr[0].array_elem = 1
+		expr[0] = expr[1]
+		expr[0].array_elem += 1
 
 	else: # var -> REGISTRO.CAMPO
 		if expr[1] in ['res','reS','rEs','rES','Res','ReS','REs','RES']: # el campo no puede ser res
@@ -99,12 +99,12 @@ def p_variable(expr):
 	
 	if expr[1] == '(':
 		expr[0].impr = '(' + expr[2].impr + ')'
+	elif len(expr) == 5: 
+		expr[0].impr = expr[1].impr + '[' + expr[3].impr + ']'
 	else:
 		expr[0].impr = expr[0].nombre
 		if len(expr) == 4:
 			expr[0].impr += '.' + expr[3]
-		elif len(expr) == 5: 
-			expr[0].impr += '[' + expr[3].impr + ']'
 
 #---------------------------------------------------------#
 #---------------------------------------------------------#
@@ -269,15 +269,18 @@ def p_asignacion(expr):
 
 	global variables
 	
-	if type(expr[3]) == Variable:	# si aparece una variable del lado izquierdo de la asignacion
+	if type(expr[3]) == Variable:	# si aparece una variable del lado derecho de la asignacion
 		if not(expr[3].nombre in variables):
 			error_semantico(expr,3,"Opera con variable no inicializada")
 		
 		elif (expr[3].campo != 'None') & (type(variables[expr[3].nombre]) != dict):
 			error_semantico(expr,3,"Accede a campo de variable que no es registro")
 		
-		elif expr[3].array_elem == 1:
-			if variables[expr[3].nombre][:6] != 'vector':
+		elif expr[3].array_elem >= 1:
+			if (expr[3].campo != 'None'):
+				if variables[expr[3].nombre][expr[3].campo][:6] != 'vector':
+					error_semantico(expr,3,"Accede a indice de variable que no es vector")
+			elif variables[expr[3].nombre][:6] != 'vector':
 				error_semantico(expr,3,"Accede a indice de variable que no es vector")
 	
 	tipoZ =	tipo_segun(expr[3])
@@ -290,7 +293,7 @@ def p_asignacion(expr):
 					variables[expr[1].nombre] = {}
 				variables[expr[1].nombre][expr[1].campo] = tipoZ
 
-			elif expr[1].array_elem == 1: 	# var[num] = bla
+			elif expr[1].array_elem >= 1: 	# var[num] = bla
 				if type(variables[expr[1].nombre]) == dict:
 					variables[expr[1].nombre] = 'vector' + tipoZ
 				elif variables[expr[1].nombre][:6] != 'vector':
@@ -315,7 +318,7 @@ def p_asignacion(expr):
 			elif tipoZ == 'vreg': # reflejo los campos de la variable q es registro
 				variables[expr[1].nombre] = variables[expr[3].nombre]
 	
-			elif expr[1].array_elem == 1:	# declaro un vector a traves de uno de sus elementos
+			elif expr[1].array_elem >= 1:	# declaro un vector a traves de uno de sus elementos
 				variables[expr[1].nombre] = 'vector' + tipoZ
 
 			else:
@@ -593,7 +596,8 @@ def p_operRelacion(op):
 def p_logico(expr):
 	'''logico : logprim operLogicoBinario logf
 			  | LPAREN logico RPAREN
-			  | NOT z'''
+			  | NOT zso
+			  | NOT LPAREN operacion RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 	
@@ -602,6 +606,9 @@ def p_logico(expr):
 	elif len(expr) == 3:	# not
 		if tipo_segun(expr[2]) != 'bool':
 			error_semantico(expr,2,"El tipo debe ser bool")
+	elif len(expr) == 5:	# not(bla)
+		if tipo_segun(expr[3]) != 'bool':
+			error_semantico(expr,3,"El tipo debe ser bool")
 	else:
 		tipo1 = tipo_segun(expr[1])
 		tipo2 = tipo_segun(expr[3])
@@ -617,6 +624,8 @@ def p_logico(expr):
 		expr[0].impr = '(' + expr[2].impr + ')'
 	elif len(expr) == 3:	# not
 		expr[0].impr = 'NOT ' + expr[2].impr
+	elif len(expr) == 5:	# not(bla)
+		expr[0].impr = 'NOT(' + expr[3].impr + ')'
 	else:
 		expr[0].impr = expr[1].impr + ' ' + expr[2] + ' ' + expr[3].impr
 
@@ -649,7 +658,9 @@ def p_logprim(expr):
 def p_logf(expr):
 	'''logf : zso
 			| relacion
-			| LPAREN logico RPAREN'''
+			| LPAREN logico RPAREN
+			| NOT LPAREN operacion RPAREN
+			| NOT zso'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
@@ -657,12 +668,23 @@ def p_logf(expr):
 		expr[0] = expr[1]
 
 	else:
+		if len(expr) == 5:
+			if tipo_segun(expr[3]) != 'bool':
+				error_semantico(expr,3,"El tipo debe ser bool")
+		elif len(expr) == 4:
+			if tipo_segun(expr[2]) != 'bool':
+				error_semantico(expr,2,"El tipo debe ser bool")
+		
 		expr[0] = Operacion('bool')	
 
 	#### FORMATO PARA IMPRIMIR ####
 
-	if len(expr) > 2:
+	if len(expr) == 4:
 		expr[0].impr = '(' + expr[2].impr + ')'
+	elif len(expr) == 5:
+		expr[0].impr = 'NOT(' + expr[3].impr + ')'
+	elif len(expr) == 3:
+		expr[0].impr = 'NOT ' + expr[2].impr
 
 #---------------------------------------------------------#
 
@@ -1056,8 +1078,14 @@ def tipo_segun(objeto):
 	global variables
 	
 	if type(objeto) == Variable:
-		if objeto.array_elem == 1:	# es una posicion de un arreglo
-			variable = variables[objeto.nombre][6:]
+		if objeto.array_elem >= 1:	# es una posicion de un arreglo
+			if objeto.campo != 'None':	# es algo tipo reg.campo
+				variable = variables[objeto.nombre][objeto.campo][6:]
+			else:
+				variable = variables[objeto.nombre][6:]
+			for x in range(1,objeto.array_elem):
+				variable = variable[6:]
+								
 		elif objeto.campo != 'None':	# es algo tipo reg.campo
 			variable = (variables[objeto.nombre])[objeto.campo]
 		elif type(variables[objeto.nombre]) == dict:
@@ -1088,14 +1116,15 @@ def tabular(codigo):
 	lineas = (codigo.impr).splitlines()
 	
 	if codigo.llaves == 1:
-		res = ""	
-		for l in lineas:
-			if l[0] == '{':
-				res += l + '\n'
-			elif l[0] == '}':
-				res += l + '\n'
-			else:
-				res += '\t' + l + '\n'
+		res = "{\n"	
+		for l in lineas[1:-1]:
+			#if l[0] == '{':
+				#res += l + '\n'
+			#elif l[0] == '}':
+				#res += l + '\n'
+			#else:
+			res += '\t' + l + '\n'
+		res += '}\n'
 	else:
 		res = "\n"	
 		for l in lineas:
