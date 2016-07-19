@@ -1,10 +1,11 @@
 \section{La gramatica}
 
-En esta sección se muestra cómo se realizó la tokenización de las expresiones válidas en este leguaje, una primer gramática que acepta estas expresiones, y las transformaciones que se realizaron a la misma hasta llegar a la gramática implementada.
+En esta sección se muestra cómo se realizó la tokenización de las expresiones válidas en este leguaje, la gramática implementada y algunas aclaraciones sobre los conflictos con los que nos encontramos en la medida que la creábamos.
 
 \subsection{Tokens}
 
-En este pequeño lenguaje de scripting, existen palabras reservadas que no pueden usarse como nombres de variables, tanto en mayúsculas como en minúsculas, y el proceso de tokenización tiene en cuenta este aspecto.
+En este pequeño lenguaje de scripting, existen palabras reservadas que no pueden usarse como nombres de variables, en cualquier combinación de minúsculas y mayúsculas: {\tt begin, end, while, for,
+if, else, do, res, return, true, false, AND, OR, NOT}. El proceso de tokenización tiene en cuenta este aspecto, y en caso de encontrar una palabra reservada, se asigna al token correspondiente o se arroja un error en caso de no existir un token asociado.
 
 El Cuadro \ref{tab-tokens} describe, para cada token definido, el símbolo que representa y la expresión regular asociada, con el formato aceptado por Python.
 
@@ -17,14 +18,11 @@ El Cuadro \ref{tab-tokens} describe, para cada token definido, el símbolo que r
 \hline
 STR 	& cadena de caracteres entre comillas dobles & "[$\wedge$"]*" \\
 \hline
-BOOL & true o false & ([tT][rR][uU][eE] $\mid$ \\
-
-	& 				& [fF][aA][lL][sS][eE]) \\
+BOOL & true o false & (true $\mid$ false) \\
 \hline
 NUM 	& cualquier cadena numérica & [0-9]+ \\
 \hline
-VAR 	& cadena alfanumérica con '_' que  & [a-zA-Z][a-zA-Z0-9_] \\
-	& comienza en una letra				&	\\
+VAR 	& cadena alfanumérica con '_' que comienza en una letra & [a-zA-Z][a-zA-Z0-9_] \\
 \hline
 PUNTO & '.' & . \\
 \hline
@@ -68,43 +66,35 @@ MAYOR & '$>$' & $>$ \\
 \hline
 MENOR & '$<$' & $<$ \\
 \hline
-COMENT &'\# ' y cualquier cadena de caracteres, & \#.* \\
-		&  hasta el primer salto de línea		&	\\
+COMENT &'\# ' y cualquier cadena de caracteres, hasta el primer salto de línea & \#.* \\
 \hline
-BEGIN & 'begin' CCMM &  [bB][Ee][gG][iI][nN]\\
+WHILE & 'while' & while \\
 \hline
-END & 'end' CCMM & [eE][nN][dD] \\
+FOR & 'for' & for \\
 \hline
-WHILE & 'while' CCMM & [wW][hH][iI][lL][eE] \\
+IF & 'if' & if \\
 \hline
-FOR & 'for' CCMM & [fF][oO][rR] \\
+ELSE & 'else' & else \\
 \hline
-IF & 'if' CCMM & [iI][fF] \\
+DO & 'do' & do \\
 \hline
-ELSE & 'else' CCMM & [eE][lL][sS][eE] \\
+RES & 'res' & res \\
 \hline
-DO & 'do' CCMM & [dD][Oo] \\
+AND & 'AND'& AND \\
 \hline
-RES & 'res' CCMM & [rR][eE][sS] \\
+OR & 'OR' & OR \\
 \hline
-RETURN & 'return' CCMM & [rR][eE][tt][uU][rR][nN] \\
+NOT 	& 'NOT' & NOT \\
 \hline
-AND & 'and' CCMM & [aA][nN][dD] \\
+PRINT & 'print' & print \\
 \hline
-OR & 'or' CCMM & [oO][rR] \\
+MULTESC & 'multiplicacionEscalar' & multiplicacionEscalar\\
 \hline
-NOT 	& 'not' CCMM & [nN][oO][tT] \\
+CAP & 'capitalizar' & capitalizar \\
 \hline
-PRINT & 'print' CCMM & [pP][rR][iI][nN][tT] \\
+COLIN & 'colineales' & colineales \\
 \hline
-MULTESC & 'multiplicacionescalar' CCMM & [mM][uU][lL][tT][iI][pP][lL][iI][cC][aA] \\
- & & [cC][iI][oO][nN][eE][sS][cC][aA][Ll][aA][rR] \\
-\hline
-CAP & 'capitalizar' CCMM & [cC][aA][Pp][iI][tT][aA][lL][iI][zZ][aA][rR] \\
-\hline
-COLIN & 'colineales' CCMM & [cC][oO][lL][iI][nN][eE][aA][lL][eE][sS] \\
-\hline
-LENGTH & 'length' CCMM & [lL][eE][nN][gG][tT][hH] \\
+LENGTH & 'length' & length \\
 \hline
 
 \end{tabular}
@@ -114,33 +104,27 @@ LENGTH & 'length' CCMM & [lL][eE][nN][gG][tT][hH] \\
 
 %\vspace*{0.5cm}
 
-Nota: CCMM significa 'Cualquier Combinación de mayúsculas y minúsculas'
+%\newpage
 
-\newpage
+\subsection{Gramática}
 
-\subsection{Primer Gramatica}
+A continuación se muestran las reglas de la gramática implementada.  La misma es por lo menos LALR, dado la herramienta PLY pudo generar esta tabla sin conflictos a partir de las reglas declaradas.
 
+\subsubsection{Reglas}
 
 \begin{verbatim}
-
-
-
 #----------------------------------------------------#
 def p_inicial(expr):
 	'start : codigo'
 #----------------------------------------------------#
-
 def p_constante_valor(cte):
 	'''constante : STR	
 				| BOOL
 				| numero
 				| LPAREN constante RPAREN'''
-
 #----------------------------------------------------#
-
 def p_constante_funcion(f):
 	'constante : funcion'
-
 #----------------------------------------------------#
 def p_variable(expr):
 	'''variable : VAR
@@ -161,77 +145,58 @@ def p_zeta(expr):
 	'''z : zso
 		| operacion'''
 #----------------------------------------------------#
-
 def p_zeta_sin_oper(expr):
 	'''zso : variable
 			| constante
 			| vector
 			| registro'''
-
 #----------------------------------------------------#
-
 def p_ge(expr):
 	'''g : variable
 		| constante 
 		| relacion
 		| logico'''
-
 #----------------------------------------------------#
 def p_vector(expr):
 	'''vector : LCORCH z separavec RCORCH
 			| LPAREN vector RPAREN'''			
 #----------------------------------------------------#
-
 def p_separavector(expr):
 	'''separavec : empty
 				| COMA z separavec'''
-
 #----------------------------------------------------#
 def p_registro(expr):
 	'''registro : LLLAVE RLLAVE
 				| LLLAVE VAR DOSPTOS z separareg RLLAVE
 				| LPAREN registro RPAREN'''
-
 #----------------------------------------------------#
-
 def p_separaregistro(expr):
 	'''separareg : empty
 				| COMA VAR DOSPTOS z separareg'''
-
 #----------------------------------------------------#
-
 def p_asignacion(expr):
 	'''asignacion : variable operasig z
 				| variable operasig ternario'''
 #----------------------------------------------------#
-
 def p_operasig(op):
 	'''operasig : IGUAL
 				| MAS IGUAL
 				| MENOS IGUAL
 				| POR IGUAL
 				| DIV IGUAL'''
-
 #----------------------------------------------------#
-
 def p_matematico(expr):
 	'''matematico : matprim operMatBinario matf
 				| LPAREN matematico RPAREN'''
-
 #----------------------------------------------------#
-
 def p_matprim(expr):		   
 	'''matprim : matprim operMatBinario matf
 				| matf'''
-
 #----------------------------------------------------#
-
 def p_matf(expr):
 	'''matf : zso
 			| LPAREN matematico RPAREN'''
-
 #----------------------------------------------------#
-
 def p_operMatBinario(op):
 	'''operMatBinario : MAS
 					| MENOS
@@ -239,127 +204,84 @@ def p_operMatBinario(op):
 					| POT
 					| MOD
 					| DIV'''
-
 #----------------------------------------------------#
-
 def p_autoincdec(expr):
 	'''autoincdec : operMatUnario variable
 				| variable operMatUnario'''
-
 #----------------------------------------------------#
-
-
 def p_operMatUnario(op):
 	'''operMatUnario : MAS MAS
 					| MENOS MENOS'''
-
 #----------------------------------------------------#
-
 def p_relacion(expr):
 	'''relacion : relprim operRelacion relf
 			  | LPAREN relacion RPAREN'''
-
 #----------------------------------------------------#
-
 def p_relprim(expr):		   
 	'''relprim : relprim operRelacion relf
 				| relf'''
-
 #----------------------------------------------------#
-
 def p_relf(expr):
 	'''relf : zso
 			| matematico
 			| LPAREN relacion RPAREN
 			| LPAREN logico RPAREN'''
-
 #----------------------------------------------------#
-
 def p_operRelacion(op):
 	'''operRelacion : IGUAL IGUAL
 					| ADM IGUAL
 					| MAYOR
 					| MENOR'''
-
-
 #----------------------------------------------------#
-
 def p_logico(expr):
 	'''logico : logprim operLogicoBinario logf
 			  | LPAREN logico RPAREN
 			  | NOT z'''
-
 #----------------------------------------------------#
-
 def p_logprim(expr):
 	'''logprim : logprim operLogicoBinario logf
 				| logf'''
-
 #----------------------------------------------------#
-
 def p_logf(expr):
 	'''logf : zso
 			| relacion
 			| LPAREN logico RPAREN'''
-
-
 #----------------------------------------------------#
-
 def p_operLogBinario(op):
 	'''operLogicoBinario : AND
 						| OR'''
-
 #----------------------------------------------------#
-
 def p_ternario(expr):
 	'''ternario : g PREG z DOSPTOS z
 				| g PREG ternario DOSPTOS ternario'''
-
-
 #----------------------------------------------------#
-
 def p_operacion(expr):
 	'''operacion : matematico
 				| relacion
 				| logico'''
-
-
 #----------------------------------------------------#
-
 def p_sentencia_(expr):
 	'''sentencia : asignacion PTOCOMA
 				| PRINT z PTOCOMA
 				| autoincdec PTOCOMA'''
-
 #----------------------------------------------------#
-
 def p_funcion_multesc(expr):
 	'''funcion : MULTESC LPAREN z COMA z RPAREN
 				| MULTESC LPAREN z COMA z COMA z RPAREN'''
-
 #----------------------------------------------------#
-
 def p_funcion_cap(expr):
 	'funcion : CAP LPAREN z RPAREN'
-
 #----------------------------------------------------#
-
 def p_funcion_colin(expr):
 	'funcion : COLIN LPAREN z COMA z RPAREN'
-
 #----------------------------------------------------#
-
 def p_funcion_length(expr):
 	'funcion : LENGTH LPAREN z RPAREN'
-
 #----------------------------------------------------#
-
 def p_stmt(expr):
 	'''stmt : closedstmt
 			| openstmt'''
-
 #----------------------------------------------------#
-
 def p_closedstmt(expr):
 	'''closedstmt : sentencia 
 				| LLLAVE codigo RLLAVE
@@ -368,77 +290,90 @@ def p_closedstmt(expr):
 				| loopheader closedstmt
 				| comentario closedstmt
 				'''
-
-
 #----------------------------------------------------#
-
 def p_openstmt(expr):
 	'''openstmt : IF LPAREN g RPAREN stmt
 				| IF LPAREN g RPAREN closedstmt ELSE openstmt
 				| loopheader openstmt
 				| comentario openstmt'''
-
 #----------------------------------------------------#
-
 def p_bucle(expr):
 	'''loopheader : for
 				| while'''
-
 #----------------------------------------------------#
-
 def p_for_sinasig(expr):
 	'''for : FOR LPAREN PTOCOMA g PTOCOMA RPAREN
 			| FOR LPAREN PTOCOMA g PTOCOMA asignacion RPAREN 
 			| FOR LPAREN PTOCOMA g PTOCOMA autoincdec RPAREN'''
-
 #----------------------------------------------------#
-
 def p_for_conasig(expr):
 	'''for : FOR LPAREN asignacion PTOCOMA g PTOCOMA RPAREN
 			| FOR LPAREN asignacion PTOCOMA g PTOCOMA asignacion RPAREN
 			| FOR LPAREN asignacion PTOCOMA g PTOCOMA autoincdec RPAREN'''
-
-
 #----------------------------------------------------#
-
 def p_while(expr):
 	'while : WHILE LPAREN g RPAREN'
-
 #----------------------------------------------------#
-
 def p_dowhile(expr):
 	'dowhile : DO stmt WHILE LPAREN g RPAREN PTOCOMA'
-
 #----------------------------------------------------#
-
 def p_codigo(expr):
 	'''codigo : stmt codigo
 		    | stmt
 		    | comentario'''
-
 #----------------------------------------------------#
-
 def p_comentario(expr):
 	'comentario : COMENT'
-
 #----------------------------------------------------#
-
 def p_empty(p):
 	'empty :'
 	pass
-
 #----------------------------------------------------#
-
-def p_error(token):
-    message = "[Syntax error]"
-    if token is not None:
-        message += "\ntype:" + token.type
-        message += "\nvalue:" + str(token.value)
-        message += "\nline:" + str(token.lineno)
-        message += "\nposition:" + str(token.lexpos)
-    raise Exception(message)
-
-
-#----------------------------------------------------#
-
 \end{verbatim}
+
+
+\subsubsection{Problemas}
+
+A continuación presentaremos los mayores problemas con los que nos encontramos al generar la gramática apropiada.
+
+\paragraph{Operaciones}
+Inicialmente, las reglas para las operaciones binarias (matemáticas, lógicas y relacionales) tenían la siguiente forma:
+
+{\tt operacion : z operador z} (el z de la gramática explicitada)
+
+Claramente, esto generaba muchas ambigüedades, puesto que, por ejemplo $3+3+3$ tenía más de una forma de producirse.
+
+Para resolver este problema se consideró una asociatividad a izquierda para las operaciones del mismo tipo, y la precedencia de las operaciones matemáticas sobre las relacionales, y de éstas sobre las lógicas.  No consideramos la precedencia entre los operadores matemáticos entre sí, lo mismo que entre los lógicos y entre los relacionales.
+
+\paragraph{Dangling Else}
+Dado este clásico problema, se recurrió a implementar la solución brindada en 'el libro del Dragón', pero con algunas modificaciones.
+
+Al implementarlo directamente, obtuvimos conflictos con los ciclos 'for' y 'while'.  Por ejemplo:
+
+\begin{lstlisting}
+if guarda1
+	while guarda2
+		if guarda3
+			bloque1
+		else
+			bloque2	
+\end{lstlisting}
+
+El problema surgía cuando se daba como input un código donde los bloques poseían una sola sentencia y podían prescindir de las llaves.  En el ejemplo descripto, dada la primera implementación, no podía saberse si el 'else' pertenecía al condicional más grande o al que se encuentra dentro del ciclo.
+
+Esto se producía porque, en una primera aproximación a la gramática, las reglas de estos ciclos tenían la siguiente forma:
+
+{\tt for : FOR (declaracion) bloque} y {\tt while : WHILE (guarda) bloque}
+
+Para solucionar el problema, se decidió quitar el 'bloque' de ambas reglas y manejarlo desde las reglas que definen los bloques de código. 
+
+\paragraph{Comentarios dentro de un condicional}
+La gramática actual no acepta una entrada que cuente con un comentario dentro de un condicional, antes de la palabra {\tt else}.  Por ejemplo: 
+
+\begin{lstlisting}
+if guarda
+	codigo
+	#comentario
+else
+	codigo
+\end{lstlisting}

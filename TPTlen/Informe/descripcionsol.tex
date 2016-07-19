@@ -12,7 +12,7 @@ Los no terminales de la gramática fueron asociados a clases creadas en Python, 
 	\item {\it nombre} Contiene un string con el nombre de la variable.
 	\item {\it impr} Contiene un string con el formato imprimible de la variable.
 	\item {\it campo} Contiene un string con el nombre del campo, en caso de que se trate de una variable del tipo {\tt registro.campo}.
-	\item {\it array_elem} Contiene un entero (0 o 1) que indica si se trata de una variable del tipo {\tt variable[indice]}.
+	\item {\it array_elem} Contiene un entero (mayor o igual a 0) que indica el nivel de anidamiento de índices en variables del tipo {\tt variable[indice]}. Por ejemplo, la variable {\tt a} tendrá este atributo en 0, la variable b[0] tendrá este atributo en 1 y la variable c[2][4][6] tendrá este atributo en 3.
 	\end{itemize}
 \item Los números, las funciones, operaciones y vectores se asocian a subclases de la clase Constante, que contiene los siguientes atributos:
 	\begin{itemize}
@@ -41,11 +41,51 @@ Un caso especial son los registros.  Para ello, aprovechando la versatilidad en 
 Por otro lado, si se trata de una variable de tipo vector, el tipo que se coloca en el diccionario es {\tt vectortipo}, donde {\tt tipo} es el tipo de los elementos del vector.  Esto es importante al chequear, por ejemplo, que si se declara un vector de enteros, no se pueda asignar a una posición del mismo una cadena.
 
 Al cambiar el tipo de una variable, o del campo de un registro, simplemente se reemplaza el valor en el diccionario.
+%
+%\subsection{Manejo de palabras reservadas}
+%
+%Como se mencionó anteriormente, el tokenizador evita que las variables tomen nombres de palabras reservadas, escritas con cualquier combinación de mayúsculas y minúsculas.  Estas palabras reservadas son enviadas a su token correspondiente.
+%
+%Por cuestiones prácticas, se tomó la decisión de 'normalizar' las palabras reservadas al dar el formato final al código.  Esta 'normalización' lleva las palabras reservadas a minúsculas, independientemente de cómo fueron escritas en el código original, salvo la función {\tt multiplicacionEscalar} que contiene la 'E' mayúscula, y los operadores lógicos {\tt AND, OR} Y {\tt NOT} que se llevan a mayúsculas.
+%
+%En cuanto a la variable de sistema {\tt res}, también se normaliza a minúsculas, y si se utiliza repetidas veces en el código original, variando la combinación de mayúsculas y minúsculas, se asocia siempre a la misma variable.  Por ejemplo, {\tt res = 0;} y {\tt ReS = 1;} refieren a la misma variable.  Esto es importante a la hora de chequear los tipos.
 
-\subsection{Manejo de palabras reservadas}
+\subsection{Problemas y decisiones}
 
-Como se mencionó anteriormente, el tokenizador evita que las variables tomen nombres de palabras reservadas, escritas con cualquier combinación de mayúsculas y minúsculas.  Estas palabras reservadas son enviadas a su token correspondiente.
+\subsubsection{Vectores de registros}
 
-Por cuestiones prácticas, se tomó la decisión de 'normalizar' las palabras reservadas al dar el formato final al código.  Esta 'normalización' lleva las palabras reservadas a minúsculas, independientemente de cómo fueron escritas en el código original, salvo la función {\tt multiplicacionEscalar} que contiene la 'E' mayúscula, y los operadores lógicos {\tt AND, OR} Y {\tt NOT} que se llevan a mayúsculas.
+En el caso de declararse un vector de registros, no existe al momento un control que permita consultar un campo de un registro de dicho vector. Por ejemplo, el siguiente código falla:
 
-En cuanto a la variable de sistema {\tt res}, también se normaliza a minúsculas, y si se utiliza repetidas veces en el código original, variando la combinación de mayúsculas y minúsculas, se asocia siempre a la misma variable.  Por ejemplo, {\tt res = 0;} y {\tt ReS = 1;} refieren a la misma variable.  Esto es importante a la hora de chequear los tipos.
+\begin{lstlisting}
+usuario1 = {nombre:"Al", edad:50};
+usuario2 = {nombre:"Mr.X", edad:10};
+usuarios = [usuario1, usuario2];
+
+s = usuarios[1].edad;
+\end{lstlisting}
+
+\subsubsection{Decisiones}
+Se han tomado las siguientes decisiones respecto al código que debe aceptarse:
+
+\begin{itemize}
+	\item {\bf Indexar vectores: } Para acceder a una posición de un vector, el mismo debe haber sido asignado previamente a una variable, para luego pedir el índice correspondiente.  Por lo tanto, un código como el siguiente falla:
+\begin{lstlisting}
+hola = [1,2,3,4,5,6][4];
+\end{lstlisting}
+	\item {\bf Utilización de registros: } Los registros definidos como campos entre llaves deben asignarse a una variable.  No se acepta utilizar un registro o acceder a sus campos si no es a través de una variable.
+	\item {\bf Operador ternario: } Este operador sólo tiene sentido si se lo asigna directamente a una variable.  Por ejemplo, el siguiente código falla:
+\begin{lstlisting}
+a = 3 + (true ? 3 : 4);
+\end{lstlisting}
+	\item {\bf Funciones: } Excepto la función {\tt print}, ninguna otra función puede utilizarse como sentencia, es decir, sin usar su resultado en una asignación o una operación, dado que ninguna función modifica los datos de entrada.  Por lo tanto, un código como el que sigue falla:
+\begin{lstlisting}
+length("pepe");
+\end{lstlisting}
+	\item {\bf Números negativos: } Para que un número sea considerado un negativo, debe colocarse el signo (-) inmediatamente antes del número en cuestión.  Si el número está entre paréntesis, el signo será considerado como operación de resta.  De la misma manera, una variable de tipo numérico será negativa sólo si se le asigna un valor negativo. Por ejemplo, el siguiente código falla:
+\begin{lstlisting}
+a = -(7);
+x = 3;
+b = -x;
+\end{lstlisting}
+	\item {\bf Autoincremento y autodecremento: } Los operadores (++) y (--) sólo aplica a variables, y de tipo entero.  Es decir, no se pueden utilizar sobre números o sobre variables de tipo float.
+\end{itemize}

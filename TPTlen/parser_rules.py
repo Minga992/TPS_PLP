@@ -328,7 +328,8 @@ def p_asignacion(expr):
 		if not(expr[1].nombre in variables):
 			error_semantico(expr,1,"Variable no inicializada")
 		else:
-			tipoV = variables[expr[1].nombre]
+			#tipoV = variables[expr[1].nombre]
+			tipoV = tipo_segun(expr[1])
 
 			if expr[2] == '+=': # es numerico o cadena
 				if not((numericos(tipoV,tipoZ)) | ((tipoV == tipoZ) & (tipoZ == 'str'))):
@@ -473,7 +474,7 @@ def p_autoincdec(expr):
 				| variable operMatUnario'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
-
+	
 	if (expr[1] == '++') | (expr[1] == '--') :
 		if variables[expr[2].nombre] != 'int':
 			error_semantico(expr,2,"El tipo debe ser entero")
@@ -563,7 +564,9 @@ def p_relf(expr):
 	'''relf : zso
 			| matematico
 			| LPAREN relacion RPAREN
-			| LPAREN logico RPAREN'''
+			| LPAREN logico RPAREN
+			| NOT zso
+			| NOT LPAREN operacion RPAREN'''
 
 	#### CHEQUEO Y ASIGNACION DE TIPOS ####
 
@@ -571,12 +574,23 @@ def p_relf(expr):
 		expr[0] = expr[1]
 
 	else:
+		if len(expr) == 5:
+			if tipo_segun(expr[3]) != 'bool':
+				error_semantico(expr,3,"El tipo debe ser bool")
+		elif len(expr) == 3:
+			if tipo_segun(expr[1]) != 'bool':
+				error_semantico(expr,2,"El tipo debe ser bool")
+		
 		expr[0] = Operacion('bool')	
 
 	#### FORMATO PARA IMPRIMIR ####
 
-	if len(expr) > 2:
+	if len(expr) == 4:
 		expr[0].impr = '(' + expr[2].impr + ')'
+	elif len(expr) == 5:
+		expr[0].impr = 'NOT(' + expr[3].impr + ')'
+	elif len(expr) == 3:
+		expr[0].impr = 'NOT ' + expr[2].impr
 
 #---------------------------------------------------------#
 
@@ -672,6 +686,9 @@ def p_logf(expr):
 			if tipo_segun(expr[3]) != 'bool':
 				error_semantico(expr,3,"El tipo debe ser bool")
 		elif len(expr) == 4:
+			if tipo_segun(expr[2]) != 'bool':
+				error_semantico(expr,2,"El tipo debe ser bool")
+		elif len(expr) == 3:
 			if tipo_segun(expr[2]) != 'bool':
 				error_semantico(expr,2,"El tipo debe ser bool")
 		
@@ -1035,8 +1052,8 @@ def p_comentariosfinales(expr):
 	imprimir = expr[1].impr
 	
 	if len(expr) == 3:
-		imprimir += '\n' + expr[2].impr
-	
+		imprimir += '\n' + expr[2].impr + '\n'
+
 	expr[0] = Codigo(imprimir)
 
 #---------------------------------------------------------#
